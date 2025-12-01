@@ -22,6 +22,7 @@ export default function Header() {
   const navigation = [
     { name: 'الرئيسية', path: '/' },
     { name: 'المنتجات', path: '/products' },
+    { name: 'معرض الأعمال', path: '/portfolio' },
     { name: 'المدونة', path: '/blog' },
     { name: 'من نحن', path: '/about' },
     { name: 'اتصل بنا', path: '/contact' },

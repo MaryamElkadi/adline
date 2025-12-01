@@ -140,3 +140,18 @@ export interface ProductWithOptions extends Product {
   options: ProductOption[];
   category?: Category;
 }
+
+export interface PortfolioItem {
+  id: string;
+  title_ar: string;
+  description_ar: string | null;
+  category: string | null;
+  image_url: string | null;
+  images: string[];
+  client_name: string | null;
+  completion_date: string | null;
+  is_featured: boolean;
+  display_order: number;
+  created_at: string;
+}
+

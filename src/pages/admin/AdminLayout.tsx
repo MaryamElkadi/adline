@@ -8,6 +8,7 @@ import {
   Users, 
   FileText, 
   MessageSquare,
+  Briefcase,
   Menu,
   X,
   LogOut,
@@ -35,6 +36,7 @@ export default function AdminLayout() {
     { name: 'Categories', path: '/admin/categories', icon: FolderTree },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
     { name: 'Users', path: '/admin/users', icon: Users },
+    { name: 'Portfolio', path: '/admin/portfolio', icon: Briefcase },
     { name: 'Blog Posts', path: '/admin/blog', icon: FileText },
     { name: 'Messages', path: '/admin/messages', icon: MessageSquare },
   ];

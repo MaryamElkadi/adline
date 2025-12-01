@@ -197,16 +197,20 @@ export default function Home() {
                   color: 'from-indigo-500/20 to-purple-500/20',
                 },
               ]).map((celebration, index) => (
-                <Card
+                <Link
                   key={index}
-                  className={`flex-shrink-0 w-72 bg-gradient-to-br ${celebration.color} border-none shadow-hover hover:shadow-elegant transition-smooth cursor-pointer`}
+                  to={`/portfolio?category=${encodeURIComponent(celebration.title)}`}
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="text-5xl mb-4">{celebration.icon}</div>
-                    <h3 className="font-bold text-xl mb-2">{celebration.title}</h3>
-                    <p className="text-sm text-muted-foreground">{celebration.description}</p>
-                  </CardContent>
-                </Card>
+                  <Card
+                    className={`flex-shrink-0 w-72 bg-gradient-to-br ${celebration.color} border-none shadow-hover hover:shadow-elegant transition-smooth cursor-pointer`}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <div className="text-5xl mb-4">{celebration.icon}</div>
+                      <h3 className="font-bold text-xl mb-2">{celebration.title}</h3>
+                      <p className="text-sm text-muted-foreground">{celebration.description}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>

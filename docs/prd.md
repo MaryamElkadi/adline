@@ -19,8 +19,7 @@ Arabic (RTL layout)
 
 - React with JavaScript
 - Tailwind CSS for styling\n- RTL (Right-to-Left) support for Arabic language\n- Drag-and-drop library for image upload (e.g., react-dropzone)
-
-### 2.2 Backend
+\n### 2.2 Backend
 
 - Node.js
 
@@ -29,16 +28,17 @@ Arabic (RTL layout)
 ### 3.1 Product Categories
 
 - Business cards printing
-- packaging offers\n- occasions work
+- packaging offers
+- occasions work
 - stickers
   - Rectangular stickers
-  - Custom-shaped stickers - cut to the border\n  - Sheet stickers
-  - 3D stickers\n  - Spot UV stickers
-  - Shipping and sealing stickers
-  - Square stickers
+  - Custom-shaped stickers - cut to the border
+  - Sheet stickers
+  - 3D stickers
+  - Spot UV stickers
+  - Shipping and sealing stickers\n  - Square stickers
   - Round stickers
-- Brochures and flyers
-- Printing on bags
+- Brochures and flyers\n- Printing on bags
 - cards
   - Folded cards
   - Square cards
@@ -49,25 +49,30 @@ Arabic (RTL layout)
   - Zipper boxes
   - Base and lid boxes
   - Complete box with closure
-  - Serving box
-  - Distribution boxes
+  - Serving box\n  - Distribution boxes
   - Inner box bases
   - Box holder
-- Banners and posters\n- paper products
+- Banners and posters
+- paper products
   - Files
-  - Engineering plans\n  - Envelopes\n  - Business cards
+  - Engineering plans
+  - Envelopes
+  - Business cards
   - Tags
-  - Correspondence envelopes
-  - Covering paper
-  - Menu\n  - Brochures\n  - Flyers
+  - Correspondence envelopes\n  - Covering paper
+  - Menu
+  - Brochures
+  - Flyers
   - Certificates of appreciation
   - Letter paper
-  - Printing of booklets and notebooks\n  - Calendars
+  - Printing of booklets and notebooks
+  - Calendars
   - Photographs
 - Packaging materials
   - Wrapping paper
   - Cup sleeves
-  - Cup holders\n  - Box sleeves
+  - Cup holders
+  - Box sleeves
   - Box wrapping
   - Fabric clothing labels
   - Gift ribbons
@@ -77,17 +82,19 @@ Arabic (RTL layout)
   - Brown shipping cartons
   - Thermal seal cartons
   - Full print cartons - Minimum order 1000
-- Custom printing services\n
-### 3.2 User Features
+- Custom printing services
 
+### 3.2 User Features\n
 - Product browsing and search
 - other bags
   - Shipping bags
   - Cloth bags
-  - Plastic bags\n  - Kraft bags
+  - Plastic bags
+  - Kraft bags
   - Coffee bags
 - Custom design upload
-- advertising gifts\n  - T-shirt
+- advertising gifts
+  - T-shirt
   - Brooch
   - Mugs
   - Printed pens
@@ -98,12 +105,17 @@ Arabic (RTL layout)
 - Seasonal prints
 - resturants and coffes
   - Stickers - Labels
-  - Boxes and Bags\n  - Cups
+  - Boxes and Bags
+  - Cups
   - Other Printed Materials
-  - Pizza Box
-- Shopping cart functionality
-- fachions\n  - Schools and universities
-  - Corporate and employee attire\n  - Sports and event wear\n  - Professional and service clothing\n  - Printed fabric accessories\n- Order placement and tracking
+  - Pizza Box\n- Shopping cart functionality
+- fachions
+  - Schools and universities
+  - Corporate and employee attire
+  - Sports and event wear
+  - Professional and service clothing
+  - Printed fabric accessories
+- Order placement and tracking
 - celebrations and occaisons
   - Hero section with scrolling carousel showcasing featured celebration products and services
   - All event supplies
@@ -114,46 +126,63 @@ Arabic (RTL layout)
   - Custom cut cards
   - Tags
   - Roll-up banner printing
+- مناسباتك الخاصة (Your Special Occasions)
+  - Dedicated page displaying portfolio of completed special occasion works
+  - Click on each work to view detailed images and project information
+  - Gallery-style layout with filtering options by occasion type
 - User account management
 - Design services
 - Order history
 - blog
+  - User interface for browsing blog posts
+  - Blog post listing with featured images and excerpts
+  - Individual blog post pages with full content
+  - Blog categories and tags navigation
+  - Search functionality for blog content
+- Who We Are (من نحن)
+  - User interface displaying company information
+  - Company history and mission
+  - Team introduction\n  - Values and achievements
+- Portfolio (معرض الأعمال)
+  - User interface showcasing completed projects
+  - Project gallery with categories\n  - Project details and descriptions
 - contact and redirect to whatsap or email or facebook
 - login with user or admin if user rediret to home page and of he admin redirect to admindashboard
 
 ### 3.3 E-commerce Features
 
-- Product catalog with images and descriptions\n- Pricing display
+- Product catalog with images and descriptions
+- Pricing display
 - Quantity selection
 - Size and material options
-- Add to cart functionality
-- Checkout process\n- Payment integration
-- Order confirmation
-- Each product has the following options before adding to cart (with dynamic pricing based on selections):
+- Add to cart functionality\n- Checkout process
+- Payment integration
+- Order confirmation\n- Each product has the following options before adding to cart (with dynamic pricing based on selections):
   - **الحجم** (Size): اختر
   - **الجانب** (Side): اختر
-  - **المادة** (Material): اختر
-  - **الكمية** (Quantity): اختر
+  - **المادة** (Material): اختر\n  - **الكمية** (Quantity): اختر
   - **خدمة التصميم** (Design Service): لديك نموذج لتصميم خاص أم تريد خدمة تصميم
-  - **مدة التنفيذ للمنتج** (Implementation Duration): اختر\n  - **هل تريد تصوير عينة قبل طباعة الكمية** (Do you want a sample before full production): اختر (نعم/لا)
+  - **مدة التنفيذ للمنتج** (Implementation Duration): اختر
+  - **هل تريد تصوير عينة قبل طباعة الكمية** (Do you want a sample before full production): اختر (نعم/لا)
   - Price changes dynamically based on user selections
   - Admin manages all option values and pricing rules
 - menu
 
 ### 3.4 Additional Features
 
-- Contact form\n- Customer support chat
-- FAQ section
+- Contact form
+- Customer support chat\n- FAQ section
 - Delivery information
 - Company information pages
 
 ### 3.5 Admin Dashboard
 
-- Full control and management of all website content\n\n#### 3.5.1 Category Management
-- View all product categories
-- Add new categories\n- Edit existing categories
-- Delete categories
-- Organize category hierarchy
+- Full control and management of all website content
+
+#### 3.5.1 Category Management\n- View all product categories
+- Add new categories
+- Edit existing categories
+- Delete categories\n- Organize category hierarchy
 
 #### 3.5.2 Product Management
 - Add new products with drag-and-drop image upload
@@ -162,10 +191,10 @@ Arabic (RTL layout)
 - Configure product options (size, material, quantity, design service, implementation duration, sample request)
 - Set pricing rules based on product options
 - Manage product inventory
-\n#### 3.5.3 Blog Management
+
+#### 3.5.3 Blog Management
 - View all blog posts
-- Create new blog posts
-- Edit existing blog posts
+- Create new blog posts\n- Edit existing blog posts
 - Delete blog posts
 - Manage blog categories and tags
 - Schedule blog post publication
@@ -187,11 +216,30 @@ Arabic (RTL layout)
 #### 3.5.6 User Management
 - Manage user accounts
 - View user activity and order history
-\n#### 3.5.7 Settings and Configuration
+
+#### 3.5.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload\n- Edit existing portfolio projects\n- Delete portfolio projects
+- Categorize projects by type (special occasions, commercial, etc.)
+- Manage project details (title, description, images, date)
+- Control visibility of portfolio items on user interface
+
+#### 3.5.8 Who We Are Management (إدارة من نحن)
+- Edit company information and history
+- Update team member profiles
+- Manage company values and achievements
+- Upload and update company images
+\n#### 3.5.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)\n- Add new special occasion projects with multiple images
+- Edit project details and descriptions
+- Delete projects
+- Organize projects by occasion type
+- Control display order on user interface
+
+#### 3.5.10 Settings and Configuration
 - Configure payment and delivery settings
 - Update website content and information
 - View sales reports and analytics
-\n## 4. Design Style\n
+
+## 4. Design Style
+
 - Two interfaces: User interface for customers and Admin dashboard for website management
 \n### 4.1 Color Scheme
 
@@ -205,16 +253,16 @@ Arabic (RTL layout)
 - Rounded corners (8-12px) for buttons and cards
 - Subtle shadows for depth and hierarchy
 - Clear typography optimized for Arabic text\n- Responsive grid layout for product categories
-- Drag-and-drop zone withdashed border and upload icon for image uploads
-- Scrolling hero section with smooth transitions for celebrations page
+- Drag-and-drop zone with dashed border and upload icon for image uploads
+- Scrolling hero section with smooth transitions for celebrations page\n- Gallery-style layout for portfolio and special occasions pages with lightbox functionality
 
 ### 4.3 Layout Style
 
 - Grid-based product catalog
-- Sticky navigation header
-- Clear call-to-action buttons in yellow
+- Sticky navigation header\n- Clear call-to-action buttons in yellow
 - Blue accents for links and secondary actions
 - Hero section with auto-scrolling carousel for celebrations page
+- Masonry or grid layout for portfolio displays
 
 ## 5. Reference Files
 

@@ -10,6 +10,10 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
+import About from './pages/About';
+import PortfolioPage from './pages/PortfolioPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
@@ -18,6 +22,7 @@ import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
 import AdminBlogPosts from './pages/admin/BlogPosts';
 import AdminMessages from './pages/admin/Messages';
+import AdminPortfolio from './pages/admin/Portfolio';
 
 export default function App() {
   return (
@@ -33,6 +38,7 @@ export default function App() {
               <Route path="users" element={<AdminUsers />} />
               <Route path="blog" element={<AdminBlogPosts />} />
               <Route path="messages" element={<AdminMessages />} />
+              <Route path="portfolio" element={<AdminPortfolio />} />
             </Route>
 
             <Route
@@ -47,6 +53,10 @@ export default function App() {
                       <Route path="/products/:slug" element={<ProductDetail />} />
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/blog" element={<Blog />} />
+                      <Route path="/blog/:slug" element={<BlogDetail />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/portfolio" element={<PortfolioPage />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>

@@ -10,6 +10,7 @@ import type {
   BlogPost,
   ContactMessage,
   ProductWithOptions,
+  PortfolioItem,
 } from '@/types';
 
 export const api = {
@@ -391,6 +392,18 @@ export const api = {
     return data;
   },
 
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
   async createBlogPost(post: Omit<BlogPost, 'id' | 'created_at' | 'updated_at'>): Promise<BlogPost> {
     const { data, error } = await supabase
       .from('blog_posts')
@@ -472,6 +485,76 @@ export const api = {
       .from('orders')
       .update({ status })
       .eq('id', orderId);
+    
+    if (error) throw error;
+  },
+
+  // Portfolio APIs
+  async getPortfolioItems(): Promise<PortfolioItem[]> {
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .select('*')
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getPortfolioItemsByCategory(category: string): Promise<PortfolioItem[]> {
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .select('*')
+      .eq('category', category)
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getFeaturedPortfolioItems(): Promise<PortfolioItem[]> {
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .select('*')
+      .eq('is_featured', true)
+      .order('display_order', { ascending: true })
+      .limit(6);
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createPortfolioItem(item: Omit<PortfolioItem, 'id' | 'created_at'>): Promise<PortfolioItem> {
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .insert(item)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to create portfolio item');
+    return data;
+  },
+
+  async updatePortfolioItem(id: string, updates: Partial<PortfolioItem>): Promise<PortfolioItem> {
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to update portfolio item');
+    return data;
+  },
+
+  async deletePortfolioItem(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('portfolio_items')
+      .delete()
+      .eq('id', id);
     
     if (error) throw error;
   },
