@@ -117,4 +117,21 @@ All colors MUST be HSL.
   .transition-smooth {
     transition: var(--transition-smooth);
   }
+
+  .animate-scroll-rtl {
+    animation: scroll-rtl 40s linear infinite;
+  }
+
+  .pause-animation:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll-rtl {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-50%));
+    }
+  }
 }

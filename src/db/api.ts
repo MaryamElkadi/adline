@@ -456,4 +456,23 @@ export const api = {
     
     if (error) throw error;
   },
+
+  async deleteContactMessage(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('contact_messages')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // Order Status Update
+  async updateOrderStatus(orderId: string, status: string): Promise<void> {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId);
+    
+    if (error) throw error;
+  },
 };

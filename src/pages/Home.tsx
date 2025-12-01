@@ -113,6 +113,106 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="py-16 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10">
+        <div className="max-w-7xl mx-auto px-4 xl:px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-2">مناسباتك الخاصة</h2>
+            <p className="text-muted-foreground">طباعة مخصصة لجميع المناسبات والاحتفالات</p>
+          </div>
+          
+          <div className="relative overflow-hidden">
+            <div className="flex gap-6 animate-scroll-rtl hover:pause-animation">
+              {[
+                {
+                  title: 'حفلات الزفاف',
+                  icon: '💍',
+                  description: 'دعوات وبطاقات شكر وهدايا',
+                  color: 'from-pink-500/20 to-rose-500/20',
+                },
+                {
+                  title: 'أعياد الميلاد',
+                  icon: '🎂',
+                  description: 'بطاقات وملصقات وصناديق هدايا',
+                  color: 'from-purple-500/20 to-pink-500/20',
+                },
+                {
+                  title: 'التخرج',
+                  icon: '🎓',
+                  description: 'شهادات تقدير وبطاقات تهنئة',
+                  color: 'from-blue-500/20 to-cyan-500/20',
+                },
+                {
+                  title: 'المناسبات الدينية',
+                  icon: '🌙',
+                  description: 'بطاقات معايدة وهدايا رمضانية',
+                  color: 'from-green-500/20 to-emerald-500/20',
+                },
+                {
+                  title: 'حفلات الأطفال',
+                  icon: '🎈',
+                  description: 'ديكورات وملصقات وصناديق حلوى',
+                  color: 'from-yellow-500/20 to-orange-500/20',
+                },
+                {
+                  title: 'المناسبات الرسمية',
+                  icon: '🏆',
+                  description: 'شهادات وجوائز وهدايا تذكارية',
+                  color: 'from-indigo-500/20 to-purple-500/20',
+                },
+              ].concat([
+                {
+                  title: 'حفلات الزفاف',
+                  icon: '💍',
+                  description: 'دعوات وبطاقات شكر وهدايا',
+                  color: 'from-pink-500/20 to-rose-500/20',
+                },
+                {
+                  title: 'أعياد الميلاد',
+                  icon: '🎂',
+                  description: 'بطاقات وملصقات وصناديق هدايا',
+                  color: 'from-purple-500/20 to-pink-500/20',
+                },
+                {
+                  title: 'التخرج',
+                  icon: '🎓',
+                  description: 'شهادات تقدير وبطاقات تهنئة',
+                  color: 'from-blue-500/20 to-cyan-500/20',
+                },
+                {
+                  title: 'المناسبات الدينية',
+                  icon: '🌙',
+                  description: 'بطاقات معايدة وهدايا رمضانية',
+                  color: 'from-green-500/20 to-emerald-500/20',
+                },
+                {
+                  title: 'حفلات الأطفال',
+                  icon: '🎈',
+                  description: 'ديكورات وملصقات وصناديق حلوى',
+                  color: 'from-yellow-500/20 to-orange-500/20',
+                },
+                {
+                  title: 'المناسبات الرسمية',
+                  icon: '🏆',
+                  description: 'شهادات وجوائز وهدايا تذكارية',
+                  color: 'from-indigo-500/20 to-purple-500/20',
+                },
+              ]).map((celebration, index) => (
+                <Card
+                  key={index}
+                  className={`flex-shrink-0 w-72 bg-gradient-to-br ${celebration.color} border-none shadow-hover hover:shadow-elegant transition-smooth cursor-pointer`}
+                >
+                  <CardContent className="p-6 text-center">
+                    <div className="text-5xl mb-4">{celebration.icon}</div>
+                    <h3 className="font-bold text-xl mb-2">{celebration.title}</h3>
+                    <p className="text-sm text-muted-foreground">{celebration.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 xl:px-6">
           <div className="flex items-center justify-between mb-8">

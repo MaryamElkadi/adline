@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/db/api';
 import type { Product, Category } from '@/types';
@@ -393,12 +394,11 @@ export default function Products() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">Image URL</Label>
-              <Input
-                id="image_url"
+              <Label htmlFor="image_url">Product Image</Label>
+              <ImageUpload
                 value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                placeholder="https://example.com/image.jpg"
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                onRemove={() => setFormData({ ...formData, image_url: '' })}
               />
             </div>
 

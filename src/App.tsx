@@ -13,6 +13,11 @@ import Contact from './pages/Contact';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
+import AdminCategories from './pages/admin/Categories';
+import AdminOrders from './pages/admin/Orders';
+import AdminUsers from './pages/admin/Users';
+import AdminBlogPosts from './pages/admin/BlogPosts';
+import AdminMessages from './pages/admin/Messages';
 
 export default function App() {
   return (
@@ -23,6 +28,11 @@ export default function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="blog" element={<AdminBlogPosts />} />
+              <Route path="messages" element={<AdminMessages />} />
             </Route>
 
             <Route
