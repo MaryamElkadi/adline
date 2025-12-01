@@ -4,6 +4,9 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminProducts from './pages/admin/Products';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -11,41 +14,60 @@ interface RouteConfig {
   path: string;
   element: ReactNode;
   visible?: boolean;
+  children?: RouteConfig[];
 }
 
 const routes: RouteConfig[] = [
   {
-    name: 'الرئيسية',
+    name: 'Home',
     path: '/',
     element: <Home />,
   },
   {
-    name: 'المنتجات',
+    name: 'Products',
     path: '/products',
     element: <Products />,
   },
   {
-    name: 'تفاصيل المنتج',
+    name: 'Product Detail',
     path: '/products/:slug',
     element: <ProductDetail />,
     visible: false,
   },
   {
-    name: 'السلة',
+    name: 'Cart',
     path: '/cart',
     element: <Cart />,
     visible: false,
   },
   {
-    name: 'اتصل بنا',
+    name: 'Contact',
     path: '/contact',
     element: <Contact />,
   },
   {
-    name: 'تسجيل الدخول',
+    name: 'Login',
     path: '/login',
     element: <Login />,
     visible: false,
+  },
+  {
+    name: 'Admin',
+    path: '/admin',
+    element: <AdminLayout />,
+    visible: false,
+    children: [
+      {
+        name: 'Dashboard',
+        path: '',
+        element: <AdminDashboard />,
+      },
+      {
+        name: 'Products',
+        path: 'products',
+        element: <AdminProducts />,
+      },
+    ],
   },
 ];
 
