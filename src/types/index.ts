@@ -133,7 +133,7 @@ export interface ContactMessage {
 }
 
 export interface CartItemWithProduct extends CartItem {
-  product: Product;
+  product: ProductWithOptions;
 }
 
 export interface ProductWithOptions extends Product {
