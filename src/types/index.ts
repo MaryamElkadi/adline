@@ -302,3 +302,21 @@ export interface SeasonalOffer {
   updated_at: string;
 }
 
+// طلبات التسعير (Quote Requests)
+export interface QuoteRequest {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  company: string | null;
+  project_type: string | null;
+  quantity: number | null;
+  description: string;
+  budget_range: string | null;
+  deadline: string | null;
+  status: 'pending' | 'reviewed' | 'quoted' | 'completed' | 'cancelled';
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+

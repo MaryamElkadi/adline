@@ -16,7 +16,8 @@ import {
   Settings,
   Wrench,
   Inbox,
-  Sparkles
+  Sparkles,
+  DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,6 +44,7 @@ export default function AdminLayout() {
     { name: 'Users', path: '/admin/users', icon: Users },
     { name: 'Services', path: '/admin/services', icon: Wrench },
     { name: 'Service Inquiries', path: '/admin/service-inquiries', icon: Inbox },
+    { name: 'Quote Requests', path: '/admin/quote-requests', icon: DollarSign },
     { name: 'Seasonal Offers', path: '/admin/seasonal-offers', icon: Sparkles },
     { name: 'Portfolio', path: '/admin/portfolio', icon: Briefcase },
     { name: 'Blog Posts', path: '/admin/blog', icon: FileText },

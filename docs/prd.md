@@ -27,8 +27,7 @@ Arabic (RTL layout)
 - Business cards printing
 - packaging offers
 - occasions work
-- stickers
-  - Rectangular stickers
+- stickers\n  - Rectangular stickers
   - Custom-shaped stickers - cut to the border
   - Sheet stickers
   - 3D stickers
@@ -138,8 +137,7 @@ Arabic (RTL layout)
   - User interface displaying company information\n  - Company history and mission
   - Team introduction
   - Values and achievements\n- Portfolio (معرض الأعمال)\n  - User interface showcasing completed projects
-  - Project gallery with categories\n  - Project details and descriptions
-- contact and redirect to whatsap or email or facebook
+  - Project gallery with categories\n  - Project details and descriptions\n- contact and redirect to whatsap or email or facebook
 - **User Profile Page (صفحة الملف الشخصي)**
   - View and edit personal information:\n    + Full name (الاسم الكامل)
     + Email address (البريد الإلكتروني)
@@ -212,8 +210,7 @@ Arabic (RTL layout)
   - طباعة بوكسات (Boxes Printing)\n  - العروض والباكجات (Offers and Packages)
 - Reference design: image-2.png and image-3.png
 \n#### 3.4.2 Services Section on Home Page (قسم الخدمات)\n
-- Prominent services section displayed on home page
-- Display maximum 6 service cards in grid layout
+- Prominent services section displayed on home page\n- Display maximum 6 service cards in grid layout
 - Each service card shows:
   - Service icon/image
   - Service name in Arabic
@@ -226,32 +223,97 @@ Arabic (RTL layout)
 - Consistent card styling matching overall website design
 
 #### 3.4.3 Seasonal Offers Section on Home Page (العروض الموسمية)\n
-- Prominent seasonal offers section displayed on home page\n- Animated carousel/slider showcasing current seasonal promotions
-- Animation features:
-  - Auto-scrolling carousel with smooth transitions
+- **Prominent seasonal offers section displayed on home page with animated carousel**
+- **Animation features**:
+  - Auto-scrolling carousel with smooth slide transitions
   - Fade-in/fade-out effects between slides
-  - Hover pause functionality
-  - Navigation arrows and dot indicators
+  - Scale animation on hover (subtle zoom effect)
+  - Hover pause functionality (carousel stops when user hovers)
+  - Navigation arrows (left/right) with smooth appearance on hover
+  - Dot indicators at bottom for slide navigation
   - Responsive touch/swipe support for mobile devices
-  - Configurable animation speed and transition effects
-- Each offer card displays:
-  - Offer banner image
-  - Offer title in Arabic
-  - Offer description and discount details
-  - Validity period (start and end dates)
-  - 'اطلب الآن' (Order Now) button linking to offer products
-- Section header: 'عروض موسمية' with decorative styling
-- Display active offers only (based on current date)
+- Configurable animation speed and transition effects
+  - Smooth easing functions for natural movement
+- **Each offer card displays**:
+  - Offer banner image (full-width, high-quality)
+  - Offer title in Arabic (bold, prominent)
+  - Offer description and discount details (clear, concise)
+  - Validity period with start and end dates (formatted as: من [start date] إلى [end date])
+  - 'اطلب الآن' (Order Now) button in yellow/orange linking to offer products
+- **Section styling**:
+  - Section header: 'العروض الموسمية' with decorative styling and icon
+  - Full-width carousel container with subtle shadow
+  - Card design with rounded corners and hover effects
+  - Responsive layout adapting to screen sizes
+- Display active offers only (based on current date comparison)
 - Click on offer card to view full offer details or redirect to related products
 - Admin has full control over which offers appear and their display order
-
-#### 3.4.4 Home Page Section Order\n
+- **Performance optimization**:
+  - Lazy loading for offer images
+  - Preloading of next/previous slides
+  - Smooth transitions without layout shifts
+\n#### 3.4.4 Home Page Section Order\n
 1. Hero section / Banner\n2. Main Categories Section (الأقسام الرئيسية)
 3. Services Section (خدماتنا) - Maximum 6 cards
-4. Seasonal Offers Section (العروض الموسمية) - Animated carousel
+4. **Seasonal Offers Section (العروض الموسمية) - Animated carousel**
 5. Featured products or other content sections
 
-### 3.5 E-commerce Features
+### 3.5 Navigation Bar Enhancement
+
+#### 3.5.1 طلب تسعير (Request Quote) Navigation Item
+
+- **Add new navigation item in main navbar**: 'طلب تسعير' (Request Quote)
+- Position in navbar: between main navigation items, prominently displayed
+- Clicking on 'طلب تسعير' redirects to dedicated quote request page
+- Navbar item styling:
+  - Consistent with other navigation items
+  - Hover effect matching site design
+  - Active state indicator when on quote request page
+  - Responsive: visible on desktop, accessible via mobile menu on smaller screens
+\n#### 3.5.2 طلب تسعير Page (Request Quote Page)
+
+- **Dedicated page for quote requests, similar to contact us page structure**
+- **Page layout**:
+  - Page header: 'طلب تسعير' with subtitle explaining the service
+  - Introductory text: Brief description encouraging users to request custom quotes
+  - Contact information display (optional): phone, email, business hours
+\n- **Quote Request Form**:
+  - Form fields:\n    1. **الاسم الكامل*** (Full Name): Text input, required
+    2. **البريد الإلكتروني*** (Email Address): Email input, required, with email format validation
+    3. **رقم الهاتف*** (Phone Number): Tel input, required, with phone format validation
+    4. **نوع الخدمة أو المنتج*** (Service/Product Type): Dropdown select or text input, required
+       - Options could include main categories or free text entry
+    5. **الكمية المطلوبة** (Requested Quantity): Number input, optional
+    6. **تفاصيل الطلب*** (Request Details): Textarea, required, placeholder: 'اكتب تفاصيل طلبك هنا...' (Write your request details here...)
+    7. **رفع ملفات مرجعية** (Upload Reference Files): File upload with drag-and-drop, optional\n       - Accepted formats: PDF, PNG, JPG, AI, PSD
+       - Multiple file upload support
+       - Display uploaded file names with remove option
+    8. **الميزانية المتوقعة** (Expected Budget): Text input or number input, optional
+    9. **الموعد المطلوب للتسليم** (Requested Delivery Date): Date picker, optional
+\n  - Form validation:\n    - All required fields marked with red asterisk (*)
+    - Real-time validation with error messages in Arabic
+    - Email format validation
+    - Phone number format validation
+    - Prevent submission until all required fields are valid
+\n  - Form actions:
+    - 'إرسال الطلب' (Submit Request) button - primary yellow/orange button
+    - 'إعادة تعيين' (Reset) button - secondary button to clear form
+\n- **Form submission handling**:
+  - Upon successful submission:\n    + Display success message: 'تم إرسال طلبك بنجاح! سنتواصل معك خلال 24 ساعة' (Your request has been sent successfully! We will contact you within 24 hours)\n    + Send confirmation email to customer with request details
+    + Send notification to admin with quote request details
+    + Clear form fields after successful submission
+  - Upon submission failure:
+    + Display error message: 'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.' (An error occurred while sending the request. Please try again.)\n    + Keep form data intact for user to retry\n\n- **Additional page elements**:
+  - Contact information section: Display phone, email, WhatsApp link for direct contact
+  - FAQ section (optional): Common questions about quote requests
+  - Estimated response time notice: 'نقوم بالرد على جميع الطلبات خلال 24 ساعة' (We respond to all requests within 24 hours)
+\n- **Page styling**:
+  - Clean, professional layout matching overall site design
+  - Card-based form design with subtle shadow\n  - Responsive layout: single column on mobile, optimized spacing on desktop
+  - Clear visual hierarchy with section headers
+  - Consistent color scheme (yellow/orange for CTAs, blue for links)
+
+### 3.6 E-commerce Features
 
 - Product catalog with images and descriptions
 - Pricing display\n- Add to cart functionality
@@ -276,10 +338,9 @@ Arabic (RTL layout)
   - Admin manages all option values and pricing rules through dashboard
   - **Form Validation**: All required fields must be filled before adding to cart, with error messages displayed for missing fields
 
-### 3.6 Shopping Cart and Checkout Flow
+### 3.7 Shopping Cart and Checkout Flow
 
-#### 3.6.1 Shopping Cart Page\n- Display all items added to cart with:
-  - Product image
+#### 3.7.1 Shopping Cart Page\n- Display all items added to cart with:\n  - Product image
   - Product name and model number
   - Selected configuration options (size, paper type, quantity, design service, duration, sample request)
   - Unit price and total price per item
@@ -301,14 +362,13 @@ Arabic (RTL layout)
   - Display empty cart message when no items: 'Your Cart is Empty' with'Browse Products' button
   - Implement proper error handling for cart operations
 
-#### 3.6.2 Checkout Process (إتمام الطلب)
-- **Step 1: Customer Information**
+#### 3.7.2 Checkout Process (إتمام الطلب)\n- **Step 1: Customer Information**
   - Full name (required)
-  - Email address (required, with email format validation)
-  - Phone number (required, with phone format validation)
+  - Email address (required, with email format validation)\n  - Phone number (required, with phone format validation)
   - Shipping address (required):\n    - Street address
-    - City\n    - Postal code
-- Order notes (optional)
+    - City
+    - Postal code
+  - Order notes (optional)
   - Form validation with error messages for missing or invalid fields
 \n- **Step 2: Payment Method Selection**
   - Two payment options:
@@ -324,17 +384,19 @@ Arabic (RTL layout)
   - Display order summary with all items and total
   - Display customer information
   - Display selected payment method
-  - 'تأكيد الطلب' (Confirm Order) button\n\n#### 3.6.3 Order Confirmation and Messages
+  - 'تأكيد الطلب' (Confirm Order) button
+\n#### 3.7.3 Order Confirmation and Messages
 - **Successful Order**:
   - Display success message: 'تم تأكيد طلبك بنجاح!' (Your order has been confirmed successfully!)
   - Show order number and estimated delivery date
   - Send confirmation email to customer
   - Option to view order details or return to home page
-\n- **Failed Order**:
+
+- **Failed Order**:
   - Display error message: 'فشلت عملية الطلب. يرجى المحاولة مرة أخرى.' (Order failed. Please try again.)
   - Show specific error reason if available (e.g., payment declined, invalid card)\n  - Option to retry payment or contact support
 
-#### 3.6.4 Validation Requirements
+#### 3.7.4 Validation Requirements
 - All required fields must be filled before proceeding to next step
 - Email format validation (must contain @ and domain)
 - Phone number format validation (numeric, appropriate length)
@@ -343,83 +405,141 @@ Arabic (RTL layout)
 - Display clear error messages in Arabic for each validation failure
 - Prevent form submission until all validations pass
 
-### 3.7 Seasonal Offers Management
+### 3.8 Seasonal Offers Management
 
-#### 3.7.1 User Interface - Seasonal Offers Display
-- Prominent section on home page displaying seasonal offers
-- Animated carousel/slider showcasing current seasonal promotions\n- Animation features:
-  - Auto-scrolling carousel with smooth transitions
-  - Fade-in/fade-out effects between slides\n  - Hover pause functionality\n  - Navigation arrows and dot indicators
-  - Responsive touch/swipe support for mobile devices
-- Each offer card displays:
-  - Offer banner image
-  - Offer title in Arabic
-  - Offer description and discount details\n  - Validity period (start and end dates)
-  - 'اطلب الآن' (Order Now) button linking to offer products
-- Section header: 'عروض موسمية' with decorative styling
-- Display active offers only (based on current date)
-- Responsive grid layout for multiple offers
+#### 3.8.1 User Interface - Seasonal Offers Display
+- **Prominent animated section on home page displaying seasonal offers**
+- **Animated carousel/slider showcasing current seasonal promotions**
+- **Animation features**:
+  - Auto-scrolling carousel with smooth slide transitions (configurable speed: 3-5 seconds per slide)
+  - Fade-in/fade-out effects between slides with opacity transitions
+  - Scale animation on hover (1.05x zoom) with smooth transform\n  - Hover pause functionality (carousel stops on mouseenter, resumes on mouseleave)
+  - Navigation arrows (chevron left/right) appearing on hover
+  - Dot indicators centered below carousel for manual navigation
+  - Responsive touch/swipe support for mobile devices using touch events
+  - Smooth easing functions (ease-in-out) for natural movement
+  - Preloading of adjacent slides for seamless transitions
+- **Each offer card displays**:
+  - Offer banner image (high-resolution, optimized for web)
+  - Offer title in Arabic (large, bold font)
+  - Offer description and discount details (clear percentage or amount off)
+  - Validity period formatted as: 'من [start date] إلى [end date]'
+  - 'اطلب الآن' (Order Now) button in yellow/orange with hover effect
+- **Section styling**:
+  - Section header: 'العروض الموسمية' with decorative icon and underline
+  - Full-width carousel container with subtle box shadow
+  - Rounded corners (12px) on offer cards
+  - Gradient overlay on images for text readability
+  - Responsive breakpoints for different screen sizes
+- Display active offers only (filtered by current date between start and end dates)
 - Click on offer card to view full offer details or redirect to related products
-\n#### 3.7.2 Admin Interface - Seasonal Offers Management
-- Dedicated 'عروض موسمية' (Seasonal Offers) section in admin dashboard sidebar
+- **Performance optimization**:
+  - Lazy loading for offer images
+  - CSS transforms for smooth animations (GPU-accelerated)
+  - Debounced resize handlers for responsive behavior
+\n#### 3.8.2 Admin Interface - Seasonal Offers Management\n- **Dedicated 'عروض موسمية' (Seasonal Offers) section in admin dashboard sidebar**
 - **View All Offers**:
-  - List all seasonal offers in table format
-  - Display columns: offer title, validity period, status (active/inactive/expired), actions
-  - Filter options: active, inactive, expired offers
-  - Search functionality by offer title\n- **Add New Seasonal Offer**:
-  - Form with fields:\n    + Offer title (required, Arabic text)
-    + Offer description (required, textarea)
-    + Discount percentage or amount (optional)
-    + Offer banner image upload with drag-and-drop (required)
-    + Start date (required, date picker)
-    + End date (required, date picker)
-    + Related products/categories (optional, multi-select dropdown)
-    + Display order/priority (optional, number input)
-    + Show on home page toggle (control visibility on home page)
-    + Active/inactive status toggle\n  - Form validation for all required fields
-  - Preview option to see how offer will appear on user interface
-  - 'حفظ العرض' (Save Offer) button
+  - List all seasonal offers in data table format with pagination
+  - Display columns: \n    + Offer title (sortable)
+    + Validity period (start date - end date)
+    + Status badge (active/inactive/expired with color coding)
+    + Display order/priority (sortable)
+    + Actions (edit, delete, toggle status)
+  - Filter options: 
+    + Active offers (currently running)
+    + Inactive offers (manually disabled)
+    + Expired offers (past end date)
+    + All offers\n  - Search functionality by offer title with real-time filtering
+  - Bulk actions: activate, deactivate, delete multiple offers
+- **Add New Seasonal Offer**:
+  - Form with fields:
+    + **عنوان العرض*** (Offer title): Text input, required, Arabic text, max 100 characters
+    + **وصف العرض*** (Offer description): Textarea, required, max 500 characters
+    + **نسبة أو قيمة الخصم** (Discount percentage or amount): Number input, optional, with unit selector (% or ر.س)
+    + **صورة بانر العرض*** (Offer banner image): Drag-and-drop image upload, required
+      - Accepted formats: JPG, PNG, WebP\n      - Recommended dimensions: 1200x600px
+      - Max file size: 2MB
+      - Image preview with crop/resize option
+    + **تاريخ البداية*** (Start date): Date picker, required, cannot be past date
+    + **تاريخ النهاية*** (End date): Date picker, required, must be after start date
+    + **المنتجات/الفئات المرتبطة** (Related products/categories): Multi-select dropdown, optional
+      - Search and select from existing products/categories
+      - Display selected items with remove option
+    + **ترتيب العرض** (Display order/priority): Number input, optional, default: 0
+      - Lower numbers appear first in carousel
+    + **عرض في الصفحة الرئيسية** (Show on home page): Toggle switch, default: ON
+    + **الحالة** (Active/inactive status): Toggle switch, default: Active
+  - Form validation:
+    + All required fields marked with red asterisk\n    + Real-time validation with error messages\n    + End date must be after start date validation
+    + Image file size and format validation
+  - **Preview option**: Button to preview how offer will appear on user interface in modal
+  - 'حفظ العرض' (Save Offer) button - primary action
+  - 'إلغاء' (Cancel) button - secondary action
 - **Edit Existing Offer**:
   - Same form as add offer, pre-populated with existing data
-  - Update offer details, images, dates, and status
+  - All fields editable\n  - Image replacement option with current image preview
   - 'تحديث العرض' (Update Offer) button
+  - 'إلغاء' (Cancel) button
 - **Delete Offer**:
-  - Delete button with confirmation dialog
-  - Soft delete option to archive offers instead of permanent deletion
+  - Delete button (trash icon) with confirmation dialog
+  - Confirmation message: 'هل أنت متأكد من حذف هذا العرض؟ لا يمكن التراجع عن هذا الإجراء.' (Are you sure you want to delete this offer? This action cannot be undone.)
+  - Soft delete option: Archive offers instead of permanent deletion
+  - Archived offers can be restored from archive section
 - **Offer Status Management**:
-  - Automatic status update based on validity dates (active/expired)
-  - Manual toggle to activate/deactivate offers\n  - Display offer status indicators (green for active, red for expired, gray for inactive)
-- **Analytics** (optional):
-  - View offer performance metrics (views, clicks, conversions)
+  - Automatic status update based on validity dates:\n    + Active: current date is between start and end dates AND manually set to active
+    + Expired: current date is past end date\n    + Inactive: manually disabled by admin
+  - Manual toggle to activate/deactivate offers (quick action in table)
+  - Status indicators:\n    + Green badge for active offers
+    + Red badge for expired offers
+    + Gray badge for inactive offers
+  - Bulk status change: select multiple offers and change status at once
+- **Display Order Management**:
+  - Drag-and-drop interface to reorder offers in carousel
+  - Number input for precise order control
+  - Preview button to see carousel order before saving
+- **Analytics Dashboard** (optional):
+  - View offer performance metrics:\n    + Total views (impressions)
+    + Click-through rate (CTR)
+    + Conversions (orders from offer)
+    + Revenue generated
+  - Date range filter for analytics
+  - Export analytics data to CSV
   - Track which offers generate most orders
-\n### 3.8 Services Section
+  - Comparison between different offers
 
-#### 3.8.1 User Interface - Services Page
+### 3.9 Services Section
+
+#### 3.9.1 User Interface - Services Page
 - Dedicated services page accessible from main navigation
 - Display available services in card-based grid layout
 - Each service card shows:
   - Service icon/image
   - Service name in Arabic
-  - Brief service description\n  - 'طلب الخدمة' (Request Service) button
+  - Brief service description
+  - 'طلب الخدمة' (Request Service) button
 - Clicking on service card or button opens service details modal/page with:
   - Full service description
   - Service features and benefits
   - Pricing information (if applicable)
   - Service request form with fields:
     + Customer name (required)
-    + Email address (required)\n    + Phone number (required)\n    + Service details/requirements (text area, required)\n    + File upload option for relevant documents\n  - 'إرسال الطلب' (Submit Request) button
+    + Email address (required)\n    + Phone number (required)\n    + Service details/requirements (text area, required)
+    + File upload option for relevant documents
+  - 'إرسال الطلب' (Submit Request) button
 - Upon service request submission:
-  - Display success message: 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً' (Your request has been sent successfully! We will contact you soon)\n  - Send notification message to admin containing:
-    + Service name
+  - Display success message: 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً' (Your request has been sent successfully! We will contact you soon)
+  - Send notification message to admin containing:\n    + Service name
     + Customer information
     + Service requirements
   - Send confirmation email to customer
-\n#### 3.8.2 Admin Interface - Services Management
+\n#### 3.9.2 Admin Interface - Services Management
 - Services management section in admin dashboard
-- Add new services with:
-  - Service name (required)\n  - Service description (required)\n  - Service icon/image upload with drag-and-drop
+- Add new services with:\n  - Service name (required)
+  - Service description (required)
+  - Service icon/image upload with drag-and-drop
   - Pricing information (optional)
-  - Service features list\n  - Show on home page toggle (control if service appears in home page services section)
+  - Service features list
+  - Show on home page toggle (control if service appears in home page services section)
   - Display order/priority for home page (number input)
   - Active/inactive status toggle
 - Edit existing services\n- Delete services
@@ -437,22 +557,22 @@ Arabic (RTL layout)
 - Update service request status
 - Respond to service requests via email or phone
 - Filter and search service requests
-
-### 3.9 Additional Features
+\n### 3.10 Additional Features
 
 - Contact form\n- Customer support chat
 - FAQ section
 - Delivery information
 - Company information pages
-\n### 3.10 Admin Dashboard
+\n### 3.11 Admin Dashboard
 
-- Full control and management of all website content\n\n#### 3.10.1 Category Management
+- Full control and management of all website content
+\n#### 3.11.1 Category Management
 - View all product categories\n- Add new categories\n- Edit existing categories
 - Delete categories
 - Organize category hierarchy
 - Manage category icons/images for home page display
 
-#### 3.10.2 Product Management - Add/Edit Product Interface
+#### 3.11.2 Product Management - Add/Edit Product Interface
 \n**Product Form Structure (matching provided code exactly):**
 
 **Section 1: Basic Product Information (معلومات المنتج الأساسية)**
@@ -469,16 +589,16 @@ Arabic (RTL layout)
   - Header: 'حساب السعر الأساسي'\n  - Shows:\n    + السعر الأساسي (Subtotal)
     + ضريبة القيمة المضافة (15%) (VAT 15%)
     + الإجمالي (Total) - bold, larger font, with top border
-  - All prices formatted to2 decimal places with'ر.س' currency\n
+  - All prices formatted to 2 decimal places with'ر.س' currency\n
 **Section 2: Quantity Options with Pricing (خيارات الكمية والأسعار)**
 - Card layout with header 'خيارات الكمية والأسعار'
-- Description:'أضف خيارات كمية مختلفة مع أسعارها (مثال: 100 نسخة بسعر 1500 ريال، 500 نسخة بسعر 6000 ريال)'
+- Description: 'أضف خيارات كمية مختلفة مع أسعارها (مثال: 100 نسخة بسعر 1500 ريال، 500 نسخة بسعر 6000 ريال)'
 - Dynamic quantity rows, each row contains:
   1. **الكمية *** (Quantity): Number input, required, placeholder: 'مثال: 100', with black border
   2. **السعر (ر.س) *** (Price): Number input, required, placeholder: 'مثال: 1500', with black border
   3. **الإجمالي شامل الضريبة** (Total with Tax): Display-only field showing calculated total (price +15% VAT) in yellow/orange color, formatted to 2 decimals with 'ر.س'\n  4. Remove button (X icon) - red destructive variant, only shown if more than 1 row exists
 - Each row has gray background (bg-gray-50) with border and padding
--'إضافة خيار كمية آخر' button with Plus icon to add new quantity row
+- 'إضافة خيار كمية آخر' button with Plus icon to add new quantity row
 - Info note with blue background: '💡 ملاحظة: هذه الخيارات ستظهر للعميل ليختار الكمية المناسبة مع السعر المحدد لكل كمية.'
 
 **Section 3: Size Options with Additional Pricing (خيارات المقاس مع الأسعار الإضافية)**
@@ -486,8 +606,7 @@ Arabic (RTL layout)
 - Label: 'المقاسات المتاحة والسعر الإضافي'
 - Dynamic size option rows, each row contains:
   1. **اسم المقاس** (Size Name): Text input, placeholder: 'اسم المقاس X', flex-1
-  2. **السعر الإضافي** (Additional Price): Number input, placeholder: 'السعر الإضافي', width: w-32
-  3. Currency label: 'ر.س'\n  4. Remove button (X icon) - red destructive variant\n- '+ إضافة مقاس آخر' button to add new size option
+  2. **السعر الإضافي** (Additional Price): Number input, placeholder: 'السعر الإضافي', width: w-32\n  3. Currency label: 'ر.س'\n  4. Remove button (X icon) - red destructive variant\n- '+ إضافة مقاس آخر' button to add new size option
 \n**Section 4: Paper Type Options with Additional Pricing (خيارات نوع الورق مع الأسعار الإضافية)**
 - Same structure as Size Options section
 - Card layout with header 'خيارات نوع الورق مع الأسعار الإضافية'
@@ -495,8 +614,7 @@ Arabic (RTL layout)
 - Dynamic paper type option rows with:
   1. Paper type name input
   2. Additional price input
-  3. Currency label
-  4. Remove button\n- '+ إضافة نوع ورق آخر' button\n
+  3. Currency label\n  4. Remove button\n- '+ إضافة نوع ورق آخر' button\n
 **Section 5: Design Service Options with Additional Pricing (خيارات خدمة التصميم مع الأسعار الإضافية)**
 - Same structure as previous option sections
 - Card layout with header 'خيارات خدمة التصميم مع الأسعار الإضافية'
@@ -509,10 +627,10 @@ Arabic (RTL layout)
 \n**Section 7: Sample Request Options with Additional Pricing (خيارات تصوير العينة مع الأسعار الإضافية)**
 - Same structure as previous option sections\n- Card layout with header 'خيارات تصوير العينة مع الأسعار الإضافية'\n- Dynamic sample option rows
 - '+ إضافة خيار عينة آخر' button\n
-**Section 8: Product Images (صور المنتج)**
-- Card layout with drag-and-drop image upload zone
+**Section 8: Product Images (صور المنتج)**\n- Card layout with drag-and-drop image upload zone
 - Support multiple image uploads\n- Image preview with remove option
-- Accepted formats: JPG, PNG, WebP\n\n**Form Actions:**
+- Accepted formats: JPG, PNG, WebP
+\n**Form Actions:**
 - 'حفظ المنتج' (Save Product) button - primary action, yellow/orange color
 - 'إلغاء' (Cancel) button - secondary action\n- Form validation for all required fields before submission
 - Success message upon successful save
@@ -528,15 +646,14 @@ Arabic (RTL layout)
 - Gray background (bg-gray-50/bg-gray-100) for calculated price displays
 - Yellow/orange (brand-yellow) color for total price displays
 - Responsive grid layout (grid-cols-1 md:grid-cols-2) for form fields
-
-#### 3.10.3 Blog Management
+\n#### 3.11.3 Blog Management
 - View all blog posts
 - Create new blog posts
 - Edit existing blog posts
 - Delete blog posts
 - Manage blog categories and tags
 - Schedule blog post publication
-\n#### 3.10.4 Order Management
+\n#### 3.11.4 Order Management
 - View all orders with filtering options (status, date, customer, payment method)
 - Update order status (pending, processing, shipped, delivered, cancelled)
 - View order details including:\n  - Customer-selected product configurations
@@ -553,37 +670,51 @@ Arabic (RTL layout)
   - Customer contact information
   - Service requirements and uploaded files
   - Send notification message to admin when new service request is received
+- **Quote Request Management**:
+  - View all quote requests from'طلب تسعير' page
+  - Display quote request details:\n    + Customer name, email, phone
+    + Service/product type requested
+    + Quantity and budget
+    + Request details and uploaded files
+    + Requested delivery date
+  - Update quote request status (new, in progress, quoted, completed, cancelled)
+  - Respond to quote requests via email or phone
+  - Generate and send custom quotes to customers
+  - Track quote conversion to orders
 
-#### 3.10.5 Message Management
+#### 3.11.5 Message Management
 - View all customer messages and inquiries
 - Respond to customer messages\n- Mark messages as read/unread
-- Archive or delete messages
-- Filter messages by status or date
+- Archive or delete messages\n- Filter messages by status or date
 - **Service Request Notifications**:
   - Receive notifications for new service requests
   - Notification includes service name and customer details
   - Quick access to full service request information
-\n#### 3.10.6 User Management
+- **Quote Request Notifications**:
+  - Receive notifications for new quote requests from 'طلب تسعير' page
+  - Notification includes customer name and request summary
+  - Quick link to view full quote request details
+\n#### 3.11.6 User Management
 - Manage user accounts\n- View user activity and order history
-\n#### 3.10.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
+\n#### 3.11.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
 - Edit existing portfolio projects
 - Delete portfolio projects
 - Categorize projects by type (special occasions, commercial, etc.)
 - Manage project details (title, description, images, date)
 - Control visibility of portfolio items on user interface
 
-#### 3.10.8 Who We Are Management (إدارة من نحن)\n- Edit company information and history
+#### 3.11.8 Who We Are Management (إدارة من نحن)\n- Edit company information and history
 - Update team member profiles
 - Manage company values and achievements
 - Upload and update company images
-\n#### 3.10.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)
+\n#### 3.11.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)
 - Add new special occasion projects with multiple images
 - Edit project details and descriptions
 - Delete projects
 - Organize projects by occasion type
 - Control display order on user interface
 
-#### 3.10.10 Settings and Configuration
+#### 3.11.10 Settings and Configuration
 - Configure payment and delivery settings
 - Update website content and information
 - View sales reports and analytics
@@ -592,26 +723,25 @@ Arabic (RTL layout)
 - Two interfaces: User interface for customers and Admin dashboard for website management
 \n### 4.1 Color Scheme
 
-- Primary color: Yellow (أصفر)
-- Secondary color: Blue (أزرق)
-- Complementary neutral tones for balance
-\n### 4.2 Visual Elements
+- Primary color: Yellow (أصفر) - used for CTAs, active states, and highlights
+- Secondary color: Blue (أزرق) - used for links, secondary actions, and accents
+- Complementary neutral tones for balance (grays, whites)\n- Status colors: Green for success/active, Red for errors/expired, Gray for inactive
+
+### 4.2 Visual Elements
 
 - Modern and clean interface with RTL layout
-- Card-based product display with hover effects
+- Card-based product display with hover effects (subtle elevation and scale)
 - Card-based category display on home page with icons and labels
 - Card-based services display on home page (maximum 6 cards) with hover effects
+- **Animated carousel for seasonal offers with smooth transitions and hover effects**
 - Rounded corners (8-12px) for buttons and cards
-- Subtle shadows for depth and hierarchy
-- Clear typography optimized for Arabic text
+- Subtle shadows for depth and hierarchy (box-shadow with low opacity)
+- Clear typography optimized for Arabic text (readable font sizes, appropriate line heights)
 - Responsive grid layout for product categories, services section, and main categories section
 - Drag-and-drop zone withdashed border and upload icon for image uploads
 - Product configuration panel with tabbed interface (orange active tab, gray inactive tab)
 - Dropdown fields with downward arrow indicators and price display beside each option
-- File upload button with outlined style
-- Orange call-to-action buttons for'Add to Cart' and 'Complete Order'
-- Required field indicators with red asterisks
-- Error message styling in red with clear visibility
+- File upload button with outlined style\n- Orange call-to-action buttons for'Add to Cart', 'Complete Order', 'Submit Request'\n- Required field indicators with red asterisks\n- Error message styling in red with clear visibility and icon
 - Success message styling in green with checkmark icon
 - Scrolling hero section with smooth transitions for celebrations page
 - Gallery-style layout for portfolio and special occasions pages with lightbox functionality
@@ -619,12 +749,15 @@ Arabic (RTL layout)
 - Profile page with clean card-based layout for user information sections
 - Admin dashboard with sidebar navigation and data tables
 - **Seasonal Offers Animation Effects**:
-  - Smooth slide transitions with fade effects
-  - Subtle scale animation on hover
-  - Auto-play carousel with configurable speed
+  - Smooth slide transitions with fade effects (opacity 0 to 1)
+  - Subtle scale animation on hover (transform: scale(1.05))
+  - Auto-play carousel with configurable speed (3-5 seconds)
   - Pause on hover functionality
-  - Responsive touch gestures for mobile\n- **Admin Product Form Styling**:
-  - Card-based sections with clear headers
+  - Responsive touch gestures for mobile (swipe left/right)
+  - Navigation arrows with smooth appearance (fade in on hover)
+  - Dot indicators with active state highlighting
+- **Admin Product Form Styling**:
+  - Card-based sections with clear headers and spacing
   - Gray backgrounds (bg-gray-50, bg-gray-100) for calculated price displays
   - Black borders on input fields in quantity section
   - Yellow/orange (brand-yellow) color for total price displays
@@ -632,27 +765,35 @@ Arabic (RTL layout)
   - Consistent spacing and padding across all sections
   - Responsive two-column grid for form fields
   - Icon buttons (Plus, X) for add/remove actions
+- **Quote Request Page Styling**:
+  - Clean form layout with card design
+  - Consistent field styling matching overall site design
+  - Clear section headers and spacing
+  - Drag-and-drop file upload zone with visual feedback
+  - Yellow/orange primary button for form submission
+  - Responsive single-column layout on mobile
 \n### 4.3 Layout Style
 
 - Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
 - Grid-based services section on home page (maximum 6 cards,3 columns desktop, 2 columns tablet, 1 column mobile)
-- Full-width animated carousel for seasonal offers section
-- Sticky navigation header\n- Clear call-to-action buttons in yellow/orange
+- **Full-width animated carousel for seasonal offers section with smooth transitions**
+- Sticky navigation header with 'طلب تسعير' navigation item
+- Clear call-to-action buttons in yellow/orange
 - Blue accents for links and secondary actions
 - Two-column product detail layout: product image on left, configuration options on right
 - Hero section with auto-scrolling carousel for celebrations page
 - Masonry or grid layout for portfolio displays
 - Multi-step checkout layout with progress indicator
-- Responsive cart summary sidebar
-- Centered authentication forms with social login buttons below main form
+- Responsive cart summary sidebar\n- Centered authentication forms with social login buttons below main form
 - Profile page with sidebar navigation and main content area
 - Admin dashboard with collapsible sidebar and main content area
 - **Seasonal Offers Section Layout**:
   - Full-width carousel section on home page
-  - Prominent placement below main categories or services section
+  - Prominent placement after services section and before featured products
   - Responsive card layout within carousel
-  - Navigation controls positioned at carousel edges
+  - Navigation controls positioned at carousel edges (left/right arrows)
   - Dot indicators centered below carousel
+  - Smooth transitions between slides
 - **Admin Product Form Layout**:
   - Vertical card stack layout for different sections
   - Each section in separate card component
@@ -660,6 +801,12 @@ Arabic (RTL layout)
   - Dynamic rows for quantity and option inputs
   - Consistent button placement (add buttons at bottom of each section)
   - Form actions (Save/Cancel) at bottom of entire form
+- **Quote Request Page Layout**:
+  - Centered page layout with max-width container
+  - Page header with title and description
+  - Single-column form layout for clarity
+  - Contact information section below form
+  - Responsive design adapting to all screen sizes
 \n## 5. Reference Images
 
 1. Product configuration interface reference: image.png

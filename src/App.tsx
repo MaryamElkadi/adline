@@ -15,6 +15,7 @@ import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
+import RequestQuote from './pages/RequestQuote';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import About from './pages/About';
@@ -35,6 +36,7 @@ import AdminPortfolio from './pages/admin/Portfolio';
 import AdminServices from './pages/admin/Services';
 import AdminServiceInquiries from './pages/admin/ServiceInquiries';
 import AdminSeasonalOffers from './pages/admin/SeasonalOffers';
+import AdminQuoteRequests from './pages/admin/QuoteRequests';
 
 // User Layout Component
 function UserLayout() {
@@ -53,6 +55,7 @@ function UserLayout() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/request-quote" element={<RequestQuote />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/about" element={<About />} />
@@ -90,6 +93,7 @@ export default function App() {
               <Route path="services" element={<AdminServices />} />
               <Route path="service-inquiries" element={<AdminServiceInquiries />} />
               <Route path="seasonal-offers" element={<AdminSeasonalOffers />} />
+              <Route path="quote-requests" element={<AdminQuoteRequests />} />
             </Route>
             
             {/* User Routes - With Header/Footer */}

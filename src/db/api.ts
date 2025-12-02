@@ -20,6 +20,7 @@ import type {
   QuantityPricingTier,
   SimpleProductOption,
   SimpleProductOptionWithTiers,
+  QuoteRequest,
 } from '@/types';
 
 export const api = {
@@ -1477,5 +1478,70 @@ export const api = {
       .eq('id', id);
     
     if (error) throw error;
+  },
+
+  // طلبات التسعير (Quote Requests)
+  async createQuoteRequest(quoteRequest: Omit<QuoteRequest, 'id' | 'created_at' | 'updated_at' | 'status' | 'admin_notes'>) {
+    const { data, error } = await supabase
+      .from('quote_requests')
+      .insert([quoteRequest])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getQuoteRequests() {
+    const { data, error } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getQuoteRequestById(id: string) {
+    const { data, error } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateQuoteRequest(id: string, updates: Partial<QuoteRequest>) {
+    const { data, error } = await supabase
+      .from('quote_requests')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteQuoteRequest(id: string) {
+    const { error } = await supabase
+      .from('quote_requests')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async getQuoteRequestsByStatus(status: string) {
+    const { data, error } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .eq('status', status)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
   },
 };

@@ -23,6 +23,7 @@ export default function Header() {
     { name: 'الرئيسية', path: '/' },
     { name: 'المنتجات', path: '/products' },
     { name: 'الخدمات', path: '/services' },
+    { name: 'طلب تسعير', path: '/request-quote' },
     { name: 'معرض الأعمال', path: '/portfolio' },
     { name: 'المدونة', path: '/blog' },
     { name: 'من نحن', path: '/about' },
