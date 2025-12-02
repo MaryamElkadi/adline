@@ -177,6 +177,19 @@ export interface ProductOptionValue {
   created_at: string;
 }
 
+export interface QuantityPricingTier {
+  id: string;
+  option_value_id: string;
+  min_quantity: number;
+  max_quantity: number | null;
+  price_modifier: number;
+  created_at: string;
+}
+
+export interface ProductOptionValueWithTiers extends ProductOptionValue {
+  quantity_tiers: QuantityPricingTier[];
+}
+
 export interface ProductOptionAssignment {
   id: string;
   product_id: string;

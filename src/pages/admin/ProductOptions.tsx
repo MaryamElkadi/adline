@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/db/api';
-import type { ProductOptionTemplate, ProductOptionValue, Product, ProductOptionAssignment } from '@/types';
+import type { ProductOptionTemplate, ProductOptionValue, Product, ProductOptionAssignment, QuantityPricingTier } from '@/types';
 
 export default function ProductOptions() {
   const { toast } = useToast();
@@ -51,6 +51,17 @@ export default function ProductOptions() {
     product_id: '',
     template_id: '',
   });
+
+  // Quantity tier dialog state
+  const [tierDialogOpen, setTierDialogOpen] = useState(false);
+  const [selectedValueForTiers, setSelectedValueForTiers] = useState<ProductOptionValue | null>(null);
+  const [tiers, setTiers] = useState<QuantityPricingTier[]>([]);
+  const [tierForm, setTierForm] = useState({
+    min_quantity: 1,
+    max_quantity: null as number | null,
+    price_modifier: 0,
+  });
+  const [editingTier, setEditingTier] = useState<QuantityPricingTier | null>(null);
 
   useEffect(() => {
     loadData();
@@ -242,6 +253,80 @@ export default function ProductOptions() {
     }
   };
 
+  // Quantity Tier Management Functions
+  const handleManageTiers = async (value: ProductOptionValue) => {
+    setSelectedValueForTiers(value);
+    try {
+      const tiersData = await api.getQuantityPricingTiersByValueId(value.id);
+      setTiers(tiersData);
+      setTierDialogOpen(true);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to load quantity tiers',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleCreateTier = async () => {
+    if (!selectedValueForTiers) return;
+    
+    try {
+      await api.createQuantityPricingTier({
+        option_value_id: selectedValueForTiers.id,
+        min_quantity: tierForm.min_quantity,
+        max_quantity: tierForm.max_quantity,
+        price_modifier: tierForm.price_modifier,
+      });
+      
+      // Reload tiers
+      const tiersData = await api.getQuantityPricingTiersByValueId(selectedValueForTiers.id);
+      setTiers(tiersData);
+      
+      // Reset form
+      setTierForm({
+        min_quantity: 1,
+        max_quantity: null,
+        price_modifier: 0,
+      });
+      
+      toast({
+        title: 'Success',
+        description: 'Quantity tier created successfully',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create quantity tier',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteTier = async (tierId: string) => {
+    if (!selectedValueForTiers) return;
+    
+    try {
+      await api.deleteQuantityPricingTier(tierId);
+      
+      // Reload tiers
+      const tiersData = await api.getQuantityPricingTiersByValueId(selectedValueForTiers.id);
+      setTiers(tiersData);
+      
+      toast({
+        title: 'Success',
+        description: 'Quantity tier deleted successfully',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to delete quantity tier',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const getTemplateName = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
     return template?.option_name_en || 'Unknown';
@@ -409,6 +494,14 @@ export default function ProductOptions() {
                         <TableCell>{value.display_order}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleManageTiers(value)}
+                            >
+                              <Layers className="h-4 w-4 mr-1" />
+                              Tiers
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -702,6 +795,131 @@ export default function ProductOptions() {
               </Button>
               <Button onClick={handleSaveAssignment}>
                 Assign
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Quantity Tiers Dialog */}
+      <Dialog open={tierDialogOpen} onOpenChange={setTierDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Quantity Tiers</DialogTitle>
+            <DialogDescription>
+              {selectedValueForTiers && (
+                <>
+                  Set different prices based on quantity ranges for: <strong>{selectedValueForTiers.value_en} ({selectedValueForTiers.value_ar})</strong>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Existing Tiers */}
+            <div className="space-y-2">
+              <Label className="text-base font-semibold">Current Tiers</Label>
+              {tiers.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4 text-center border rounded-lg">
+                  No quantity tiers defined. Add your first tier below.
+                </p>
+              ) : (
+                <div className="border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Min Quantity</TableHead>
+                        <TableHead>Max Quantity</TableHead>
+                        <TableHead>Price Modifier</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {tiers.map((tier) => (
+                        <TableRow key={tier.id}>
+                          <TableCell className="font-medium">{tier.min_quantity}</TableCell>
+                          <TableCell>{tier.max_quantity || 'Unlimited'}</TableCell>
+                          <TableCell>
+                            <span className={tier.price_modifier > 0 ? 'text-green-600' : tier.price_modifier < 0 ? 'text-red-600' : ''}>
+                              {tier.price_modifier > 0 ? '+' : ''}{tier.price_modifier} SAR
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteTier(tier.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+
+            {/* Add New Tier Form */}
+            <div className="space-y-4 border-t pt-4">
+              <Label className="text-base font-semibold">Add New Tier</Label>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="min_quantity">Min Quantity</Label>
+                  <Input
+                    id="min_quantity"
+                    type="number"
+                    min="1"
+                    value={tierForm.min_quantity}
+                    onChange={(e) => setTierForm({ ...tierForm, min_quantity: parseInt(e.target.value) || 1 })}
+                    placeholder="e.g., 1"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="max_quantity">Max Quantity</Label>
+                  <Input
+                    id="max_quantity"
+                    type="number"
+                    min="1"
+                    value={tierForm.max_quantity || ''}
+                    onChange={(e) => setTierForm({ ...tierForm, max_quantity: e.target.value ? parseInt(e.target.value) : null })}
+                    placeholder="Leave empty for unlimited"
+                  />
+                  <p className="text-xs text-muted-foreground">Leave empty for unlimited</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="price_modifier">Price Modifier (SAR)</Label>
+                  <Input
+                    id="price_modifier"
+                    type="number"
+                    step="0.01"
+                    value={tierForm.price_modifier}
+                    onChange={(e) => setTierForm({ ...tierForm, price_modifier: parseFloat(e.target.value) || 0 })}
+                    placeholder="e.g., 20"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleCreateTier} className="flex-1">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Tier
+                </Button>
+              </div>
+            </div>
+
+            {/* Examples */}
+            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+              <p className="text-sm font-medium">Examples:</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• 1-50 units: +20 SAR (small orders)</li>
+                <li>• 51-100 units: +15 SAR (bulk discount)</li>
+                <li>• 101+ units: +10 SAR (large bulk discount)</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-end">
+              <Button variant="outline" onClick={() => setTierDialogOpen(false)}>
+                Close
               </Button>
             </div>
           </div>

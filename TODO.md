@@ -1,90 +1,51 @@
-# khat-alailan Printing Services Website - Development Plan
+# Quantity-Based Pricing Implementation
 
-## Phase 1: Setup & Configuration
-- [x] Review research report for design inspiration
-- [x] Configure RTL support in Tailwind
-- [x] Set up color scheme (Yellow primary, Blue secondary)
-- [x] Initialize Supabase project
-- [x] Create database schema and migrations
-- [x] Set up authentication system
-- [ ] Install required dependencies
+## Goal
+Add quantity-based pricing tiers for product options, allowing admins to set different prices based on quantity ranges.
 
-## Phase 2: Database & Backend
-- [x] Create database tables:
-  - [x] profiles (user/admin roles)
-  - [x] categories
-  - [x] products
-  - [x] product_options
-  - [x] cart_items
-  - [x] orders
-  - [x] order_items (embedded in orders)
-  - [x] blog_posts
-  - [x] contact_messages
-- [x] Set up RLS policies
-- [x] Create API functions in @/db/api.ts
-- [x] Define TypeScript types
-- [x] Create Auth context
-- [x] Create Cart context
+## Plan
 
-## Phase 3: Core Components
-- [ ] Create RTL-aware Header component
-- [ ] Create Footer component
-- [ ] Create product card component
-- [ ] Create category card component
-- [ ] Create cart components
-- [ ] Create admin sidebar navigation
+### 1. Database Schema
+- [x] Create quantity_pricing_tiers table
+- [x] Add columns: id, option_value_id, min_quantity, max_quantity, price_modifier
+- [x] Add migration
 
-## Phase 4: User-Facing Pages
-- [ ] Home page with hero and featured categories
-- [ ] Product categories page
-- [ ] Product detail page with customization options
-- [ ] Shopping cart page
-- [ ] Checkout page
-- [ ] User profile page
-- [ ] Order history page
-- [ ] Blog listing page
-- [ ] Blog detail page
-- [ ] Contact page
-- [ ] FAQ page
-- [ ] About/Company info page
+### 2. Types
+- [x] Add QuantityPricingTier type
+- [x] Add ProductOptionValueWithTiers type
 
-## Phase 5: Admin Dashboard
-- [ ] Admin dashboard layout
-- [ ] Product management (CRUD)
-- [ ] Category management
-- [ ] Order management
-- [ ] User management
-- [ ] Blog management
-- [ ] Contact messages view
-- [ ] Settings page
+### 3. API Methods
+- [x] getQuantityPricingTiers()
+- [x] getQuantityPricingTiersByValueId()
+- [x] createQuantityPricingTier()
+- [x] updateQuantityPricingTier()
+- [x] deleteQuantityPricingTier()
+- [x] getPriceForQuantity()
 
-## Phase 6: Authentication & Authorization
-- [ ] Login page
-- [ ] Registration page
-- [ ] Role-based routing
-- [ ] Protected routes
-- [ ] Admin access control
+### 4. Admin UI - Product Options Page
+- [x] Add "Manage Tiers" button to Values tab
+- [x] Show tiers for each option value
+- [x] Add tier dialog
+- [x] Create tier form
+- [x] Delete tier confirmation
 
-## Phase 7: E-commerce Features
-- [ ] Add to cart functionality
-- [ ] Cart state management
-- [ ] Product customization options
-- [ ] Order placement
-- [ ] Order tracking
-- [ ] Payment integration placeholder
+### 5. Admin UI - Products Page
+- [ ] Show quantity tiers when expanding options
+- [ ] Display tier ranges and prices
 
-## Phase 8: Polish & Testing
-- [ ] Ensure all Arabic text is properly displayed
-- [ ] Test RTL layout on all pages
-- [ ] Validate forms
-- [ ] Error handling
-- [ ] Loading states
-- [ ] Responsive design testing
-- [ ] Run lint and fix issues
+### 6. Product Detail Page
+- [ ] Show quantity-based pricing table
+- [ ] Update price based on selected quantity
+- [ ] Display tier information
 
-## Notes
-- Primary color: Yellow (#FCD34D or similar)
-- Secondary color: Blue (#3B82F6 or similar)
-- All UI text must be in Arabic
-- RTL layout throughout
-- Two distinct interfaces: user and admin
+### 7. Cart Calculations
+- [ ] Calculate price based on quantity tier
+- [ ] Update total when quantity changes
+
+## Current Status
+- ✅ Database schema complete
+- ✅ API methods complete
+- ✅ Admin Product Options page complete with tier management
+- 🔄 Next: Update Products page to show tiers
+- 🔄 Next: Update Product Detail page
+- 🔄 Next: Update Cart calculations

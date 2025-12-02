@@ -17,6 +17,7 @@ import type {
   ProductOptionAssignment,
   CheckoutData,
   ShippingAddress,
+  QuantityPricingTier,
 } from '@/types';
 
 export const api = {
@@ -828,5 +829,90 @@ export const api = {
     }
 
     return order;
+  },
+
+  // Quantity Pricing Tier APIs
+  async getQuantityPricingTiers(): Promise<QuantityPricingTier[]> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .select('*')
+      .order('option_value_id', { ascending: true })
+      .order('min_quantity', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getQuantityPricingTiersByValueId(valueId: string): Promise<QuantityPricingTier[]> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .select('*')
+      .eq('option_value_id', valueId)
+      .order('min_quantity', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createQuantityPricingTier(tier: Omit<QuantityPricingTier, 'id' | 'created_at'>): Promise<QuantityPricingTier> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .insert(tier)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to create quantity pricing tier');
+    return data;
+  },
+
+  async updateQuantityPricingTier(id: string, updates: Partial<QuantityPricingTier>): Promise<QuantityPricingTier> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to update quantity pricing tier');
+    return data;
+  },
+
+  async deleteQuantityPricingTier(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('quantity_pricing_tiers')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async getPriceForQuantity(valueId: string, quantity: number): Promise<number> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .select('price_modifier')
+      .eq('option_value_id', valueId)
+      .lte('min_quantity', quantity)
+      .or(`max_quantity.gte.${quantity},max_quantity.is.null`)
+      .order('min_quantity', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    if (error) throw error;
+    
+    // If no tier found, return the base price_modifier from the value
+    if (!data) {
+      const { data: valueData, error: valueError } = await supabase
+        .from('product_option_values')
+        .select('price_modifier')
+        .eq('id', valueId)
+        .maybeSingle();
+      
+      if (valueError) throw valueError;
+      return valueData?.price_modifier || 0;
+    }
+    
+    return data.price_modifier;
   },
 };

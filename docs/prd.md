@@ -14,8 +14,7 @@ Arabic (RTL layout)
 
 ## 2. Technical Stack
 
-### 2.1 Frontend
-
+### 2.1 Frontend\n
 - React with JavaScript
 - Tailwind CSS for styling
 - RTL (Right-to-Left) support for Arabic language
@@ -115,7 +114,8 @@ Arabic (RTL layout)
 - Order placement and tracking
 - celebrations and occaisons
   - Hero section with scrolling carousel showcasing featured celebration products and services
-  - All event supplies\n  - Stickers
+  - All event supplies
+  - Stickers
   - Favor boxes
   - Canvas printing
   - Posters
@@ -200,9 +200,9 @@ Arabic (RTL layout)
 - Form validation with error messages\n- **Login Redirect Logic**:
   - If user role is 'user': redirect to home page
   - If user role is 'admin': redirect to admin dashboard
+\n### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
 
-### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
-\n- Display main product categories in card-based grid layout on home page
+- Display main product categories in card-based grid layout on home page
 - Each category card shows:
   - Category icon/image
   - Category name in Arabic
@@ -270,8 +270,7 @@ Arabic (RTL layout)
     2. **Cash on Delivery (الدفع عند الاستلام)**:
        - No additional fields required
        - Display confirmation message about cash payment upon delivery
-
-- **Step 3: Order Review**
+\n- **Step 3: Order Review**
   - Display order summary with all items and total
   - Display customer information
   - Display selected payment method
@@ -319,17 +318,19 @@ Arabic (RTL layout)
 - Set product model numbers
 \n#### 3.8.3 Product Options Configuration Page (صفحة إعدادات خيارات المنتج)\n- **Dedicated interface for configuring all product options**
 - **Size Options Management (إدارة خيارات المقاس)**:
-  - Add new size options with name and price modifier
-  - Edit existing size options
+  - Add new size options by entering specific size value (e.g., '33x48', '45x25x8') and corresponding price modifier
+  - Edit existing size options (modify size value and price modifier)
   - Delete size options\n  - Set display order for size options
-  - Example: '33x48' with price modifier '+10ر.س'
-- **Paper Type Options Management (إدارة خيارات نوع الورق)**:
+  - Example: Admin enters size '33x48' with price modifier '+10ر.س'\n- **Paper Type Options Management (إدارة خيارات نوع الورق)**:
   - Add new paper type options with name and price modifier
-  - Edit existing paper type options\n  - Delete paper type options\n  - Set display order for paper type options
-  - Example: 'ورق تغليف 92gm ثلجي' with price modifier '+5ر.س'
-- **Quantity Options Management (إدارة خيارات الكمية)**:\n  - Add quantity tiers with price modifiers
-  - Edit existing quantity options
-  - Delete quantity options\n  - Set minimum and maximum quantity limits
+  - Edit existing paper type options
+  - Delete paper type options
+  - Set display order for paper type options\n  - Example: 'ورق تغليف 92gm ثلجي' with price modifier '+5ر.س'
+- **Quantity Options Management (إدارة خيارات الكمية)**:\n  - Add quantity tiers by entering specific quantity value (e.g., '100', '500', '1000') and corresponding price modifier
+  - Edit existing quantity options (modify quantity value and price modifier)
+  - Delete quantity options
+  - Set minimum and maximum quantity limits
+  - Example: Admin enters quantity '500' with price modifier '+15ر.س'
 - **Design Service Options Management (إدارة خيارات خدمة التصميم)**:
   - Add design service options with name and price modifier\n  - Edit existing design service options
   - Delete design service options
@@ -362,7 +363,14 @@ Arabic (RTL layout)
   - Live preview of how options appear on product pages
   - Test price calculation with different option combinations
   - Verify dropdown display and functionality
-\n#### 3.8.4 Blog Management
+- **Admin Input Interface**:
+  - For each option type (size, quantity, etc.), admin can:
+    + Enter specific value (e.g., size '33x48', quantity '500')
+    + Enter corresponding price modifier (e.g., '+10ر.س', '+15ر.س')
+    + Save and apply to selected products
+  - Interface displays all configured options in a table format with columns: Option Type, Value, Price Modifier, Actions (Edit/Delete)
+
+#### 3.8.4 Blog Management
 - View all blog posts
 - Create new blog posts
 - Edit existing blog posts
@@ -372,7 +380,8 @@ Arabic (RTL layout)
 \n#### 3.8.5 Order Management
 - View all orders with filtering options (status, date, customer, payment method)
 - Update order status (pending, processing, shipped, delivered, cancelled)
-- View order details including:\n  - Customer-selected product configurations
+- View order details including:
+  - Customer-selected product configurations
   - Uploaded design files
   - Customer information
   - Payment method and status
@@ -434,8 +443,7 @@ Arabic (RTL layout)
 - Dropdown fields with downward arrow indicators and price display beside each option
 - File upload button with outlined style
 - Orange call-to-action buttons for'Add to Cart' and 'Complete Order'
-- Required field indicators with red asterisks
-- Error message styling in red with clear visibility
+- Required field indicators with red asterisks\n- Error message styling in red with clear visibility
 - Success message styling in green with checkmark icon
 - Scrolling hero section with smooth transitions for celebrations page
 - Gallery-style layout for portfolio and special occasions pages with lightbox functionality
@@ -443,6 +451,7 @@ Arabic (RTL layout)
 - Profile page with clean card-based layout for user information sections
 - Admin dashboard with sidebar navigation and data tables
 - Form-based interface for product options configuration with add/edit/delete controls
+- Admin input fields for entering specific option values (size, quantity) and corresponding price modifiers
 \n### 4.3 Layout Style
 
 - Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
@@ -457,6 +466,7 @@ Arabic (RTL layout)
 - Profile page with sidebar navigation and main content area
 - Admin dashboard with collapsible sidebar and main content area
 - Product options configuration page with tabbed sections for each option type
+- Admin interface with table layout displaying configured options (Option Type, Value, Price Modifier, Actions)
 \n## 5. Reference Images
 
 1. Product configuration interface reference: image.png
