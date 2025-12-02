@@ -13,6 +13,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminProductOptions from './pages/admin/ProductOptions';
 import SimpleProductOptions from './pages/admin/SimpleProductOptions';
+import AdminSeasonalOffers from './pages/admin/SeasonalOffers';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -107,6 +108,11 @@ const routes: RouteConfig[] = [
         path: 'products/:productId/options',
         element: <SimpleProductOptions />,
         visible: false,
+      },
+      {
+        name: 'Seasonal Offers',
+        path: 'seasonal-offers',
+        element: <AdminSeasonalOffers />,
       },
     ],
   },

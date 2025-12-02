@@ -1386,4 +1386,96 @@ export const api = {
     
     if (error) throw error;
   },
+
+  // عروض موسمية (Seasonal Offers)
+  async getSeasonalOffers() {
+    const { data, error } = await supabase
+      .from('seasonal_offers')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getActiveSeasonalOffers() {
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from('seasonal_offers')
+      .select('*')
+      .eq('is_active', true)
+      .lte('start_date', now)
+      .gte('end_date', now)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getSeasonalOfferById(id: string) {
+    const { data, error } = await supabase
+      .from('seasonal_offers')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createSeasonalOffer(offer: {
+    title_ar: string;
+    description_ar: string;
+    discount_percentage?: number;
+    start_date: string;
+    end_date: string;
+    image_url?: string;
+    is_active?: boolean;
+  }) {
+    const { data, error } = await supabase
+      .from('seasonal_offers')
+      .insert([{
+        title_ar: offer.title_ar,
+        description_ar: offer.description_ar,
+        discount_percentage: offer.discount_percentage || null,
+        start_date: offer.start_date,
+        end_date: offer.end_date,
+        image_url: offer.image_url || null,
+        is_active: offer.is_active !== undefined ? offer.is_active : true,
+      }])
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateSeasonalOffer(id: string, updates: Partial<{
+    title_ar: string;
+    description_ar: string;
+    discount_percentage: number | null;
+    start_date: string;
+    end_date: string;
+    image_url: string | null;
+    is_active: boolean;
+  }>) {
+    const { data, error } = await supabase
+      .from('seasonal_offers')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteSeasonalOffer(id: string) {
+    const { error } = await supabase
+      .from('seasonal_offers')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
 };

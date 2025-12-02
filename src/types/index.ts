@@ -288,3 +288,17 @@ export interface ServiceInquiryWithService extends ServiceInquiry {
   service: Service;
 }
 
+// عروض موسمية (Seasonal Offers)
+export interface SeasonalOffer {
+  id: string;
+  title_ar: string;
+  description_ar: string;
+  discount_percentage: number | null;
+  start_date: string;
+  end_date: string;
+  image_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+

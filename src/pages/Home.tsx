@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ProductCard from '@/components/ProductCard';
 import CategoryCard from '@/components/CategoryCard';
+import SeasonalOffersSection from '@/components/SeasonalOffersSection';
 import { api } from '@/db/api';
 import type { Product, Category } from '@/types';
 
@@ -112,6 +113,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Seasonal Offers Section */}
+      <SeasonalOffersSection />
 
       {/* Main Categories Section */}
       <section className="py-16 bg-muted/30">
