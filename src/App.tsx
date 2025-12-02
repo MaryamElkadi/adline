@@ -36,56 +36,65 @@ import AdminServices from './pages/admin/Services';
 import AdminServiceInquiries from './pages/admin/ServiceInquiries';
 import AdminSeasonalOffers from './pages/admin/SeasonalOffers';
 
+// User Layout Component
+function UserLayout() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:slug" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+          <Route path="/order-failed" element={<OrderFailed />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Router>
       <AuthProvider>
         <CartProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow">
-              <Routes>
-                {/* Admin Routes */}
-                <Route path="/admin/*" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="products" element={<AdminProducts />} />
-                  <Route path="products/new" element={<EnhancedProductForm />} />
-                  <Route path="products/:productId/edit" element={<EnhancedProductForm />} />
-                  <Route path="products/:productId/options" element={<SimpleProductOptions />} />
-                  <Route path="product-options" element={<AdminProductOptions />} />
-                  <Route path="categories" element={<AdminCategories />} />
-                  <Route path="orders" element={<AdminOrders />} />
-                  <Route path="users" element={<AdminUsers />} />
-                  <Route path="blog" element={<AdminBlogPosts />} />
-                  <Route path="messages" element={<AdminMessages />} />
-                  <Route path="portfolio" element={<AdminPortfolio />} />
-                  <Route path="services" element={<AdminServices />} />
-                  <Route path="service-inquiries" element={<AdminServiceInquiries />} />
-                  <Route path="seasonal-offers" element={<AdminSeasonalOffers />} />
-                </Route>
-                
-                {/* User Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:slug" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-success/:orderId" element={<OrderSuccess />} />
-                <Route path="/order-failed" element={<OrderFailed />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogDetail />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/portfolio" element={<PortfolioPage />} />
-                <Route path="/services" element={<ServicesPage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <Routes>
+            {/* Admin Routes - No Header/Footer */}
+            <Route path="/admin/*" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="products/new" element={<EnhancedProductForm />} />
+              <Route path="products/:productId/edit" element={<EnhancedProductForm />} />
+              <Route path="products/:productId/options" element={<SimpleProductOptions />} />
+              <Route path="product-options" element={<AdminProductOptions />} />
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="blog" element={<AdminBlogPosts />} />
+              <Route path="messages" element={<AdminMessages />} />
+              <Route path="portfolio" element={<AdminPortfolio />} />
+              <Route path="services" element={<AdminServices />} />
+              <Route path="service-inquiries" element={<AdminServiceInquiries />} />
+              <Route path="seasonal-offers" element={<AdminSeasonalOffers />} />
+            </Route>
+            
+            {/* User Routes - With Header/Footer */}
+            <Route path="*" element={<UserLayout />} />
+          </Routes>
           <Toaster />
         </CartProvider>
       </AuthProvider>
