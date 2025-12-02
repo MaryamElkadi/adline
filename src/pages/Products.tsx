@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export default function Products() {
   const [searchParams] = useSearchParams();
   const categorySlug = searchParams.get('category');
+  const categoryId = searchParams.get('category');
   
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -18,7 +19,7 @@ export default function Products() {
 
   useEffect(() => {
     loadData();
-  }, [categorySlug]);
+  }, [categorySlug, categoryId]);
 
   const loadData = async () => {
     setLoading(true);
@@ -30,8 +31,11 @@ export default function Products() {
 
       setCategories(allCategories);
 
-      if (categorySlug) {
-        const category = allCategories.find(c => c.slug === categorySlug);
+      if (categorySlug || categoryId) {
+        // Try to find by slug first, then by ID
+        const category = allCategories.find(c => 
+          c.slug === categorySlug || c.id === categoryId
+        );
         setSelectedCategory(category || null);
         const filteredProducts = allProducts.filter(p => p.category_id === category?.id);
         setProducts(filteredProducts);

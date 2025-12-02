@@ -2,30 +2,27 @@
 
 ## 1. Website Overview
 
-### 1.1 Website Name\n
-khat-alailan (خط الاعلان)
-
+### 1.1 Website Name
+\nkhat-alailan (خط الاعلان)\n
 ### 1.2 Website Description
 
 A comprehensive online printing services platform offering custom printing solutions for individuals and businesses. The website provides a wide range of printing products and services with an easy-to-use ordering system.
 
-### 1.3 Language
-
+### 1.3 Language\n
 Arabic (RTL layout)
 
 ## 2. Technical Stack
 
-### 2.1 Frontend
-
+### 2.1 Frontend\n
 - React with JavaScript
-- Tailwind CSS for styling\n- RTL (Right-to-Left) support for Arabic language\n- Drag-and-drop library for image upload (e.g., react-dropzone)
-\n### 2.2 Backend
+- Tailwind CSS for styling
+- RTL (Right-to-Left) support for Arabic language
+- Drag-and-drop library for image upload (e.g., react-dropzone)
 
-- Node.js
+### 2.2 Backend
 
-## 3. Core Features
-
-### 3.1 Product Categories
+- Node.js\n\n## 3. Core Features
+\n### 3.1 Product Categories
 
 - Business cards printing
 - packaging offers
@@ -36,9 +33,11 @@ Arabic (RTL layout)
   - Sheet stickers
   - 3D stickers
   - Spot UV stickers
-  - Shipping and sealing stickers\n  - Square stickers
+  - Shipping and sealing stickers
+  - Square stickers
   - Round stickers
-- Brochures and flyers\n- Printing on bags
+- Brochures and flyers
+- Printing on bags
 - cards
   - Folded cards
   - Square cards
@@ -49,21 +48,20 @@ Arabic (RTL layout)
   - Zipper boxes
   - Base and lid boxes
   - Complete box with closure
-  - Serving box\n  - Distribution boxes
+  - Serving box
+  - Distribution boxes
   - Inner box bases
   - Box holder
 - Banners and posters
 - paper products
-  - Files
-  - Engineering plans
+  - Files\n  - Engineering plans
   - Envelopes
   - Business cards
   - Tags
-  - Correspondence envelopes\n  - Covering paper
-  - Menu
-  - Brochures
-  - Flyers
-  - Certificates of appreciation
+  - Correspondence envelopes
+  - Covering paper
+  - Menu\n  - Brochures
+  - Flyers\n  - Certificates of appreciation
   - Letter paper
   - Printing of booklets and notebooks
   - Calendars
@@ -73,18 +71,16 @@ Arabic (RTL layout)
   - Cup sleeves
   - Cup holders
   - Box sleeves
-  - Box wrapping
-  - Fabric clothing labels
+  - Box wrapping\n  - Fabric clothing labels
   - Gift ribbons
 - Stationery items
 - cartons
   - White shipping cartons
   - Brown shipping cartons
   - Thermal seal cartons
-  - Full print cartons - Minimum order 1000
-- Custom printing services
+  - Full print cartons - Minimum order1000\n- Custom printing services
+\n### 3.2 User Features
 
-### 3.2 User Features\n
 - Product browsing and search
 - other bags
   - Shipping bags
@@ -94,8 +90,7 @@ Arabic (RTL layout)
   - Coffee bags
 - Custom design upload
 - advertising gifts
-  - T-shirt
-  - Brooch
+  - T-shirt\n  - Brooch
   - Mugs
   - Printed pens
   - Stamp
@@ -106,9 +101,9 @@ Arabic (RTL layout)
 - resturants and coffes
   - Stickers - Labels
   - Boxes and Bags
-  - Cups
-  - Other Printed Materials
-  - Pizza Box\n- Shopping cart functionality
+  - Cups\n  - Other Printed Materials
+  - Pizza Box
+- Shopping cart functionality
 - fachions
   - Schools and universities
   - Corporate and employee attire
@@ -118,8 +113,7 @@ Arabic (RTL layout)
 - Order placement and tracking
 - celebrations and occaisons
   - Hero section with scrolling carousel showcasing featured celebration products and services
-  - All event supplies
-  - Stickers
+  - All event supplies\n  - Stickers
   - Favor boxes
   - Canvas printing
   - Posters
@@ -142,128 +136,166 @@ Arabic (RTL layout)
 - Who We Are (من نحن)
   - User interface displaying company information
   - Company history and mission
-  - Team introduction\n  - Values and achievements
+  - Team introduction
+  - Values and achievements
 - Portfolio (معرض الأعمال)
   - User interface showcasing completed projects
   - Project gallery with categories\n  - Project details and descriptions
 - contact and redirect to whatsap or email or facebook
 - login with user or admin if user rediret to home page and of he admin redirect to admindashboard
+\n### 3.3 Home Page - Main Categories Section (الأقسام الرئيسية)
 
-### 3.3 E-commerce Features
+- Display main product categories in card-based grid layout on home page
+- Each category card shows:
+  - Category icon/image
+  - Category name in Arabic
+- Clicking on any category card redirects user to the corresponding category product listing page
+- Categories displayed include (but not limited to):
+  - التغليف والتعبئة (Packaging)\n  - مطبوعات ورقية (Paper Products)
+  - طباعة الملصقات (Stickers Printing)
+  - طباعة الأكياس (Bags Printing)
+  - طباعة بوكسات (Boxes Printing)
+  - العروض والباكجات (Offers and Packages)
+- Reference design: image-2.png and image-3.png
+\n### 3.4 E-commerce Features
 
 - Product catalog with images and descriptions
 - Pricing display
-- Quantity selection
-- Size and material options
-- Add to cart functionality\n- Checkout process
+- Add to cart functionality
+- Checkout process
 - Payment integration
-- Order confirmation\n- Each product has the following options before adding to cart (with dynamic pricing based on selections):
-  - **الحجم** (Size): اختر
-  - **الجانب** (Side): اختر
-  - **المادة** (Material): اختر\n  - **الكمية** (Quantity): اختر
-  - **خدمة التصميم** (Design Service): لديك نموذج لتصميم خاص أم تريد خدمة تصميم
-  - **مدة التنفيذ للمنتج** (Implementation Duration): اختر
-  - **هل تريد تصوير عينة قبل طباعة الكمية** (Do you want a sample before full production): اختر (نعم/لا)
-  - Price changes dynamically based on user selections
-  - Admin manages all option values and pricing rules
+- Order confirmation
+- **Product Configuration Before Adding to Cart** (matching image.png exactly):
+  - Each product page displays configuration options on the right side
+  - Product model number displayed at top (رقم الموديل)
+  - Two tabs: خيارات المنتج (Product Options - active/orange) and تقييمات المنتج (Product Reviews)\n  - Configuration fields (all required, marked with red asterisk *):
+    1. **اختر المقاس*** (Choose Size): Dropdown list showing size options (e.g., '33x48')
+    2. **اختر نوع الورق*** (Choose Paper Type): Dropdown list showing paper type options (e.g., 'ورق تغليف 92gmثلجي')
+    3. **الكمية*** (Quantity): Dropdown list for quantity selection
+    4. **خدمة التصميم*** (Design Service): Dropdown list with options (e.g., 'طلب خدمة تصميم (...ر.س)')
+    5. **مدة التنفيذ للمنتج*** (Implementation Duration): Dropdown list showing duration options with pricing impact
+    6. **هل تريد تصوير عينة قبل طباعة الكمية*** (Do you want a sample before full production): Dropdown with yes/no options
+    7. **ارفع تصميمك*** (Upload Your Design): File upload field with text'يمكنك رفع ملف بصيغة (PDF, PNG, JPG, AI, PSD)' and 'اختر ملف' button
+  - Price display at bottom showing total with currency (ر.س) and shipping note
+  - Orange'إضافة للسلة' (Add to Cart) button at bottom
+  - All dropdown fields show'اختر' (Choose) as placeholder
+  - Price updates dynamically based on user selections
+  - Admin manages all option values and pricing rules through dashboard
 - menu
-
-### 3.4 Additional Features
+\n### 3.5 Additional Features
 
 - Contact form
-- Customer support chat\n- FAQ section
+- Customer support chat
+- FAQ section
 - Delivery information
 - Company information pages
-
-### 3.5 Admin Dashboard
+\n### 3.6 Admin Dashboard
 
 - Full control and management of all website content
-
-#### 3.5.1 Category Management\n- View all product categories
+\n#### 3.6.1 Category Management
+- View all product categories
 - Add new categories
 - Edit existing categories
-- Delete categories\n- Organize category hierarchy
+- Delete categories
+- Organize category hierarchy
+- Manage category icons/images for home page display
 
-#### 3.5.2 Product Management
+#### 3.6.2 Product Management
 - Add new products with drag-and-drop image upload
 - Edit existing products with drag-and-drop image replacement
 - Remove products
-- Configure product options (size, material, quantity, design service, implementation duration, sample request)
-- Set pricing rules based on product options
+- Configure product options:\n  - Size options (المقاس)
+  - Paper type options (نوع الورق)
+  - Quantity options (الكمية)
+  - Design service options (خدمة التصميم)
+  - Implementation duration options (مدة التنفيذ للمنتج)
+  - Sample request options (تصوير عينة)
+- Set pricing rules based on product option combinations
 - Manage product inventory
-
-#### 3.5.3 Blog Management
+- Set product model numbers
+\n#### 3.6.3 Blog Management
 - View all blog posts
-- Create new blog posts\n- Edit existing blog posts
+- Create new blog posts
+- Edit existing blog posts
 - Delete blog posts
 - Manage blog categories and tags
 - Schedule blog post publication
 
-#### 3.5.4 Order Management
-- View all orders with filtering options (status, date, customer)
+#### 3.6.4 Order Management\n- View all orders with filtering options (status, date, customer)
 - Update order status (pending, processing, shipped, delivered, cancelled)
-- View order details and customer information
+- View order details including customer-selected product configurations and uploaded design files
 - Process refunds and cancellations
 - Generate order reports
 
-#### 3.5.5 Message Management
+#### 3.6.5 Message Management
 - View all customer messages and inquiries
 - Respond to customer messages
 - Mark messages as read/unread
 - Archive or delete messages
 - Filter messages by status or date
 
-#### 3.5.6 User Management
+#### 3.6.6 User Management
 - Manage user accounts
 - View user activity and order history
-
-#### 3.5.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload\n- Edit existing portfolio projects\n- Delete portfolio projects
+\n#### 3.6.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
+- Edit existing portfolio projects
+- Delete portfolio projects
 - Categorize projects by type (special occasions, commercial, etc.)
 - Manage project details (title, description, images, date)
 - Control visibility of portfolio items on user interface
 
-#### 3.5.8 Who We Are Management (إدارة من نحن)
+#### 3.6.8 Who We Are Management (إدارة من نحن)
 - Edit company information and history
 - Update team member profiles
 - Manage company values and achievements
 - Upload and update company images
-\n#### 3.5.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)\n- Add new special occasion projects with multiple images
+\n#### 3.6.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)\n- Add new special occasion projects with multiple images
 - Edit project details and descriptions
 - Delete projects
 - Organize projects by occasion type
 - Control display order on user interface
 
-#### 3.5.10 Settings and Configuration
+#### 3.6.10 Settings and Configuration
 - Configure payment and delivery settings
 - Update website content and information
 - View sales reports and analytics
-
-## 4. Design Style
+\n## 4. Design Style
 
 - Two interfaces: User interface for customers and Admin dashboard for website management
 \n### 4.1 Color Scheme
 
 - Primary color: Yellow (أصفر)
 - Secondary color: Blue (أزرق)
-- Complementary neutral tones for balance\n
-### 4.2 Visual Elements
+- Complementary neutral tones for balance
+\n### 4.2 Visual Elements
 
 - Modern and clean interface with RTL layout
 - Card-based product display with hover effects
+- Card-based category display on home page with icons and labels
 - Rounded corners (8-12px) for buttons and cards
 - Subtle shadows for depth and hierarchy
-- Clear typography optimized for Arabic text\n- Responsive grid layout for product categories
-- Drag-and-drop zone with dashed border and upload icon for image uploads
-- Scrolling hero section with smooth transitions for celebrations page\n- Gallery-style layout for portfolio and special occasions pages with lightbox functionality
+- Clear typography optimized for Arabic text
+- Responsive grid layout for product categories and main categories section
+- Drag-and-drop zone withdashed border and upload icon for image uploads
+- Product configuration panel with tabbed interface (orange active tab, gray inactive tab)
+- Dropdown fields with downward arrow indicators
+- File upload button with outlined style
+- Orange call-to-action buttons for'Add to Cart'\n- Required field indicators with red asterisks
+- Scrolling hero section with smooth transitions for celebrations page
+- Gallery-style layout for portfolio and special occasions pages with lightbox functionality
 
 ### 4.3 Layout Style
 
-- Grid-based product catalog
-- Sticky navigation header\n- Clear call-to-action buttons in yellow
+- Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
+- Sticky navigation header\n- Clear call-to-action buttons in yellow/orange
 - Blue accents for links and secondary actions
+- Two-column product detail layout: product image on left, configuration options on right
 - Hero section with auto-scrolling carousel for celebrations page
 - Masonry or grid layout for portfolio displays
+\n## 5. Reference Images
 
-## 5. Reference Files
+1. Product configuration interface reference: image.png
+2. Home page main categories section reference: image-2.png, image-3.png
+\n## 6. Reference Files
 
 1. Research Report: /workspace/app-7xukyn3fda82/docs/report.md

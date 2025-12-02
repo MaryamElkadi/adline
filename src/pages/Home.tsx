@@ -113,6 +113,71 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Main Categories Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 xl:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl xl:text-4xl font-bold mb-4">الأقسام الرئيسية</h2>
+            <p className="text-muted-foreground text-lg">
+              تصفح جميع الأقسام للعثور على ما تحتاجه
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 @md:grid-cols-3 xl:grid-cols-6 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4" />
+                    <div className="h-4 bg-muted rounded" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 @md:grid-cols-3 xl:grid-cols-6 gap-4">
+              {categories.slice(0, 6).map((category) => (
+                <Link
+                  key={category.id}
+                  to={`/products?category=${category.id}`}
+                  className="group"
+                >
+                  <Card className="hover:shadow-hover transition-smooth hover:scale-105">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-smooth">
+                        <span className="text-3xl">
+                          {category.name_ar.includes('ملصق') ? '🏷️' :
+                           category.name_ar.includes('بطاق') ? '💳' :
+                           category.name_ar.includes('صندوق') || category.name_ar.includes('علب') ? '📦' :
+                           category.name_ar.includes('كيس') || category.name_ar.includes('أكياس') ? '🛍️' :
+                           category.name_ar.includes('ورق') ? '📄' :
+                           category.name_ar.includes('كرتون') ? '📦' :
+                           '🖨️'}
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-sm group-hover:text-primary transition-smooth">
+                        {category.name_ar}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {categories.length > 6 && (
+            <div className="text-center mt-8">
+              <Button asChild variant="outline" size="lg">
+                <Link to="/products">
+                  عرض جميع الأقسام
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
       <section className="py-16 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10">
         <div className="max-w-7xl mx-auto px-4 xl:px-6">
           <div className="text-center mb-8">
