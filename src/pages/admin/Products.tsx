@@ -232,9 +232,9 @@ export default function Products() {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-muted-foreground">Manage your product catalog</p>
         </div>
-        <Button onClick={() => handleOpenDialog()}>
+        <Button onClick={() => navigate('/admin/products/new')}>
           <Plus className="ml-2 h-4 w-4" />
-          Add Product
+          Add Product (Enhanced)
         </Button>
       </div>
 
@@ -325,7 +325,8 @@ export default function Products() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleOpenDialog(product)}
+                            onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+                            title="Edit Product (Enhanced Form)"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>

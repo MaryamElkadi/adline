@@ -15,24 +15,24 @@ Implement comprehensive product options system with quantity tiers, size/materia
 - [x] 1.3 Add API methods in @/db/api.ts
 
 ## Phase 2: Admin Product Form Enhancement
-- [ ] 2.1 Add Quantity Tiers Section
-  - [ ] Dynamic rows for quantity + price pairs
-  - [ ] Calculate total with 15% VAT for each tier
-  - [ ] Add/remove quantity tier rows
-- [ ] 2.2 Add Size Options Section
-  - [ ] Dynamic rows for size name + price addition
-  - [ ] Add/remove size option rows
-- [ ] 2.3 Add Material Options Section
-  - [ ] Dynamic rows for material name + price addition
-  - [ ] Add/remove material option rows
-- [ ] 2.4 Add Side Options Section
-  - [ ] Dynamic rows for side option + price addition
-  - [ ] Add/remove side option rows
-- [ ] 2.5 Add Tax Calculation Display
-  - [ ] Show subtotal
-  - [ ] Show 15% VAT
-  - [ ] Show total price
-- [ ] 2.6 Update form submission to save all options
+- [x] 2.1 Add Quantity Tiers Section
+  - [x] Dynamic rows for quantity + price pairs
+  - [x] Calculate total with 15% VAT for each tier
+  - [x] Add/remove quantity tier rows
+- [x] 2.2 Add Size Options Section
+  - [x] Dynamic rows for size name + price addition
+  - [x] Add/remove size option rows
+- [x] 2.3 Add Material Options Section
+  - [x] Dynamic rows for material name + price addition
+  - [x] Add/remove material option rows
+- [x] 2.4 Add Side Options Section
+  - [x] Dynamic rows for side option + price addition
+  - [x] Add/remove side option rows
+- [x] 2.5 Add Tax Calculation Display
+  - [x] Show subtotal
+  - [x] Show 15% VAT
+  - [x] Show total price
+- [x] 2.6 Update form submission to save all options
 
 ## Phase 3: User Product Detail Page Enhancement
 - [ ] 3.1 Display Quantity Tiers

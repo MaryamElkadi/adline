@@ -184,6 +184,17 @@ export const api = {
     };
   },
 
+  async getProductById(id: string): Promise<Product | null> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
   async createProduct(product: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Promise<Product> {
     const { data, error } = await supabase
       .from('products')
