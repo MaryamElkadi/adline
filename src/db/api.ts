@@ -747,6 +747,25 @@ export const api = {
     if (error) throw error;
   },
 
+  async getProductOptionAssignments(): Promise<ProductOptionAssignment[]> {
+    const { data, error } = await supabase
+      .from('product_option_assignments')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async deleteProductOptionAssignment(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('product_option_assignments')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
   // Checkout APIs
   async createOrder(checkoutData: CheckoutData, cartItems: CartItemWithProduct[], userId?: string): Promise<Order> {
     const totalAmount = cartItems.reduce((sum, item) => {

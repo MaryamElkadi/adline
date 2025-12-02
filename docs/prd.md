@@ -14,7 +14,8 @@ Arabic (RTL layout)
 
 ## 2. Technical Stack
 
-### 2.1 Frontend\n
+### 2.1 Frontend
+
 - React with JavaScript
 - Tailwind CSS for styling
 - RTL (Right-to-Left) support for Arabic language
@@ -114,8 +115,7 @@ Arabic (RTL layout)
 - Order placement and tracking
 - celebrations and occaisons
   - Hero section with scrolling carousel showcasing featured celebration products and services
-  - All event supplies
-  - Stickers
+  - All event supplies\n  - Stickers
   - Favor boxes
   - Canvas printing
   - Posters
@@ -144,12 +144,37 @@ Arabic (RTL layout)
   - Project gallery with categories\n  - Project details and descriptions
 - contact and redirect to whatsap or email or facebook
 - **User Profile Page (صفحة الملف الشخصي)**
-  - View and edit personal information
-  - Display user's full name, email, phone number\n  - Edit profile details
-  - View order history
-  - Manage saved addresses
-  - Change password functionality
-  - Account settings
+  - View and edit personal information:\n    + Full name (الاسم الكامل)
+    + Email address (البريد الإلكتروني)
+    + Phone number (رقم الهاتف)
+    + Profile picture upload with drag-and-drop functionality
+  - Edit profile details with inline editing or dedicated edit mode
+  - View complete order history with:\n    + Order number and date
+    + Order status (pending, processing, shipped, delivered, cancelled)
+    + Order items with product images and configurations
+    + Total amount paid
+    + Option to view detailed order information
+    + Option to reorder previous orders
+  - Manage saved addresses:\n    + Add new shipping addresses
+    + Edit existing addresses\n    + Delete addresses
+    + Set default shipping address
+    + Address fields: street address, city, postal code\n  - Change password functionality:\n    + Current password field (required)
+    + New password field (required, minimum 8 characters)
+    + Confirm new password field (required, must match new password)
+    + Form validation with error messages
+  - Account settings:
+    + Email notification preferences
+    + Language preferences
+    + Account deletion option with confirmation dialog
+  - Sidebar navigation with sections:
+    + معلومات الحساب (Account Information)
+    + سجل الطلبات (Order History)
+    + العناوين المحفوظة (Saved Addresses)
+    + تغيير كلمة المرور (Change Password)
+    + الإعدادات (Settings)
+  - Responsive card-based layout for each section
+  - Success and error messages for all actions
+  - Form validation for all input fields
 \n### 3.3 Authentication Features
 
 #### 3.3.1 Registration Page (صفحة التسجيل)
@@ -160,7 +185,8 @@ Arabic (RTL layout)
 - Confirm password field (required, must match password)
 - Terms and conditions checkbox (required)
 - 'تسجيل' (Register) button
-- **Social Login Options**:\n  - 'تسجيل بواسطة Google' (Sign up with Google) button - using OSS Google login method
+- **Social Login Options**:
+  - 'تسجيل بواسطة Google' (Sign up with Google) button - using OSS Google login method
   - 'تسجيل بواسطة Facebook' (Sign up with Facebook) button\n- Link to login page:'لديك حساب بالفعل؟ تسجيل الدخول' (Already have an account? Login)
 - Form validation with error messages for all fields
 
@@ -174,9 +200,9 @@ Arabic (RTL layout)
 - Form validation with error messages\n- **Login Redirect Logic**:
   - If user role is 'user': redirect to home page
   - If user role is 'admin': redirect to admin dashboard
-\n### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
 
-- Display main product categories in card-based grid layout on home page
+### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
+\n- Display main product categories in card-based grid layout on home page
 - Each category card shows:
   - Category icon/image
   - Category name in Arabic
@@ -191,8 +217,7 @@ Arabic (RTL layout)
 \n### 3.5 E-commerce Features
 
 - Product catalog with images and descriptions
-- Pricing display
-- Add to cart functionality
+- Pricing display\n- Add to cart functionality
 - Checkout process
 - Payment integration
 - Order confirmation
@@ -215,7 +240,8 @@ Arabic (RTL layout)
 
 ### 3.6 Shopping Cart and Checkout Flow
 
-#### 3.6.1 Shopping Cart Page\n- Display all items added to cart with:\n  - Product image
+#### 3.6.1 Shopping Cart Page\n- Display all items added to cart with:
+  - Product image
   - Product name and model number
   - Selected configuration options (size, paper type, quantity, design service, duration, sample request)
   - Unit price and total price per item
@@ -226,14 +252,13 @@ Arabic (RTL layout)
   - Shipping cost
   - Total amount
 -'إتمام الطلب' (Complete Order) button to proceed to checkout
-- 'متابعة التسوق' (Continue Shopping) button to return to products\n\n#### 3.6.2 Checkout Process (إتمام الطلب)\n- **Step 1: Customer Information**
+- 'متابعة التسوق' (Continue Shopping) button to return to products\n\n#### 3.6.2 Checkout Process (إتمام الطلب)
+- **Step 1: Customer Information**
   - Full name (required)
-  - Email address (required, with email format validation)
-  - Phone number (required, with phone format validation)
+  - Email address (required, with email format validation)\n  - Phone number (required, with phone format validation)
   - Shipping address (required):\n    - Street address
-    - City
-    - Postal code
-  - Order notes (optional)
+    - City\n    - Postal code
+- Order notes (optional)
   - Form validation with error messages for missing or invalid fields
 \n- **Step 2: Payment Method Selection**
   - Two payment options:
@@ -290,67 +315,100 @@ Arabic (RTL layout)
 - Add new products with drag-and-drop image upload
 - Edit existing products with drag-and-drop image replacement
 - Remove products
-- **Configure product options (خيارات المنتج)**:
-  - Size options (المقاس) with individual pricing for each size
-  - Paper type options (نوع الورق) with individual pricing for each type
-  - Quantity options (الكمية) with individual pricing for each quantity tier
-  - Design service options (خدمة التصميم) with individual pricing for each service level
-  - Implementation duration options (مدة التنفيذ للمنتج) with individual pricing for each duration
-  - Sample request options (تصوير عينة) with individual pricing if applicable
-- **Pricing Management**:
-  - Set base price for each product
-  - Add price modifier (+ or -) for each option choice
-  - Preview how prices display in dropdown menus
-  - Set pricing rules based on product option combinations
 - Manage product inventory
 - Set product model numbers
-\n#### 3.8.3 Blog Management
+\n#### 3.8.3 Product Options Configuration Page (صفحة إعدادات خيارات المنتج)\n- **Dedicated interface for configuring all product options**
+- **Size Options Management (إدارة خيارات المقاس)**:
+  - Add new size options with name and price modifier
+  - Edit existing size options
+  - Delete size options\n  - Set display order for size options
+  - Example: '33x48' with price modifier '+10ر.س'
+- **Paper Type Options Management (إدارة خيارات نوع الورق)**:
+  - Add new paper type options with name and price modifier
+  - Edit existing paper type options\n  - Delete paper type options\n  - Set display order for paper type options
+  - Example: 'ورق تغليف 92gm ثلجي' with price modifier '+5ر.س'
+- **Quantity Options Management (إدارة خيارات الكمية)**:\n  - Add quantity tiers with price modifiers
+  - Edit existing quantity options
+  - Delete quantity options\n  - Set minimum and maximum quantity limits
+- **Design Service Options Management (إدارة خيارات خدمة التصميم)**:
+  - Add design service options with name and price modifier\n  - Edit existing design service options
+  - Delete design service options
+  - Example: 'طلب خدمة تصميم' with price modifier '+50ر.س'
+- **Implementation Duration Options Management (إدارة خيارات مدة التنفيذ)**:
+  - Add duration options with name and price modifier
+  - Edit existing duration options
+  - Delete duration options
+  - Example: 'تنفيذ سريع - 3 أيام' with price modifier '+20ر.س'
+- **Sample Request Options Management (إدارة خيارات تصوير العينة)**:
+  - Add sample options (yes/no) with price modifiers
+  - Edit existing sample options
+  - Delete sample options
+- **Pricing Rules Configuration**:
+  - Set base price for each product
+  - Configure price modifiers for each option choice
+  - Preview how prices display in dropdown menus on product pages
+  - Set conditional pricing rules based on option combinations
+  - Bulk edit pricing for multiple products
+- **Option Assignment to Products**:
+  - Assign specific options to individual products or product categories
+  - Enable/disable specific options for certain products
+  - Set default selections for each option type
+- **Option Display Settings**:
+  - Configure option labels in Arabic
+  - Set placeholder text for dropdown fields
+  - Configure required/optional status for each option
+  - Set validation rules for each option
+- **Preview Functionality**:
+  - Live preview of how options appear on product pages
+  - Test price calculation with different option combinations
+  - Verify dropdown display and functionality
+\n#### 3.8.4 Blog Management
 - View all blog posts
 - Create new blog posts
 - Edit existing blog posts
 - Delete blog posts
 - Manage blog categories and tags
 - Schedule blog post publication
-
-#### 3.8.4 Order Management\n- View all orders with filtering options (status, date, customer, payment method)
+\n#### 3.8.5 Order Management
+- View all orders with filtering options (status, date, customer, payment method)
 - Update order status (pending, processing, shipped, delivered, cancelled)
 - View order details including:\n  - Customer-selected product configurations
   - Uploaded design files
   - Customer information
   - Payment method and status
-  - Total amount
-- Process refunds and cancellations
+  - Total amount\n- Process refunds and cancellations
 - Generate order reports
 - Mark orders as paid/unpaid for cash on delivery
 
-#### 3.8.5 Message Management
+#### 3.8.6 Message Management
 - View all customer messages and inquiries
 - Respond to customer messages
 - Mark messages as read/unread
 - Archive or delete messages
 - Filter messages by status or date
 
-#### 3.8.6 User Management
+#### 3.8.7 User Management
 - Manage user accounts\n- View user activity and order history
-\n#### 3.8.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
+\n#### 3.8.8 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
 - Edit existing portfolio projects
 - Delete portfolio projects
 - Categorize projects by type (special occasions, commercial, etc.)
 - Manage project details (title, description, images, date)
 - Control visibility of portfolio items on user interface
 
-#### 3.8.8 Who We Are Management (إدارة من نحن)
+#### 3.8.9 Who We Are Management (إدارة من نحن)
 - Edit company information and history
 - Update team member profiles
 - Manage company values and achievements
 - Upload and update company images
-\n#### 3.8.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)\n- Add new special occasion projects with multiple images
+\n#### 3.8.10 Special Occasions Works Management (إدارة مناسباتك الخاصة)
+- Add new special occasion projects with multiple images
 - Edit project details and descriptions
 - Delete projects
 - Organize projects by occasion type
 - Control display order on user interface
 
-#### 3.8.10 Settings and Configuration
+#### 3.8.11 Settings and Configuration
 - Configure payment and delivery settings
 - Update website content and information
 - View sales reports and analytics
@@ -383,6 +441,8 @@ Arabic (RTL layout)
 - Gallery-style layout for portfolio and special occasions pages with lightbox functionality
 - Social login buttons with brand colors (Google and Facebook)
 - Profile page with clean card-based layout for user information sections
+- Admin dashboard with sidebar navigation and data tables
+- Form-based interface for product options configuration with add/edit/delete controls
 \n### 4.3 Layout Style
 
 - Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
@@ -395,6 +455,8 @@ Arabic (RTL layout)
 - Responsive cart summary sidebar
 - Centered authentication forms with social login buttons below main form
 - Profile page with sidebar navigation and main content area
+- Admin dashboard with collapsible sidebar and main content area
+- Product options configuration page with tabbed sections for each option type
 \n## 5. Reference Images
 
 1. Product configuration interface reference: image.png
