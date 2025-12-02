@@ -313,7 +313,11 @@ export default function Products() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => navigate(`/admin/products/${product.id}/options`)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('Navigating to options for product:', product.id);
+                              navigate(`/admin/products/${product.id}/options`);
+                            }}
                           >
                             <Settings className="h-4 w-4 mr-1" />
                             Options

@@ -196,6 +196,11 @@ export default function ProductDetail() {
   };
 
   const validateForm = (): string | null => {
+    // If no options are configured, validation passes
+    if (productOptions.length === 0) {
+      return null;
+    }
+
     // Get unique option names
     const optionNames = new Set(productOptions.map(o => o.option_name_en || o.option_name_ar));
     
@@ -218,8 +223,14 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     if (!product) return;
 
+    console.log('Add to cart clicked');
+    console.log('Product options:', productOptions);
+    console.log('Selected options:', selectedOptions);
+    console.log('Quantity:', quantity);
+
     const validationError = validateForm();
     if (validationError) {
+      console.log('Validation error:', validationError);
       toast({
         title: 'Please Complete All Fields',
         description: validationError,
@@ -257,6 +268,8 @@ export default function ProductDetail() {
         customOptions.wantSample = wantSample;
       }
 
+      console.log('Adding to cart with options:', customOptions);
+
       await addItem(product.id, quantity, customOptions);
 
       toast({
@@ -273,7 +286,7 @@ export default function ProductDetail() {
       console.error('Error adding to cart:', error);
       toast({
         title: 'Error',
-        description: 'Failed to add product to cart',
+        description: error instanceof Error ? error.message : 'Failed to add product to cart',
         variant: 'destructive',
       });
     } finally {
@@ -386,69 +399,75 @@ export default function ProductDetail() {
                     </div>
 
                     {/* Dynamic Options from Database - Grouped by Option Name */}
-                    {(() => {
-                      // Group options by name
-                      const optionGroups = new Map<string, SimpleProductOptionWithTiers[]>();
-                      productOptions.forEach(option => {
-                        const key = option.option_name_en || option.option_name_ar;
-                        if (!optionGroups.has(key)) {
-                          optionGroups.set(key, []);
-                        }
-                        optionGroups.get(key)!.push(option);
-                      });
+                    {productOptions.length === 0 ? (
+                      <div className="p-4 bg-muted/50 rounded-lg text-center text-muted-foreground">
+                        <p>No product options configured. You can still add this product to cart.</p>
+                      </div>
+                    ) : (
+                      (() => {
+                        // Group options by name
+                        const optionGroups = new Map<string, SimpleProductOptionWithTiers[]>();
+                        productOptions.forEach(option => {
+                          const key = option.option_name_en || option.option_name_ar;
+                          if (!optionGroups.has(key)) {
+                            optionGroups.set(key, []);
+                          }
+                          optionGroups.get(key)!.push(option);
+                        });
 
-                      return Array.from(optionGroups.entries()).map(([optionName, options]) => (
-                        <div key={optionName} className="space-y-2">
-                          <Label className="text-base">
-                            {optionName} <span className="text-destructive">*</span>
-                          </Label>
-                          <RadioGroup
-                            value={Object.keys(selectedOptions).find(id => 
-                              options.some(o => o.id === id)
-                            ) || ''}
-                            onValueChange={(value) => handleOptionChange(value)}
-                          >
-                            <div className="grid grid-cols-1 gap-2">
-                              {options.filter(o => o.is_available).map((option) => {
-                                // Calculate price for this option based on quantity
-                                let displayPrice = option.price_modifier;
-                                if (option.quantity_tiers && option.quantity_tiers.length > 0) {
-                                  const tier = option.quantity_tiers.find(t => 
-                                    t.min_quantity <= quantity && 
-                                    (t.max_quantity === null || t.max_quantity >= quantity)
-                                  );
-                                  if (tier) {
-                                    displayPrice = tier.price_modifier;
+                        return Array.from(optionGroups.entries()).map(([optionName, options]) => (
+                          <div key={optionName} className="space-y-2">
+                            <Label className="text-base">
+                              {optionName} <span className="text-destructive">*</span>
+                            </Label>
+                            <RadioGroup
+                              value={Object.keys(selectedOptions).find(id => 
+                                options.some(o => o.id === id)
+                              ) || ''}
+                              onValueChange={(value) => handleOptionChange(value)}
+                            >
+                              <div className="grid grid-cols-1 gap-2">
+                                {options.filter(o => o.is_available).map((option) => {
+                                  // Calculate price for this option based on quantity
+                                  let displayPrice = option.price_modifier;
+                                  if (option.quantity_tiers && option.quantity_tiers.length > 0) {
+                                    const tier = option.quantity_tiers.find(t => 
+                                      t.min_quantity <= quantity && 
+                                      (t.max_quantity === null || t.max_quantity >= quantity)
+                                    );
+                                    if (tier) {
+                                      displayPrice = tier.price_modifier;
+                                    }
                                   }
-                                }
 
-                                return (
-                                  <div key={option.id} className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-muted/50 cursor-pointer">
-                                    <RadioGroupItem value={option.id} id={option.id} />
-                                    <Label htmlFor={option.id} className="flex-1 cursor-pointer flex items-center justify-between">
-                                      <span>{option.option_value_en || option.option_value_ar}</span>
-                                      {displayPrice !== 0 && (
-                                        <span className="text-sm font-medium text-primary">
-                                          {displayPrice > 0 ? '+' : ''}
-                                          {displayPrice.toFixed(2)} SAR
-                                        </span>
-                                      )}
-                                    </Label>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </RadioGroup>
-                          
-                          {/* Show quantity tier info if available */}
-                          {options.some(o => o.quantity_tiers && o.quantity_tiers.length > 0) && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                              💡 Prices vary based on quantity. Adjust quantity to see different pricing tiers.
-                            </p>
-                          )}
-                        </div>
-                      ));
-                    })()}
+                                  return (
+                                    <div key={option.id} className="flex items-center space-x-2 space-x-reverse border rounded-lg p-3 hover:bg-muted/50 cursor-pointer">
+                                      <RadioGroupItem value={option.id} id={option.id} />
+                                      <Label htmlFor={option.id} className="flex-1 cursor-pointer flex items-center justify-between">
+                                        <span>{option.option_value_en || option.option_value_ar}</span>
+                                        {displayPrice !== 0 && (
+                                          <span className="text-sm font-medium text-primary">
+                                            {displayPrice > 0 ? '+' : ''}
+                                            {displayPrice.toFixed(2)} SAR
+                                          </span>
+                                        )}
+                                      </Label>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </RadioGroup>
+                            
+                            {/* Show quantity tier info if available */}
+                            {options.some(o => o.quantity_tiers && o.quantity_tiers.length > 0) && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                💡 Prices vary based on quantity. Adjust quantity to see different pricing tiers.
+                              </p>
+                            )}
+                          </div>
+                        ));
+                      })()
+                    )}
 
                     {/* File Upload */}
                     <div className="space-y-2">
