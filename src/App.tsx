@@ -8,6 +8,11 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderSuccess from './pages/OrderSuccess';
+import OrderFailed from './pages/OrderFailed';
+import Orders from './pages/Orders';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
@@ -17,6 +22,7 @@ import PortfolioPage from './pages/PortfolioPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
+import AdminProductOptions from './pages/admin/ProductOptions';
 import AdminCategories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
@@ -33,6 +39,7 @@ export default function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="product-options" element={<AdminProductOptions />} />
               <Route path="categories" element={<AdminCategories />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="users" element={<AdminUsers />} />
@@ -52,6 +59,11 @@ export default function App() {
                       <Route path="/products" element={<Products />} />
                       <Route path="/products/:slug" element={<ProductDetail />} />
                       <Route path="/cart" element={<Cart />} />
+                      <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+                      <Route path="/order-failed" element={<OrderFailed />} />
+                      <Route path="/orders" element={<Orders />} />
+                      <Route path="/profile" element={<Profile />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/blog" element={<Blog />} />
                       <Route path="/blog/:slug" element={<BlogDetail />} />
