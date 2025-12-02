@@ -14,17 +14,17 @@ export default function Cart() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background py-12">
+      <div className="min-h-screen bg-background py-12" dir="rtl">
         <div className="max-w-4xl mx-auto px-4 xl:px-6">
           <Card className="text-center py-12">
             <CardContent>
               <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Please Sign In</h2>
+              <h2 className="text-2xl font-bold mb-2">يرجى تسجيل الدخول</h2>
               <p className="text-muted-foreground mb-6">
-                You need to sign in to view your shopping cart
+                تحتاج إلى تسجيل الدخول لعرض سلة التسوق الخاصة بك
               </p>
               <Button asChild>
-                <Link to="/login">Sign In</Link>
+                <Link to="/login">تسجيل الدخول</Link>
               </Button>
             </CardContent>
           </Card>
@@ -35,7 +35,7 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background py-12">
+      <div className="min-h-screen bg-background py-12" dir="rtl">
         <div className="max-w-4xl mx-auto px-4 xl:px-6">
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -47,19 +47,19 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background py-12">
+      <div className="min-h-screen bg-background py-12" dir="rtl">
         <div className="max-w-4xl mx-auto px-4 xl:px-6">
           <Card className="text-center py-12">
             <CardContent>
               <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Your Cart is Empty</h2>
+              <h2 className="text-2xl font-bold mb-2">سلة التسوق فارغة</h2>
               <p className="text-muted-foreground mb-6">
-                You haven't added any products to your cart yet
+                لم تقم بإضافة أي منتجات إلى سلة التسوق بعد
               </p>
               <Button asChild>
                 <Link to="/products">
-                  Browse Products
                   <ArrowRight className="ml-2 h-4 w-4" />
+                  تصفح المنتجات
                 </Link>
               </Button>
             </CardContent>
@@ -114,12 +114,12 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className="min-h-screen bg-background py-12" dir="rtl">
       <div className="max-w-6xl mx-auto px-4 xl:px-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Shopping Cart</h1>
+          <h1 className="text-4xl font-bold mb-2">سلة التسوق</h1>
           <p className="text-muted-foreground">
-            You have {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
+            لديك {totalItems} {totalItems === 1 ? 'منتج' : 'منتجات'} في سلة التسوق
           </p>
         </div>
 
@@ -150,7 +150,7 @@ export default function Cart() {
                             {item.product?.name_ar || 'Product'}
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">
-                            Base Price: {item.product?.base_price?.toFixed(2)} SAR
+                            السعر الأساسي: {item.product?.base_price?.toFixed(2)} ريال
                           </p>
                         </div>
                         <Button
@@ -166,7 +166,7 @@ export default function Cart() {
                       {/* Selected Options */}
                       {item.selected_options && Object.keys(item.selected_options).length > 0 && item.product?.options && (
                         <div className="mb-3 space-y-1">
-                          <p className="text-sm font-medium mb-2">Selected Options:</p>
+                          <p className="text-sm font-medium mb-2">الخيارات المحددة:</p>
                           {Object.entries(item.selected_options).map(([type, optionId]) => {
                             const option = item.product?.options?.find(opt => opt.id === optionId);
                             return option ? (
@@ -174,7 +174,7 @@ export default function Cart() {
                                 <span className="text-muted-foreground">{option.option_name_ar}</span>
                                 {option.price_modifier !== 0 && (
                                   <Badge variant="outline" className={option.price_modifier > 0 ? 'text-green-600' : 'text-red-600'}>
-                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier.toFixed(2)} SAR
+                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier.toFixed(2)} ريال
                                   </Badge>
                                 )}
                               </div>
@@ -193,17 +193,17 @@ export default function Cart() {
                           if (customOpts && typeof customOpts === 'object' && Object.keys(customOpts).length > 0) {
                             return (
                               <div className="mb-3 space-y-1">
-                                <p className="text-sm font-medium mb-2">Custom Options:</p>
+                                <p className="text-sm font-medium mb-2">خيارات مخصصة:</p>
                                 {Object.entries(customOpts).map(([key, value]: [string, any]) => {
                                   if (value && typeof value === 'object') {
                                     return (
                                       <div key={key} className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">
-                                          {value.label || key}: {value.value || value.value_en || 'Selected'}
+                                          {value.label || key}: {value.value || value.value_en || 'محدد'}
                                         </span>
                                         {value.price_modifier && value.price_modifier !== 0 && (
                                           <Badge variant="outline" className={value.price_modifier > 0 ? 'text-green-600' : 'text-red-600'}>
-                                            {value.price_modifier > 0 ? '+' : ''}{value.price_modifier.toFixed(2)} SAR
+                                            {value.price_modifier > 0 ? '+' : ''}{value.price_modifier.toFixed(2)} ريال
                                           </Badge>
                                         )}
                                       </div>
@@ -223,7 +223,7 @@ export default function Cart() {
                       {/* Notes */}
                       {item.notes && (
                         <div className="mb-3">
-                          <p className="text-sm font-medium mb-1">Notes:</p>
+                          <p className="text-sm font-medium mb-1">ملاحظات:</p>
                           <p className="text-sm text-muted-foreground">{item.notes}</p>
                         </div>
                       )}
@@ -250,12 +250,12 @@ export default function Cart() {
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left">
                           <p className="text-lg font-bold text-primary">
-                            {calculateItemPrice(item).toFixed(2)} SAR
+                            {calculateItemPrice(item).toFixed(2)} ريال
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {(calculateItemPrice(item) / item.quantity).toFixed(2)} SAR each
+                            {(calculateItemPrice(item) / item.quantity).toFixed(2)} ريال للقطعة
                           </p>
                         </div>
                       </div>
@@ -270,24 +270,24 @@ export default function Cart() {
           <div className="xl:col-span-1">
             <Card className="sticky top-4">
               <CardContent className="p-6">
-                <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+                <h2 className="text-xl font-bold mb-4">ملخص الطلب</h2>
                 
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal ({totalItems} items)</span>
-                    <span className="font-medium">{totalPrice.toFixed(2)} SAR</span>
+                    <span className="text-muted-foreground">المجموع الفرعي ({totalItems} منتجات)</span>
+                    <span className="font-medium">{totalPrice.toFixed(2)} ريال</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium">Calculated at checkout</span>
+                    <span className="text-muted-foreground">الشحن</span>
+                    <span className="font-medium">يحسب عند الدفع</span>
                   </div>
                 </div>
 
                 <Separator className="my-4" />
 
                 <div className="flex justify-between mb-6">
-                  <span className="text-lg font-bold">Total</span>
-                  <span className="text-2xl font-bold text-primary">{totalPrice.toFixed(2)} SAR</span>
+                  <span className="text-lg font-bold">الإجمالي</span>
+                  <span className="text-2xl font-bold text-primary">{totalPrice.toFixed(2)} ريال</span>
                 </div>
 
                 <Button 
@@ -295,7 +295,7 @@ export default function Cart() {
                   size="lg"
                   onClick={handleCheckout}
                 >
-                  Proceed to Checkout
+                  متابعة إلى الدفع
                 </Button>
 
                 <Button 
@@ -303,12 +303,12 @@ export default function Cart() {
                   className="w-full"
                   asChild
                 >
-                  <Link to="/products">Continue Shopping</Link>
+                  <Link to="/products">متابعة التسوق</Link>
                 </Button>
 
                 <div className="mt-6 p-4 bg-muted rounded-lg">
                   <p className="text-sm text-muted-foreground">
-                    <strong>Note:</strong> Final price will be calculated at checkout including shipping and any applicable taxes.
+                    <strong>ملاحظة:</strong> سيتم حساب السعر النهائي عند الدفع بما في ذلك الشحن وأي ضرائب قابلة للتطبيق.
                   </p>
                 </div>
               </CardContent>
