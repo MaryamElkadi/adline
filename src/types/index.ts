@@ -64,6 +64,7 @@ export interface CartItem {
   product_id: string;
   quantity: number;
   selected_options: Record<string, string>;
+  custom_options?: Record<string, any> | string | null;
   custom_design_url: string | null;
   notes: string | null;
   created_at: string;
@@ -153,5 +154,45 @@ export interface PortfolioItem {
   is_featured: boolean;
   display_order: number;
   created_at: string;
+}
+
+export interface ProductOptionTemplate {
+  id: string;
+  option_type: string;
+  option_name_ar: string;
+  option_name_en: string | null;
+  is_required: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+export interface ProductOptionValue {
+  id: string;
+  template_id: string;
+  value_ar: string;
+  value_en: string | null;
+  price_modifier: number;
+  is_available: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+export interface ProductOptionAssignment {
+  id: string;
+  product_id: string;
+  template_id: string;
+  created_at: string;
+}
+
+export interface ProductOptionTemplateWithValues extends ProductOptionTemplate {
+  values: ProductOptionValue[];
+}
+
+export type PaymentMethod = 'card' | 'cash';
+
+export interface CheckoutData {
+  shipping_address: ShippingAddress;
+  payment_method: PaymentMethod;
+  notes?: string;
 }
 

@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   LogOut,
-  Home
+  Home,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,7 @@ export default function AdminLayout() {
   const navigation = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { name: 'Products', path: '/admin/products', icon: Package },
+    { name: 'Product Options', path: '/admin/product-options', icon: Settings },
     { name: 'Categories', path: '/admin/categories', icon: FolderTree },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
     { name: 'Users', path: '/admin/users', icon: Users },

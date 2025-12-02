@@ -68,6 +68,23 @@ export default function Cart() {
       });
     }
     
+    // Add custom options price modifiers
+    if (item.custom_options) {
+      try {
+        const customOpts = typeof item.custom_options === 'string' 
+          ? JSON.parse(item.custom_options) 
+          : item.custom_options;
+        
+        Object.values(customOpts).forEach((value: any) => {
+          if (value && typeof value === 'object' && 'price_modifier' in value) {
+            price += value.price_modifier || 0;
+          }
+        });
+      } catch (e) {
+        console.error('Error parsing custom_options:', e);
+      }
+    }
+    
     return price * item.quantity;
   };
 
@@ -116,23 +133,56 @@ export default function Cart() {
                       </div>
 
                       {item.selected_options && Object.keys(item.selected_options).length > 0 && item.product?.options && (
-                        <div className="mb-3">
-                          <p className="text-sm text-muted-foreground mb-1">الخيارات المحددة:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {Object.entries(item.selected_options).map(([type, optionId]) => {
-                              const option = item.product?.options?.find(opt => opt.id === optionId);
-                              return option ? (
-                                <span
-                                  key={type}
-                                  className="text-xs bg-muted px-2 py-1 rounded"
-                                >
-                                  {option.option_name_ar}
-                                </span>
-                              ) : null;
-                            })}
-                          </div>
+                        <div className="mb-3 space-y-1">
+                          <p className="text-sm text-muted-foreground mb-2">الخيارات المحددة:</p>
+                          {Object.entries(item.selected_options).map(([type, optionId]) => {
+                            const option = item.product?.options?.find(opt => opt.id === optionId);
+                            return option ? (
+                              <div key={type} className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">{option.option_name_ar}</span>
+                                {option.price_modifier !== 0 && (
+                                  <span className="text-primary font-medium">
+                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier.toFixed(2)} ر.س
+                                  </span>
+                                )}
+                              </div>
+                            ) : null;
+                          })}
                         </div>
                       )}
+
+                      {item.custom_options && (() => {
+                        try {
+                          const customOpts = typeof item.custom_options === 'string' 
+                            ? JSON.parse(item.custom_options) 
+                            : item.custom_options;
+                          
+                          const entries = Object.entries(customOpts);
+                          if (entries.length === 0) return null;
+                          
+                          return (
+                            <div className="mb-3 space-y-1">
+                              <p className="text-sm text-muted-foreground mb-2">خيارات إضافية:</p>
+                              {entries.map(([key, value]: [string, any]) => {
+                                if (!value || typeof value !== 'object') return null;
+                                return (
+                                  <div key={key} className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">{value.label_ar || key}</span>
+                                    {value.price_modifier !== 0 && (
+                                      <span className="text-primary font-medium">
+                                        {value.price_modifier > 0 ? '+' : ''}{value.price_modifier.toFixed(2)} ر.س
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        } catch (e) {
+                          console.error('Error parsing custom_options:', e);
+                          return null;
+                        }
+                      })()}
 
                       {item.notes && (
                         <p className="text-sm text-muted-foreground mb-3">

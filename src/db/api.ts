@@ -11,6 +11,12 @@ import type {
   ContactMessage,
   ProductWithOptions,
   PortfolioItem,
+  ProductOptionTemplate,
+  ProductOptionValue,
+  ProductOptionTemplateWithValues,
+  ProductOptionAssignment,
+  CheckoutData,
+  ShippingAddress,
 } from '@/types';
 
 export const api = {
@@ -329,6 +335,17 @@ export const api = {
     return Array.isArray(data) ? data : [];
   },
 
+  async getOrder(orderId: string): Promise<Order | null> {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
   async getOrderByNumber(orderNumber: string): Promise<Order | null> {
     const { data, error } = await supabase
       .from('orders')
@@ -337,18 +354,6 @@ export const api = {
       .maybeSingle();
     
     if (error) throw error;
-    return data;
-  },
-
-  async createOrder(order: Omit<Order, 'id' | 'order_number' | 'created_at' | 'updated_at'>): Promise<Order> {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert(order)
-      .select()
-      .maybeSingle();
-    
-    if (error) throw error;
-    if (!data) throw new Error('Failed to create order');
     return data;
   },
 
@@ -557,5 +562,252 @@ export const api = {
       .eq('id', id);
     
     if (error) throw error;
+  },
+
+  // Product Option Template APIs
+  async getProductOptionTemplates(): Promise<ProductOptionTemplate[]> {
+    const { data, error } = await supabase
+      .from('product_option_templates')
+      .select('*')
+      .order('display_order', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getProductOptionValues(): Promise<ProductOptionValue[]> {
+    const { data, error } = await supabase
+      .from('product_option_values')
+      .select('*')
+      .order('display_order', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getProductOptionTemplatesWithValues(): Promise<ProductOptionTemplateWithValues[]> {
+    const { data: templates, error: templatesError } = await supabase
+      .from('product_option_templates')
+      .select('*')
+      .order('display_order', { ascending: true });
+    
+    if (templatesError) throw templatesError;
+    
+    const templatesWithValues = await Promise.all(
+      (templates || []).map(async (template) => {
+        const { data: values, error: valuesError } = await supabase
+          .from('product_option_values')
+          .select('*')
+          .eq('template_id', template.id)
+          .order('display_order', { ascending: true });
+        
+        if (valuesError) throw valuesError;
+        
+        return {
+          ...template,
+          values: Array.isArray(values) ? values : [],
+        };
+      })
+    );
+    
+    return templatesWithValues;
+  },
+
+  async getProductOptionsByProductId(productId: string): Promise<ProductOptionTemplateWithValues[]> {
+    const { data: assignments, error: assignmentsError } = await supabase
+      .from('product_option_assignments')
+      .select('template_id')
+      .eq('product_id', productId);
+    
+    if (assignmentsError) throw assignmentsError;
+    
+    if (!assignments || assignments.length === 0) {
+      return [];
+    }
+    
+    const templateIds = assignments.map(a => a.template_id);
+    
+    const { data: templates, error: templatesError } = await supabase
+      .from('product_option_templates')
+      .select('*')
+      .in('id', templateIds)
+      .order('display_order', { ascending: true });
+    
+    if (templatesError) throw templatesError;
+    
+    const templatesWithValues = await Promise.all(
+      (templates || []).map(async (template) => {
+        const { data: values, error: valuesError } = await supabase
+          .from('product_option_values')
+          .select('*')
+          .eq('template_id', template.id)
+          .order('display_order', { ascending: true });
+        
+        if (valuesError) throw valuesError;
+        
+        return {
+          ...template,
+          values: Array.isArray(values) ? values : [],
+        };
+      })
+    );
+    
+    return templatesWithValues;
+  },
+
+  async createProductOptionTemplate(template: Omit<ProductOptionTemplate, 'id' | 'created_at'>): Promise<ProductOptionTemplate> {
+    const { data, error } = await supabase
+      .from('product_option_templates')
+      .insert(template)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to create option template');
+    return data;
+  },
+
+  async updateProductOptionTemplate(id: string, updates: Partial<ProductOptionTemplate>): Promise<ProductOptionTemplate> {
+    const { data, error } = await supabase
+      .from('product_option_templates')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to update option template');
+    return data;
+  },
+
+  async deleteProductOptionTemplate(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('product_option_templates')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // Product Option Value APIs
+  async createProductOptionValue(value: Omit<ProductOptionValue, 'id' | 'created_at'>): Promise<ProductOptionValue> {
+    const { data, error } = await supabase
+      .from('product_option_values')
+      .insert(value)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to create option value');
+    return data;
+  },
+
+  async updateProductOptionValue(id: string, updates: Partial<ProductOptionValue>): Promise<ProductOptionValue> {
+    const { data, error } = await supabase
+      .from('product_option_values')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to update option value');
+    return data;
+  },
+
+  async deleteProductOptionValue(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('product_option_values')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // Product Option Assignment APIs
+  async assignOptionToProduct(productId: string, templateId: string): Promise<ProductOptionAssignment> {
+    const { data, error } = await supabase
+      .from('product_option_assignments')
+      .insert({ product_id: productId, template_id: templateId })
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to assign option to product');
+    return data;
+  },
+
+  async unassignOptionFromProduct(productId: string, templateId: string): Promise<void> {
+    const { error } = await supabase
+      .from('product_option_assignments')
+      .delete()
+      .eq('product_id', productId)
+      .eq('template_id', templateId);
+    
+    if (error) throw error;
+  },
+
+  // Checkout APIs
+  async createOrder(checkoutData: CheckoutData, cartItems: CartItemWithProduct[], userId?: string): Promise<Order> {
+    const totalAmount = cartItems.reduce((sum, item) => {
+      let itemTotal = item.product.base_price * item.quantity;
+      
+      if (item.custom_options) {
+        const options = typeof item.custom_options === 'string' 
+          ? JSON.parse(item.custom_options) 
+          : item.custom_options;
+        
+        if (options.priceModifiers) {
+          const modifiersTotal = Object.values(options.priceModifiers as Record<string, number>)
+            .reduce((sum, mod) => sum + mod, 0);
+          itemTotal += modifiersTotal * item.quantity;
+        }
+      }
+      
+      return sum + itemTotal;
+    }, 0);
+
+    const orderData = {
+      user_id: userId || null,
+      status: 'pending' as const,
+      total_amount: totalAmount,
+      shipping_address: checkoutData.shipping_address,
+      payment_method: checkoutData.payment_method,
+      notes: checkoutData.notes || null,
+    };
+
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert(orderData)
+      .select()
+      .maybeSingle();
+
+    if (orderError) throw orderError;
+    if (!order) throw new Error('Failed to create order');
+
+    const orderItems = cartItems.map(item => ({
+      order_id: order.id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.product.base_price,
+      custom_options: item.custom_options,
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(orderItems);
+
+    if (itemsError) throw itemsError;
+
+    if (userId) {
+      const { error: clearCartError } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', userId);
+
+      if (clearCartError) console.error('Failed to clear cart:', clearCartError);
+    }
+
+    return order;
   },
 };

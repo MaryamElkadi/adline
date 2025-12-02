@@ -7,12 +7,13 @@ import { useToast } from '@/hooks/use-toast';
 interface CartContextType {
   items: CartItemWithProduct[];
   loading: boolean;
-  addItem: (productId: string, quantity: number, selectedOptions: Record<string, string>, notes?: string) => Promise<void>;
+  addItem: (productId: string, quantity: number, customOptions?: Record<string, any>, notes?: string) => Promise<void>;
   updateItem: (id: string, quantity: number) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
   clearCart: () => Promise<void>;
   totalItems: number;
   totalPrice: number;
+  getTotalPrice: () => number;
   refreshCart: () => Promise<void>;
 }
 
@@ -54,7 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = async (
     productId: string,
     quantity: number,
-    selectedOptions: Record<string, string>,
+    customOptions?: Record<string, any>,
     notes?: string
   ) => {
     if (!user) {
@@ -71,7 +72,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         user_id: user.id,
         product_id: productId,
         quantity,
-        selected_options: selectedOptions,
+        selected_options: {},
+        custom_options: customOptions ? JSON.stringify(customOptions) : null,
         notes: notes || null,
         custom_design_url: null,
       });
@@ -146,10 +148,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   
-  const totalPrice = items.reduce((sum, item) => {
-    const basePrice = item.product?.base_price || 0;
-    return sum + (basePrice * item.quantity);
-  }, 0);
+  const calculateTotalPrice = () => {
+    return items.reduce((sum, item) => {
+      let itemPrice = item.product?.base_price || 0;
+      
+      // Add price modifiers from custom options
+      if (item.custom_options) {
+        const options = typeof item.custom_options === 'string' 
+          ? JSON.parse(item.custom_options) 
+          : item.custom_options;
+        
+        if (options?.priceModifiers) {
+          const modifiersTotal = Object.values(options.priceModifiers as Record<string, number>)
+            .reduce((sum, mod) => sum + mod, 0);
+          itemPrice += modifiersTotal;
+        }
+      }
+      
+      return sum + (itemPrice * item.quantity);
+    }, 0);
+  };
+
+  const totalPrice = calculateTotalPrice();
 
   return (
     <CartContext.Provider
@@ -162,6 +182,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         totalItems,
         totalPrice,
+        getTotalPrice: calculateTotalPrice,
         refreshCart,
       }}
     >

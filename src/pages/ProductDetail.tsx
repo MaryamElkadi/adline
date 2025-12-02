@@ -13,13 +13,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { api } from '@/db/api';
-import type { ProductWithOptions } from '@/types';
+import type { ProductWithOptions, ProductOptionTemplateWithValues } from '@/types';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -29,17 +28,12 @@ export default function ProductDetail() {
   const { toast } = useToast();
 
   const [product, setProduct] = useState<ProductWithOptions | null>(null);
+  const [productOptions, setProductOptions] = useState<ProductOptionTemplateWithValues[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Form state
-  const [size, setSize] = useState('');
-  const [paperType, setPaperType] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [side, setSide] = useState('');
-  const [material, setMaterial] = useState('');
-  const [designOption, setDesignOption] = useState('');
+  // Form state - store selected value IDs
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [designFile, setDesignFile] = useState<File | null>(null);
-  const [productionTime, setProductionTime] = useState('');
   const [wantSample, setWantSample] = useState('');
   const [addingToCart, setAddingToCart] = useState(false);
 
@@ -57,6 +51,10 @@ export default function ProductDetail() {
       const data = await api.getProductBySlug(slug);
       if (data) {
         setProduct(data);
+        
+        // Load product options
+        const options = await api.getProductOptionsByProductId(data.id);
+        setProductOptions(options);
       } else {
         toast({
           title: 'المنتج غير موجود',
@@ -77,148 +75,160 @@ export default function ProductDetail() {
     }
   };
 
+  const handleOptionChange = (optionType: string, valueId: string) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [optionType]: valueId,
+    }));
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
-      if (!validTypes.includes(file.type)) {
-        toast({
-          title: 'نوع ملف غير صحيح',
-          description: 'يرجى رفع صورة (JPG, PNG) أو ملف PDF',
-          variant: 'destructive',
-        });
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: 'حجم الملف كبير جداً',
-          description: 'الحد الأقصى لحجم الملف هو 10 ميجابايت',
-          variant: 'destructive',
-        });
-        return;
-      }
-      setDesignFile(file);
-    }
-  };
+    if (!file) return;
 
-  const validateForm = () => {
-    if (!size) {
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
       toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار المقاس',
+        title: 'نوع ملف غير صالح',
+        description: 'يرجى رفع صورة (JPG, PNG) أو ملف PDF فقط',
         variant: 'destructive',
       });
-      return false;
-    }
-    if (!paperType) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار نوع الورق',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (!quantity) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار الكمية',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (!side) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار الجانب',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (!material) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار المادة',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (!designOption) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار خدمة التصميم',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (designOption === 'upload' && !designFile) {
-      toast({
-        title: 'ملف مطلوب',
-        description: 'يرجى رفع ملف التصميم',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (!productionTime) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى اختيار مدة التنفيذ',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    if (!wantSample) {
-      toast({
-        title: 'حقل مطلوب',
-        description: 'يرجى تحديد إذا كنت تريد عينة',
-        variant: 'destructive',
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const handleAddToCart = async () => {
-    if (!user) {
-      toast({
-        title: 'تسجيل الدخول مطلوب',
-        description: 'يرجى تسجيل الدخول لإضافة منتجات إلى السلة',
-        variant: 'destructive',
-      });
-      navigate('/login');
       return;
     }
 
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: 'حجم الملف كبير جداً',
+        description: 'الحد الأقصى لحجم الملف هو 10 ميجابايت',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setDesignFile(file);
+  };
+
+  const calculateTotalPrice = (): number => {
+    if (!product) return 0;
+
+    let total = product.base_price;
+
+    // Add price modifiers from selected options
+    productOptions.forEach(template => {
+      const selectedValueId = selectedOptions[template.option_type];
+      if (selectedValueId) {
+        const selectedValue = template.values.find(v => v.id === selectedValueId);
+        if (selectedValue) {
+          total += selectedValue.price_modifier;
+        }
+      }
+    });
+
+    return total;
+  };
+
+  const getPriceModifiers = (): Record<string, number> => {
+    const modifiers: Record<string, number> = {};
+
+    productOptions.forEach(template => {
+      const selectedValueId = selectedOptions[template.option_type];
+      if (selectedValueId) {
+        const selectedValue = template.values.find(v => v.id === selectedValueId);
+        if (selectedValue && selectedValue.price_modifier !== 0) {
+          modifiers[template.option_type] = selectedValue.price_modifier;
+        }
+      }
+    });
+
+    return modifiers;
+  };
+
+  const validateForm = (): string | null => {
+    // Check all required options
+    for (const template of productOptions) {
+      if (template.is_required && !selectedOptions[template.option_type]) {
+        return `يرجى اختيار ${template.option_name_ar}`;
+      }
+    }
+
+    // Check if design file is required
+    const designServiceOption = productOptions.find(t => t.option_type === 'design_service');
+    if (designServiceOption) {
+      const selectedValueId = selectedOptions['design_service'];
+      const selectedValue = designServiceOption.values.find(v => v.id === selectedValueId);
+      
+      if (selectedValue && selectedValue.value_ar.includes('رفع تصميمي') && !designFile) {
+        return 'يرجى رفع ملف التصميم';
+      }
+    }
+
+    // Check sample request
+    if (!wantSample) {
+      return 'يرجى اختيار ما إذا كنت تريد عينة';
+    }
+
+    return null;
+  };
+
+  const handleAddToCart = async () => {
     if (!product) return;
 
-    if (!validateForm()) return;
+    const validationError = validateForm();
+    if (validationError) {
+      toast({
+        title: 'يرجى إكمال جميع الحقول',
+        description: validationError,
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setAddingToCart(true);
     try {
-      const customOptions = {
-        size,
-        paperType,
-        side,
-        material,
-        designOption,
-        designFileName: designFile?.name || '',
-        productionTime,
+      // Build custom options object with selected values
+      const customOptions: Record<string, any> = {
+        priceModifiers: getPriceModifiers(),
         wantSample,
       };
 
-      await addItem(product.id, parseInt(quantity), customOptions, '');
-      
+      productOptions.forEach(template => {
+        const selectedValueId = selectedOptions[template.option_type];
+        if (selectedValueId) {
+          const selectedValue = template.values.find(v => v.id === selectedValueId);
+          if (selectedValue) {
+            customOptions[template.option_type] = {
+              valueId: selectedValue.id,
+              value: selectedValue.value_ar,
+              priceModifier: selectedValue.price_modifier,
+            };
+          }
+        }
+      });
+
+      if (designFile) {
+        customOptions.designFileName = designFile.name;
+      }
+
+      await addItem(product.id, 1, customOptions);
+
+      toast({
+        title: 'تمت الإضافة إلى السلة',
+        description: 'تم إضافة المنتج إلى سلة التسوق بنجاح',
+      });
+
       // Reset form
-      setSize('');
-      setPaperType('');
-      setQuantity('');
-      setSide('');
-      setMaterial('');
-      setDesignOption('');
+      setSelectedOptions({});
       setDesignFile(null);
-      setProductionTime('');
       setWantSample('');
     } catch (error) {
       console.error('Error adding to cart:', error);
+      toast({
+        title: 'خطأ',
+        description: 'فشل إضافة المنتج إلى السلة',
+        variant: 'destructive',
+      });
     } finally {
       setAddingToCart(false);
     }
@@ -313,156 +323,78 @@ export default function ProductDetail() {
                   </TabsList>
                   
                   <TabsContent value="options" className="space-y-4 mt-6">
-                    {/* Size Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor="size" className="text-base">
-                        اختر المقاس <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={size} onValueChange={setSize}>
-                        <SelectTrigger id="size">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="33x48">33x48</SelectItem>
-                          <SelectItem value="50x70">50x70</SelectItem>
-                          <SelectItem value="a4">A4</SelectItem>
-                          <SelectItem value="a5">A5</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Paper Type Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor="paperType" className="text-base">
-                        اختر نوع الورق <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={paperType} onValueChange={setPaperType}>
-                        <SelectTrigger id="paperType">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="glossy-92">ورق تغليف 92 gm ثلجي</SelectItem>
-                          <SelectItem value="matte-120">ورق مطفي 120 gm</SelectItem>
-                          <SelectItem value="cardboard-300">كرتون 300 gm</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Quantity Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor="quantity" className="text-base">
-                        الكمية <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={quantity} onValueChange={setQuantity}>
-                        <SelectTrigger id="quantity">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="100">100</SelectItem>
-                          <SelectItem value="250">250</SelectItem>
-                          <SelectItem value="500">500</SelectItem>
-                          <SelectItem value="1000">1000</SelectItem>
-                          <SelectItem value="2000">2000</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Side Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor="side" className="text-base">
-                        الجانب <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={side} onValueChange={setSide}>
-                        <SelectTrigger id="side">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="one-side">وجه واحد</SelectItem>
-                          <SelectItem value="two-sides">وجهين</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Material Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor="material" className="text-base">
-                        المادة <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={material} onValueChange={setMaterial}>
-                        <SelectTrigger id="material">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="paper">ورق</SelectItem>
-                          <SelectItem value="cardboard">كرتون</SelectItem>
-                          <SelectItem value="vinyl">فينيل</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Design Service */}
-                    <div className="space-y-2">
-                      <Label htmlFor="designOption" className="text-base">
-                        خدمة التصميم <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={designOption} onValueChange={setDesignOption}>
-                        <SelectTrigger id="designOption">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="upload">رفع التصميم الخاص بي</SelectItem>
-                          <SelectItem value="modify">تعديل على تصميم موجود</SelectItem>
-                          <SelectItem value="new">طلب تصميم جديد</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* File Upload */}
-                    {designOption === 'upload' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="designFile" className="text-base">
-                          رفع ملف التصميم (صورة أو PDF) <span className="text-destructive">*</span>
+                    {/* Dynamic Options from Database */}
+                    {productOptions.map((template) => (
+                      <div key={template.id} className="space-y-2">
+                        <Label htmlFor={template.option_type} className="text-base">
+                          {template.option_name_ar} {template.is_required && <span className="text-destructive">*</span>}
                         </Label>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            id="designFile"
-                            type="file"
-                            accept="image/*,.pdf"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => document.getElementById('designFile')?.click()}
-                            className="w-full"
-                          >
-                            <Upload className="ml-2 h-4 w-4" />
-                            {designFile ? designFile.name : 'اختر ملف'}
-                          </Button>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          الحد الأقصى: 10 ميجابايت (JPG, PNG, PDF)
-                        </p>
+                        <Select
+                          value={selectedOptions[template.option_type] || ''}
+                          onValueChange={(value) => handleOptionChange(template.option_type, value)}
+                        >
+                          <SelectTrigger id={template.option_type}>
+                            <SelectValue placeholder="اختر" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {template.values.map((value) => (
+                              <SelectItem key={value.id} value={value.id}>
+                                <div className="flex items-center justify-between w-full gap-4">
+                                  <span>{value.value_ar}</span>
+                                  {value.price_modifier !== 0 && (
+                                    <span className="text-xs text-primary font-medium">
+                                      {value.price_modifier > 0 ? '+' : ''}
+                                      {value.price_modifier.toFixed(2)} ر.س
+                                    </span>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    )}
+                    ))}
 
-                    {/* Production Time */}
-                    <div className="space-y-2">
-                      <Label htmlFor="productionTime" className="text-base">
-                        مدة التنفيذ للمنتج <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={productionTime} onValueChange={setProductionTime}>
-                        <SelectTrigger id="productionTime">
-                          <SelectValue placeholder="اختر" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="standard">عادي (5-7 أيام)</SelectItem>
-                          <SelectItem value="express">سريع (2-3 أيام)</SelectItem>
-                          <SelectItem value="urgent">عاجل (24 ساعة)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {/* File Upload - Show if design service is "upload" */}
+                    {(() => {
+                      const designServiceOption = productOptions.find(t => t.option_type === 'design_service');
+                      if (!designServiceOption) return null;
+                      
+                      const selectedValueId = selectedOptions['design_service'];
+                      const selectedValue = designServiceOption.values.find(v => v.id === selectedValueId);
+                      
+                      if (selectedValue && selectedValue.value_ar.includes('رفع تصميمي')) {
+                        return (
+                          <div className="space-y-2">
+                            <Label htmlFor="designFile" className="text-base">
+                              رفع ملف التصميم (صورة أو PDF) <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                id="designFile"
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={handleFileChange}
+                                className="hidden"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => document.getElementById('designFile')?.click()}
+                                className="w-full"
+                              >
+                                <Upload className="ml-2 h-4 w-4" />
+                                {designFile ? designFile.name : 'اختر ملف'}
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              الحد الأقصى: 10 ميجابايت (JPG, PNG, PDF)
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
 
                     {/* Sample Request */}
                     <div className="space-y-2">
@@ -483,15 +415,33 @@ export default function ProductDetail() {
                       </RadioGroup>
                     </div>
 
-                    {/* Price Display */}
-                    <div className="pt-4 border-t">
-                      <div className="flex items-center justify-between mb-4">
+                    {/* Price Display with Breakdown */}
+                    <div className="pt-4 border-t space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">السعر الأساسي:</span>
+                        <span className="font-medium">{product.base_price.toFixed(2)} ر.س</span>
+                      </div>
+                      
+                      {/* Show price modifiers */}
+                      {Object.entries(getPriceModifiers()).map(([optionType, modifier]) => {
+                        const template = productOptions.find(t => t.option_type === optionType);
+                        return (
+                          <div key={optionType} className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">{template?.option_name_ar}:</span>
+                            <span className="font-medium text-primary">
+                              {modifier > 0 ? '+' : ''}{modifier.toFixed(2)} ر.س
+                            </span>
+                          </div>
+                        );
+                      })}
+
+                      <div className="flex items-center justify-between pt-2 border-t">
                         <span className="text-lg font-semibold">السعر الإجمالي:</span>
                         <span className="text-2xl font-bold text-primary">
-                          {product.base_price.toFixed(2)} ر.س
+                          {calculateTotalPrice().toFixed(2)} ر.س
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-4">
+                      <p className="text-xs text-muted-foreground">
                         السعر شامل الضريبة
                       </p>
                     </div>
@@ -537,4 +487,3 @@ export default function ProductDetail() {
     </div>
   );
 }
-
