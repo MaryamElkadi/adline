@@ -31,13 +31,43 @@ import AdminBlogPosts from './pages/admin/BlogPosts';
 import AdminMessages from './pages/admin/Messages';
 import AdminPortfolio from './pages/admin/Portfolio';
 
+// Layout wrapper for user-facing pages
+function UserLayout() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:slug" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+          <Route path="/order-failed" element={<OrderFailed />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Router>
       <AuthProvider>
         <CartProvider>
           <Routes>
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin/*" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="products/:productId/options" element={<SimpleProductOptions />} />
@@ -49,36 +79,7 @@ export default function App() {
               <Route path="messages" element={<AdminMessages />} />
               <Route path="portfolio" element={<AdminPortfolio />} />
             </Route>
-
-            <Route
-              path="*"
-              element={
-                <div className="flex flex-col min-h-screen">
-                  <Header />
-                  <main className="flex-grow">
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/products" element={<Products />} />
-                      <Route path="/products/:slug" element={<ProductDetail />} />
-                      <Route path="/cart" element={<Cart />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/order-success/:orderId" element={<OrderSuccess />} />
-                      <Route path="/order-failed" element={<OrderFailed />} />
-                      <Route path="/orders" element={<Orders />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/blog" element={<Blog />} />
-                      <Route path="/blog/:slug" element={<BlogDetail />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/portfolio" element={<PortfolioPage />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </div>
-              }
-            />
+            <Route path="*" element={<UserLayout />} />
           </Routes>
           <Toaster />
         </CartProvider>
