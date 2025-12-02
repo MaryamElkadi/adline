@@ -6,6 +6,7 @@ import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderFailed from './pages/OrderFailed';
 import Login from './pages/Login';
+import Profile from './pages/Profile';
 import Contact from './pages/Contact';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -71,6 +72,12 @@ const routes: RouteConfig[] = [
     name: 'Login',
     path: '/login',
     element: <Login />,
+    visible: false,
+  },
+  {
+    name: 'Profile',
+    path: '/profile',
+    element: <Profile />,
     visible: false,
   },
   {

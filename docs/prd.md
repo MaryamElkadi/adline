@@ -3,7 +3,8 @@
 ## 1. Website Overview
 
 ### 1.1 Website Name
-\nkhat-alailan (خط الاعلان)\n
+khat-alailan (خط الاعلان)
+
 ### 1.2 Website Description
 
 A comprehensive online printing services platform offering custom printing solutions for individuals and businesses. The website provides a wide range of printing products and services with an easy-to-use ordering system.
@@ -18,7 +19,8 @@ Arabic (RTL layout)
 - Tailwind CSS for styling
 - RTL (Right-to-Left) support for Arabic language
 - Drag-and-drop library for image upload (e.g., react-dropzone)
-\n### 2.2 Backend
+
+### 2.2 Backend
 
 - Node.js\n\n## 3. Core Features
 \n### 3.1 Product Categories
@@ -59,8 +61,8 @@ Arabic (RTL layout)
   - Tags
   - Correspondence envelopes
   - Covering paper
-  - Menu\n  - Brochures\n  - Flyers
-  - Certificates of appreciation
+  - Menu\n  - Brochures
+  - Flyers\n  - Certificates of appreciation
   - Letter paper
   - Printing of booklets and notebooks
   - Calendars
@@ -112,7 +114,8 @@ Arabic (RTL layout)
 - Order placement and tracking
 - celebrations and occaisons
   - Hero section with scrolling carousel showcasing featured celebration products and services
-  - All event supplies\n  - Stickers
+  - All event supplies
+  - Stickers
   - Favor boxes
   - Canvas printing
   - Posters
@@ -140,8 +143,38 @@ Arabic (RTL layout)
   - User interface showcasing completed projects
   - Project gallery with categories\n  - Project details and descriptions
 - contact and redirect to whatsap or email or facebook
-- login with user or admin if user rediret to home page and of he admin redirect to admindashboard
-\n### 3.3 Home Page - Main Categories Section (الأقسام الرئيسية)
+- **User Profile Page (صفحة الملف الشخصي)**
+  - View and edit personal information
+  - Display user's full name, email, phone number\n  - Edit profile details
+  - View order history
+  - Manage saved addresses
+  - Change password functionality
+  - Account settings
+\n### 3.3 Authentication Features
+
+#### 3.3.1 Registration Page (صفحة التسجيل)
+- Full name field (required)
+- Email address field (required, with email format validation)
+- Phone number field (required, with phone format validation)
+- Password field (required, minimum 8 characters)
+- Confirm password field (required, must match password)
+- Terms and conditions checkbox (required)
+- 'تسجيل' (Register) button
+- **Social Login Options**:\n  - 'تسجيل بواسطة Google' (Sign up with Google) button - using OSS Google login method
+  - 'تسجيل بواسطة Facebook' (Sign up with Facebook) button\n- Link to login page:'لديك حساب بالفعل؟ تسجيل الدخول' (Already have an account? Login)
+- Form validation with error messages for all fields
+
+#### 3.3.2 Login Page (صفحة تسجيل الدخول)
+- Email address field (required, with email format validation)
+- Phone number field (required, with phone format validation)
+- Password field (required)\n- 'تذكرني' (Remember me) checkbox
+- 'نسيت كلمة المرور؟' (Forgot password?) link
+- 'تسجيل الدخول' (Login) button\n- **Social Login Options**:\n  - 'تسجيل الدخول بواسطة Google' (Login with Google) button - using OSS Google login method\n  - 'تسجيل الدخول بواسطة Facebook' (Login with Facebook) button
+- Link to registration page: 'ليس لديك حساب؟ سجل الآن' (Don't have an account? Register now)
+- Form validation with error messages\n- **Login Redirect Logic**:
+  - If user role is 'user': redirect to home page
+  - If user role is 'admin': redirect to admin dashboard
+\n### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
 
 - Display main product categories in card-based grid layout on home page
 - Each category card shows:
@@ -155,10 +188,11 @@ Arabic (RTL layout)
   - طباعة بوكسات (Boxes Printing)
   - العروض والباكجات (Offers and Packages)
 - Reference design: image-2.png and image-3.png
-\n### 3.4 E-commerce Features
+\n### 3.5 E-commerce Features
 
 - Product catalog with images and descriptions
-- Pricing display\n- Add to cart functionality
+- Pricing display
+- Add to cart functionality
 - Checkout process
 - Payment integration
 - Order confirmation
@@ -167,8 +201,8 @@ Arabic (RTL layout)
   - Product model number displayed at top (رقم الموديل)
   - Two tabs: خيارات المنتج (Product Options - active/orange) and تقييمات المنتج (Product Reviews)\n  - Configuration fields (all required, marked with red asterisk *):
     1. **اختر المقاس*** (Choose Size): Dropdown list showing size options with price beside each option (e.g., '33x48(+10ر.س)')
-    2. **اختر نوع الورق*** (Choose Paper Type): Dropdown list showing paper type options with price beside each option (e.g., 'ورق تغليف 92gm ثلجي (+5 ر.س)')
-    3. **الكمية*** (Quantity): Dropdown list for quantity selection with price beside each option\n    4. **خدمة التصميم*** (Design Service): Dropdown list with options and price beside each option (e.g., 'طلب خدمة تصميم (+50 ر.س)')
+    2. **اختر نوع الورق*** (Choose Paper Type): Dropdown list showing paper type options with price beside each option (e.g., 'ورق تغليف 92gm ثلجي (+5ر.س)')
+    3. **الكمية*** (Quantity): Dropdown list for quantity selection with price beside each option\n    4. **خدمة التصميم*** (Design Service): Dropdown list with options and price beside each option (e.g., 'طلب خدمة تصميم (+50ر.س)')
     5. **مدة التنفيذ للمنتج*** (Implementation Duration): Dropdown list showing duration options with pricing impact beside each option (e.g., 'تنفيذ سريع - 3 أيام (+20 ر.س)')
     6. **هل تريد تصوير عينة قبل طباعة الكمية*** (Do you want a sample before full production): Dropdown with yes/no options and price beside each option if applicable
     7. **ارفع تصميمك*** (Upload Your Design): File upload field with text'يمكنك رفع ملف بصيغة (PDF, PNG, JPG, AI, PSD)' and 'اختر ملف' button
@@ -179,10 +213,9 @@ Arabic (RTL layout)
   - Admin manages all option values and pricing rules through dashboard
   - **Form Validation**: All required fields must be filled before adding to cart, with error messages displayed for missing fields
 
-### 3.5 Shopping Cart and Checkout Flow
+### 3.6 Shopping Cart and Checkout Flow
 
-#### 3.5.1 Shopping Cart Page
-- Display all items added to cart with:\n  - Product image
+#### 3.6.1 Shopping Cart Page\n- Display all items added to cart with:\n  - Product image
   - Product name and model number
   - Selected configuration options (size, paper type, quantity, design service, duration, sample request)
   - Unit price and total price per item
@@ -193,8 +226,7 @@ Arabic (RTL layout)
   - Shipping cost
   - Total amount
 -'إتمام الطلب' (Complete Order) button to proceed to checkout
-- 'متابعة التسوق' (Continue Shopping) button to return to products\n\n#### 3.5.2 Checkout Process
-- **Step 1: Customer Information**
+- 'متابعة التسوق' (Continue Shopping) button to return to products\n\n#### 3.6.2 Checkout Process (إتمام الطلب)\n- **Step 1: Customer Information**
   - Full name (required)
   - Email address (required, with email format validation)
   - Phone number (required, with phone format validation)
@@ -210,14 +242,15 @@ Arabic (RTL layout)
        - Expiry date (required, MM/YY format)
        - CVV (required, 3-4 digits)
        - Form validation for all card fields
-    2. **Cash on Delivery (الدفع عند الاستلام)**:\n       - No additional fields required
+    2. **Cash on Delivery (الدفع عند الاستلام)**:
+       - No additional fields required
        - Display confirmation message about cash payment upon delivery
 
 - **Step 3: Order Review**
   - Display order summary with all items and total
   - Display customer information
   - Display selected payment method
-  - 'تأكيد الطلب' (Confirm Order) button\n\n#### 3.5.3 Order Confirmation and Messages
+  - 'تأكيد الطلب' (Confirm Order) button\n\n#### 3.6.3 Order Confirmation and Messages
 - **Successful Order**:
   - Display success message: 'تم تأكيد طلبك بنجاح!' (Your order has been confirmed successfully!)
   - Show order number and estimated delivery date
@@ -228,7 +261,7 @@ Arabic (RTL layout)
   - Display error message: 'فشلت عملية الطلب. يرجى المحاولة مرة أخرى.' (Order failed. Please try again.)
   - Show specific error reason if available (e.g., payment declined, invalid card)\n  - Option to retry payment or contact support
 
-#### 3.5.4 Validation Requirements
+#### 3.6.4 Validation Requirements
 - All required fields must be filled before proceeding to next step
 - Email format validation (must contain @ and domain)
 - Phone number format validation (numeric, appropriate length)
@@ -237,27 +270,28 @@ Arabic (RTL layout)
 - Display clear error messages in Arabic for each validation failure
 - Prevent form submission until all validations pass
 
-### 3.6 Additional Features
+### 3.7 Additional Features
 
 - Contact form\n- Customer support chat
 - FAQ section
 - Delivery information
 - Company information pages
-\n### 3.7 Admin Dashboard
+\n### 3.8 Admin Dashboard
 
 - Full control and management of all website content
-\n#### 3.7.1 Category Management
+\n#### 3.8.1 Category Management
 - View all product categories
 - Add new categories\n- Edit existing categories
 - Delete categories
 - Organize category hierarchy
 - Manage category icons/images for home page display
 
-#### 3.7.2 Product Management
+#### 3.8.2 Product Management
 - Add new products with drag-and-drop image upload
 - Edit existing products with drag-and-drop image replacement
 - Remove products
-- Configure product options:\n  - Size options (المقاس) with individual pricing for each size
+- **Configure product options (خيارات المنتج)**:
+  - Size options (المقاس) with individual pricing for each size
   - Paper type options (نوع الورق) with individual pricing for each type
   - Quantity options (الكمية) with individual pricing for each quantity tier
   - Design service options (خدمة التصميم) with individual pricing for each service level
@@ -270,15 +304,15 @@ Arabic (RTL layout)
   - Set pricing rules based on product option combinations
 - Manage product inventory
 - Set product model numbers
-\n#### 3.7.3 Blog Management
+\n#### 3.8.3 Blog Management
 - View all blog posts
 - Create new blog posts
 - Edit existing blog posts
 - Delete blog posts
 - Manage blog categories and tags
 - Schedule blog post publication
-\n#### 3.7.4 Order Management
-- View all orders with filtering options (status, date, customer, payment method)
+
+#### 3.8.4 Order Management\n- View all orders with filtering options (status, date, customer, payment method)
 - Update order status (pending, processing, shipped, delivered, cancelled)
 - View order details including:\n  - Customer-selected product configurations
   - Uploaded design files
@@ -289,41 +323,39 @@ Arabic (RTL layout)
 - Generate order reports
 - Mark orders as paid/unpaid for cash on delivery
 
-#### 3.7.5 Message Management
+#### 3.8.5 Message Management
 - View all customer messages and inquiries
 - Respond to customer messages
 - Mark messages as read/unread
 - Archive or delete messages
 - Filter messages by status or date
 
-#### 3.7.6 User Management
-- Manage user accounts
-- View user activity and order history
-\n#### 3.7.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
+#### 3.8.6 User Management
+- Manage user accounts\n- View user activity and order history
+\n#### 3.8.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
 - Edit existing portfolio projects
 - Delete portfolio projects
 - Categorize projects by type (special occasions, commercial, etc.)
 - Manage project details (title, description, images, date)
 - Control visibility of portfolio items on user interface
 
-#### 3.7.8 Who We Are Management (إدارة من نحن)
+#### 3.8.8 Who We Are Management (إدارة من نحن)
 - Edit company information and history
 - Update team member profiles
 - Manage company values and achievements
 - Upload and update company images
-\n#### 3.7.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)\n- Add new special occasion projects with multiple images
+\n#### 3.8.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)\n- Add new special occasion projects with multiple images
 - Edit project details and descriptions
 - Delete projects
 - Organize projects by occasion type
 - Control display order on user interface
 
-#### 3.7.10 Settings and Configuration
+#### 3.8.10 Settings and Configuration
 - Configure payment and delivery settings
 - Update website content and information
 - View sales reports and analytics
 - Manage shipping costs and delivery zones
-\n## 4. Design Style
-
+\n## 4. Design Style\n
 - Two interfaces: User interface for customers and Admin dashboard for website management
 \n### 4.1 Color Scheme
 
@@ -349,8 +381,9 @@ Arabic (RTL layout)
 - Success message styling in green with checkmark icon
 - Scrolling hero section with smooth transitions for celebrations page
 - Gallery-style layout for portfolio and special occasions pages with lightbox functionality
-
-### 4.3 Layout Style
+- Social login buttons with brand colors (Google and Facebook)
+- Profile page with clean card-based layout for user information sections
+\n### 4.3 Layout Style
 
 - Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
 - Sticky navigation header\n- Clear call-to-action buttons in yellow/orange
@@ -360,6 +393,8 @@ Arabic (RTL layout)
 - Masonry or grid layout for portfolio displays
 - Multi-step checkout layout with progress indicator
 - Responsive cart summary sidebar
+- Centered authentication forms with social login buttons below main form
+- Profile page with sidebar navigation and main content area
 \n## 5. Reference Images
 
 1. Product configuration interface reference: image.png

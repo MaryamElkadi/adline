@@ -4,12 +4,23 @@ import { api } from '@/db/api';
 import type { User } from '@supabase/supabase-js';
 import type { Profile } from '@/types';
 
+export interface SignUpData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
   signIn: (username: string, password: string) => Promise<void>;
-  signUp: (username: string, password: string, fullName?: string) => Promise<void>;
+  signUp: (data: SignUpData) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
 }
@@ -64,16 +75,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
-  const signUp = async (username: string, password: string, fullName?: string) => {
-    const email = `${username}@miaoda.com`;
+  const signUp = async (data: SignUpData) => {
+    if (data.password !== data.confirmPassword) {
+      throw new Error('Passwords do not match');
+    }
+
+    const email = `${data.username}@miaoda.com`;
     const { error } = await supabase.auth.signUp({
       email,
-      password,
+      password: data.password,
       options: {
         data: {
-          username,
-          full_name: fullName,
+          username: data.username,
+          full_name: data.fullName,
+          email: data.email,
+          phone: data.phone,
         },
+      },
+    });
+    if (error) throw error;
+  };
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    if (error) throw error;
+  };
+
+  const signInWithFacebook = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: window.location.origin,
       },
     });
     if (error) throw error;
@@ -87,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = profile?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, signOut, isAdmin }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signInWithFacebook, signOut, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
