@@ -1,58 +1,93 @@
-# Product Options Simplification & Cart Consistency
+# TODO: Enhanced Product Options & Services System
 
-## User Requirements
-1. **Simplify Product Options**: Admin should directly add option values and prices (e.g., "Size: Small +10 SAR") without template complexity ✅
-2. **Cart Consistency**: Ensure cart works identically for both user and admin interfaces ✅
+## Overview
+Implement comprehensive product options system with quantity tiers, size/material/side options with price modifiers, tax calculations, and a new services section.
 
-## Implementation Plan
+## Phase 1: Database Schema Updates
+- [x] 1.1 Create migration for enhanced product options structure
+  - [x] Add quantity_tiers table (quantity, price, product_id)
+  - [x] Add product_size_options table (name, price_addition, product_id)
+  - [x] Add product_material_options table (name, price_addition, product_id)
+  - [x] Add product_side_options table (name, price_addition, product_id)
+  - [x] Create services table (name_ar, description_ar, details, image_url, is_active)
+  - [x] Create service_inquiries table (service_id, customer_name, email, phone, message)
+- [x] 1.2 Update TypeScript types in @/types/index.ts
+- [x] 1.3 Add API methods in @/db/api.ts
 
-### Phase 1: Simplify Product Options System ✅
-- [x] Create new simplified schema: simple_product_options table
-- [x] Add API methods for simple product options
-- [x] Create new admin page for managing simple options
-- [x] Add route and navigation button
-- [x] Update ProductDetail page to use simple options
-- [x] Show quantity-based pricing in ProductDetail
-- [x] Calculate prices correctly with quantity tiers
+## Phase 2: Admin Product Form Enhancement
+- [ ] 2.1 Add Quantity Tiers Section
+  - [ ] Dynamic rows for quantity + price pairs
+  - [ ] Calculate total with 15% VAT for each tier
+  - [ ] Add/remove quantity tier rows
+- [ ] 2.2 Add Size Options Section
+  - [ ] Dynamic rows for size name + price addition
+  - [ ] Add/remove size option rows
+- [ ] 2.3 Add Material Options Section
+  - [ ] Dynamic rows for material name + price addition
+  - [ ] Add/remove material option rows
+- [ ] 2.4 Add Side Options Section
+  - [ ] Dynamic rows for side option + price addition
+  - [ ] Add/remove side option rows
+- [ ] 2.5 Add Tax Calculation Display
+  - [ ] Show subtotal
+  - [ ] Show 15% VAT
+  - [ ] Show total price
+- [ ] 2.6 Update form submission to save all options
 
-### Phase 2: Verify Cart Consistency ✅
-- [x] Verified cart implementation in CartContext
-- [x] Cart works for all authenticated users (admin and regular users)
-- [x] No role-based restrictions in cart functionality
-- [x] Cart is accessible from header for all users
+## Phase 3: User Product Detail Page Enhancement
+- [ ] 3.1 Display Quantity Tiers
+  - [ ] Show all available quantity options
+  - [ ] Display price for each quantity
+  - [ ] Show total with tax
+- [ ] 3.2 Display Size Options
+  - [ ] Radio buttons or select for sizes
+  - [ ] Show price addition for each size
+- [ ] 3.3 Display Material Options
+  - [ ] Radio buttons or select for materials
+  - [ ] Show price addition for each material
+- [ ] 3.4 Display Side Options
+  - [ ] Radio buttons for printing sides
+  - [ ] Show price addition
+- [ ] 3.5 Dynamic Price Calculation
+  - [ ] Calculate based on selected options
+  - [ ] Show subtotal + tax + total
+- [ ] 3.6 Update cart integration
 
-## Current Status
-- ✅ **COMPLETE** - All requirements implemented
-- ✅ Database migration applied
-- ✅ API methods created
-- ✅ Admin UI created (SimpleProductOptions page)
-- ✅ ProductDetail page updated with simplified options
-- ✅ Quantity-based pricing working
-- ✅ Cart works consistently for all users
-- ✅ All code passes linting
+## Phase 4: Services Section
+- [ ] 4.1 Create Admin Services Management Page
+  - [ ] List all services
+  - [ ] Add/Edit/Delete services
+  - [ ] Upload service images
+  - [ ] Manage service details
+- [ ] 4.2 Create User Services Page
+  - [ ] Display all active services
+  - [ ] Show service details
+  - [ ] Contact/Inquiry button
+- [ ] 4.3 Create Service Inquiry Form
+  - [ ] Customer name, email, phone
+  - [ ] Message field
+  - [ ] Submit inquiry
+- [ ] 4.4 Admin Service Inquiries Page
+  - [ ] View all inquiries
+  - [ ] Mark as contacted/resolved
+  - [ ] Send response
 
-## Summary of Changes
-1. **New Table**: `simple_product_options` - Direct product options without templates
-2. **New Admin Page**: `/admin/products/:productId/options` - Manage options per product
-3. **Updated ProductDetail**: Now uses simplified options with quantity tiers
-4. **Quantity Pricing**: Prices adjust based on quantity selected
-5. **Cart**: Already works for both users and admins (uses CartContext)
+## Phase 5: Testing & Validation
+- [ ] 5.1 Test product creation with all options
+- [ ] 5.2 Test product editing
+- [ ] 5.3 Test user product viewing
+- [ ] 5.4 Test cart with new options
+- [ ] 5.5 Test services CRUD
+- [ ] 5.6 Test service inquiries
+- [ ] 5.7 Run linting
 
-## How to Use
+## Phase 6: Documentation
+- [ ] 6.1 Update README with new features
+- [ ] 6.2 Create user guide for product options
+- [ ] 6.3 Create admin guide for services
 
-### For Admins:
-1. Go to Admin → Products
-2. Click "Options" button next to any product
-3. Add options directly:
-   - Option Name: e.g., "Size", "Material", "Color"
-   - Option Value: e.g., "Small", "Large", "Premium"
-   - Price Modifier: e.g., +20 SAR, -10 SAR, 0 SAR
-4. Optionally add quantity tiers for bulk pricing
-5. Options appear immediately on product detail page
-
-### For Users:
-1. Browse products
-2. Select product options (grouped by option name)
-3. Choose quantity
-4. Prices update automatically based on quantity tiers
-5. Add to cart - works the same for all users
+## Notes
+- Tax rate: 15% VAT
+- All prices in SAR (Saudi Riyal)
+- RTL layout for Arabic
+- Maintain existing functionality while adding new features

@@ -226,3 +226,65 @@ export interface CheckoutData {
   notes?: string;
 }
 
+// Enhanced Product Options Types
+export interface ProductQuantityTier {
+  id: string;
+  product_id: string;
+  quantity: number;
+  price: number;
+  created_at: string;
+}
+
+export interface ProductSizeOption {
+  id: string;
+  product_id: string;
+  name_ar: string;
+  price_addition: number;
+  created_at: string;
+}
+
+export interface ProductMaterialOption {
+  id: string;
+  product_id: string;
+  name_ar: string;
+  price_addition: number;
+  created_at: string;
+}
+
+export interface ProductSideOption {
+  id: string;
+  product_id: string;
+  name_ar: string;
+  price_addition: number;
+  created_at: string;
+}
+
+// Services Types
+export interface Service {
+  id: string;
+  name_ar: string;
+  description_ar: string;
+  details: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceInquiry {
+  id: string;
+  service_id: string;
+  customer_name: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  status: 'pending' | 'contacted' | 'resolved';
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceInquiryWithService extends ServiceInquiry {
+  service: Service;
+}
+

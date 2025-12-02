@@ -1041,4 +1041,338 @@ export const api = {
     
     return data.price_modifier;
   },
+
+  // ==================== Product Quantity Tiers ====================
+  async getProductQuantityTiers(productId: string) {
+    const { data, error } = await supabase
+      .from('product_quantity_tiers')
+      .select('*')
+      .eq('product_id', productId)
+      .order('quantity', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createProductQuantityTier(tier: { product_id: string; quantity: number; price: number }) {
+    const { data, error } = await supabase
+      .from('product_quantity_tiers')
+      .insert(tier)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateProductQuantityTier(id: string, updates: { quantity?: number; price?: number }) {
+    const { data, error } = await supabase
+      .from('product_quantity_tiers')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteProductQuantityTier(id: string) {
+    const { error } = await supabase
+      .from('product_quantity_tiers')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async deleteAllProductQuantityTiers(productId: string) {
+    const { error } = await supabase
+      .from('product_quantity_tiers')
+      .delete()
+      .eq('product_id', productId);
+    
+    if (error) throw error;
+  },
+
+  // ==================== Product Size Options ====================
+  async getProductSizeOptions(productId: string) {
+    const { data, error } = await supabase
+      .from('product_size_options')
+      .select('*')
+      .eq('product_id', productId)
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createProductSizeOption(option: { product_id: string; name_ar: string; price_addition: number }) {
+    const { data, error } = await supabase
+      .from('product_size_options')
+      .insert(option)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateProductSizeOption(id: string, updates: { name_ar?: string; price_addition?: number }) {
+    const { data, error } = await supabase
+      .from('product_size_options')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteProductSizeOption(id: string) {
+    const { error } = await supabase
+      .from('product_size_options')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async deleteAllProductSizeOptions(productId: string) {
+    const { error } = await supabase
+      .from('product_size_options')
+      .delete()
+      .eq('product_id', productId);
+    
+    if (error) throw error;
+  },
+
+  // ==================== Product Material Options ====================
+  async getProductMaterialOptions(productId: string) {
+    const { data, error } = await supabase
+      .from('product_material_options')
+      .select('*')
+      .eq('product_id', productId)
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createProductMaterialOption(option: { product_id: string; name_ar: string; price_addition: number }) {
+    const { data, error } = await supabase
+      .from('product_material_options')
+      .insert(option)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateProductMaterialOption(id: string, updates: { name_ar?: string; price_addition?: number }) {
+    const { data, error } = await supabase
+      .from('product_material_options')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteProductMaterialOption(id: string) {
+    const { error } = await supabase
+      .from('product_material_options')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async deleteAllProductMaterialOptions(productId: string) {
+    const { error } = await supabase
+      .from('product_material_options')
+      .delete()
+      .eq('product_id', productId);
+    
+    if (error) throw error;
+  },
+
+  // ==================== Product Side Options ====================
+  async getProductSideOptions(productId: string) {
+    const { data, error } = await supabase
+      .from('product_side_options')
+      .select('*')
+      .eq('product_id', productId)
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createProductSideOption(option: { product_id: string; name_ar: string; price_addition: number }) {
+    const { data, error } = await supabase
+      .from('product_side_options')
+      .insert(option)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateProductSideOption(id: string, updates: { name_ar?: string; price_addition?: number }) {
+    const { data, error } = await supabase
+      .from('product_side_options')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteProductSideOption(id: string) {
+    const { error } = await supabase
+      .from('product_side_options')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async deleteAllProductSideOptions(productId: string) {
+    const { error } = await supabase
+      .from('product_side_options')
+      .delete()
+      .eq('product_id', productId);
+    
+    if (error) throw error;
+  },
+
+  // ==================== Services ====================
+  async getServices() {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getActiveServices() {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getServiceById(id: string) {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createService(service: { name_ar: string; description_ar: string; details?: string; image_url?: string; is_active?: boolean }) {
+    const { data, error } = await supabase
+      .from('services')
+      .insert(service)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateService(id: string, updates: { name_ar?: string; description_ar?: string; details?: string; image_url?: string; is_active?: boolean }) {
+    const { data, error } = await supabase
+      .from('services')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteService(id: string) {
+    const { error } = await supabase
+      .from('services')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  // ==================== Service Inquiries ====================
+  async getServiceInquiries() {
+    const { data, error } = await supabase
+      .from('service_inquiries')
+      .select(`
+        *,
+        service:services(*)
+      `)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getServiceInquiriesByService(serviceId: string) {
+    const { data, error } = await supabase
+      .from('service_inquiries')
+      .select('*')
+      .eq('service_id', serviceId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createServiceInquiry(inquiry: { service_id: string; customer_name: string; email: string; phone?: string; message: string }) {
+    const { data, error } = await supabase
+      .from('service_inquiries')
+      .insert(inquiry)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateServiceInquiry(id: string, updates: { status?: 'pending' | 'contacted' | 'resolved'; admin_notes?: string }) {
+    const { data, error } = await supabase
+      .from('service_inquiries')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteServiceInquiry(id: string) {
+    const { error } = await supabase
+      .from('service_inquiries')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
 };

@@ -14,7 +14,8 @@ Arabic (RTL layout)
 
 ## 2. Technical Stack
 
-### 2.1 Frontend\n
+### 2.1 Frontend
+
 - React with JavaScript
 - Tailwind CSS for styling
 - RTL (Right-to-Left) support for Arabic language
@@ -114,8 +115,7 @@ Arabic (RTL layout)
 - Order placement and tracking
 - celebrations and occaisons
   - Hero section with scrolling carousel showcasing featured celebration products and services
-  - All event supplies
-  - Stickers
+  - All event supplies\n  - Stickers
   - Favor boxes
   - Canvas printing
   - Posters
@@ -201,8 +201,7 @@ Arabic (RTL layout)
   - If user role is 'user': redirect to home page
   - If user role is 'admin': redirect to admin dashboard
 \n### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
-
-- Display main product categories in card-based grid layout on home page
+\n- Display main product categories in card-based grid layout on home page
 - Each category card shows:
   - Category icon/image
   - Category name in Arabic
@@ -221,14 +220,15 @@ Arabic (RTL layout)
 - Checkout process
 - Payment integration
 - Order confirmation
-- **Product Configuration Before Adding to Cart** (matching image.png exactly):
+- **Product Configuration Before Adding to Cart**:
   - Each product page displays configuration options on the right side
   - Product model number displayed at top (رقم الموديل)
   - Two tabs: خيارات المنتج (Product Options - active/orange) and تقييمات المنتج (Product Reviews)\n  - Configuration fields (all required, marked with red asterisk *):
-    1. **اختر المقاس*** (Choose Size): Dropdown list showing size options with price beside each option (e.g., '33x48(+10ر.س)')
-    2. **اختر نوع الورق*** (Choose Paper Type): Dropdown list showing paper type options with price beside each option (e.g., 'ورق تغليف 92gm ثلجي (+5ر.س)')
-    3. **الكمية*** (Quantity): Dropdown list for quantity selection with price beside each option\n    4. **خدمة التصميم*** (Design Service): Dropdown list with options and price beside each option (e.g., 'طلب خدمة تصميم (+50ر.س)')
-    5. **مدة التنفيذ للمنتج*** (Implementation Duration): Dropdown list showing duration options with pricing impact beside each option (e.g., 'تنفيذ سريع - 3 أيام (+20 ر.س)')
+    1. **اختر المقاس*** (Choose Size): Dropdown list showing size options with price beside each option
+    2. **اختر نوع الورق*** (Choose Paper Type): Dropdown list showing paper type options with price beside each option
+    3. **الكمية*** (Quantity): Dropdown list for quantity selection with price beside each option
+    4. **خدمة التصميم*** (Design Service): Dropdown list with options and price beside each option
+    5. **مدة التنفيذ للمنتج*** (Implementation Duration): Dropdown list showing duration options with pricing impact beside each option
     6. **هل تريد تصوير عينة قبل طباعة الكمية*** (Do you want a sample before full production): Dropdown with yes/no options and price beside each option if applicable
     7. **ارفع تصميمك*** (Upload Your Design): File upload field with text'يمكنك رفع ملف بصيغة (PDF, PNG, JPG, AI, PSD)' and 'اختر ملف' button
   - Price display at bottom showing total with currency (ر.س) and shipping note
@@ -270,7 +270,8 @@ Arabic (RTL layout)
     2. **Cash on Delivery (الدفع عند الاستلام)**:
        - No additional fields required
        - Display confirmation message about cash payment upon delivery
-\n- **Step 3: Order Review**
+
+- **Step 3: Order Review**
   - Display order summary with all items and total
   - Display customer information
   - Display selected payment method
@@ -294,130 +295,199 @@ Arabic (RTL layout)
 - Display clear error messages in Arabic for each validation failure
 - Prevent form submission until all validations pass
 
-### 3.7 Additional Features
+### 3.7 Services Section (قسم الخدمات)\n
+#### 3.7.1 User Interface - Services Page
+- Dedicated services page accessible from main navigation
+- Display available services in card-based grid layout
+- Each service card shows:
+  - Service icon/image
+  - Service name in Arabic
+  - Brief service description
+  - 'طلب الخدمة' (Request Service) button
+- Clicking on service card or button opens service details modal/page with:
+  - Full service description
+  - Service features and benefits
+  - Pricing information (if applicable)
+  - Service request form with fields:
+    + Customer name (required)
+    + Email address (required)\n    + Phone number (required)\n    + Service details/requirements (text area, required)\n    + File upload option for relevant documents
+  - 'إرسال الطلب' (Submit Request) button
+- Upon service request submission:
+  - Display success message: 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً' (Your request has been sent successfully! We will contact you soon)\n  - Send notification message to admin containing:
+    + Service name
+    + Customer information
+    + Service requirements
+  - Send confirmation email to customer
+\n#### 3.7.2 Admin Interface - Services Management
+- Services management section in admin dashboard
+- Add new services with:
+  - Service name (required)
+  - Service description (required)
+  - Service icon/image upload with drag-and-drop
+  - Pricing information (optional)
+  - Service features list
+  - Active/inactive status toggle
+- Edit existing services\n- Delete services
+- View all service requests with:
+  - Request date and time
+  - Customer information
+  - Service name
+  - Service requirements
+  - Request status (new, in progress, completed, cancelled)
+- Update service request status
+- Respond to service requests via email or phone
+- Filter and search service requests
+
+### 3.8 Additional Features
 
 - Contact form\n- Customer support chat
 - FAQ section
 - Delivery information
 - Company information pages
-\n### 3.8 Admin Dashboard
+\n### 3.9 Admin Dashboard
 
 - Full control and management of all website content
-\n#### 3.8.1 Category Management
-- View all product categories
-- Add new categories\n- Edit existing categories
+\n#### 3.9.1 Category Management
+- View all product categories\n- Add new categories
+- Edit existing categories
 - Delete categories
 - Organize category hierarchy
 - Manage category icons/images for home page display
 
-#### 3.8.2 Product Management
-- Add new products with drag-and-drop image upload
-- Edit existing products with drag-and-drop image replacement
-- Remove products
-- Manage product inventory
-- Set product model numbers
-\n#### 3.8.3 Product Options Configuration Page (صفحة إعدادات خيارات المنتج)\n- **Dedicated interface for configuring all product options**
-- **Size Options Management (إدارة خيارات المقاس)**:
-  - Add new size options by entering specific size value (e.g., '33x48', '45x25x8') and corresponding price modifier
-  - Edit existing size options (modify size value and price modifier)
-  - Delete size options\n  - Set display order for size options
-  - Example: Admin enters size '33x48' with price modifier '+10ر.س'\n- **Paper Type Options Management (إدارة خيارات نوع الورق)**:
-  - Add new paper type options with name and price modifier
-  - Edit existing paper type options
-  - Delete paper type options
-  - Set display order for paper type options\n  - Example: 'ورق تغليف 92gm ثلجي' with price modifier '+5ر.س'
-- **Quantity Options Management (إدارة خيارات الكمية)**:\n  - Add quantity tiers by entering specific quantity value (e.g., '100', '500', '1000') and corresponding price modifier
-  - Edit existing quantity options (modify quantity value and price modifier)
-  - Delete quantity options
-  - Set minimum and maximum quantity limits
-  - Example: Admin enters quantity '500' with price modifier '+15ر.س'
-- **Design Service Options Management (إدارة خيارات خدمة التصميم)**:
-  - Add design service options with name and price modifier\n  - Edit existing design service options
-  - Delete design service options
-  - Example: 'طلب خدمة تصميم' with price modifier '+50ر.س'
-- **Implementation Duration Options Management (إدارة خيارات مدة التنفيذ)**:
-  - Add duration options with name and price modifier
-  - Edit existing duration options
-  - Delete duration options
-  - Example: 'تنفيذ سريع - 3 أيام' with price modifier '+20ر.س'
-- **Sample Request Options Management (إدارة خيارات تصوير العينة)**:
-  - Add sample options (yes/no) with price modifiers
-  - Edit existing sample options
-  - Delete sample options
-- **Pricing Rules Configuration**:
-  - Set base price for each product
-  - Configure price modifiers for each option choice
-  - Preview how prices display in dropdown menus on product pages
-  - Set conditional pricing rules based on option combinations
-  - Bulk edit pricing for multiple products
-- **Option Assignment to Products**:
-  - Assign specific options to individual products or product categories
-  - Enable/disable specific options for certain products
-  - Set default selections for each option type
-- **Option Display Settings**:
-  - Configure option labels in Arabic
-  - Set placeholder text for dropdown fields
-  - Configure required/optional status for each option
-  - Set validation rules for each option
-- **Preview Functionality**:
-  - Live preview of how options appear on product pages
-  - Test price calculation with different option combinations
-  - Verify dropdown display and functionality
-- **Admin Input Interface**:
-  - For each option type (size, quantity, etc.), admin can:
-    + Enter specific value (e.g., size '33x48', quantity '500')
-    + Enter corresponding price modifier (e.g., '+10ر.س', '+15ر.س')
-    + Save and apply to selected products
-  - Interface displays all configured options in a table format with columns: Option Type, Value, Price Modifier, Actions (Edit/Delete)
+#### 3.9.2 Product Management - Add/Edit Product Interface
+\n**Product Form Structure (matching provided code exactly):**
 
-#### 3.8.4 Blog Management
+**Section 1: Basic Product Information (معلومات المنتج الأساسية)**
+- Card layout with header'معلومات المنتج الأساسية'\n- Fields:
+  1. **اسم المنتج *** (Product Name): Text input, required, placeholder: 'مثال: باقة تصميم الشعار الاحترافية'
+  2. **وصف المنتج *** (Product Description): Textarea, required, placeholder: 'اكتب وصفاً مفصلاً للمنتج أو الخدمة...', rows: 4
+  3. **السعر الأساسي (ر.س) *** (Base Price): Number input, required, placeholder: '1500'
+  4. **الفئة *** (Category): Dropdown select, required\n     - Shows'اختر الفئة' as placeholder
+     - Populated with available categories from database
+     - Display helper text: 'متوفر X فئة' or 'جاري تحميل الفئات...'
+\n- **Tax and Total Price Display Section**:
+  - Displayed when base price > 0
+  - Gray background card (bg-gray-100) with black text
+  - Header: 'حساب السعر الأساسي'\n  - Shows:\n    + السعر الأساسي (Subtotal)
+    + ضريبة القيمة المضافة (15%) (VAT 15%)
+    + الإجمالي (Total) - bold, larger font, with top border
+  - All prices formatted to2 decimal places with'ر.س' currency\n
+**Section 2: Quantity Options with Pricing (خيارات الكمية والأسعار)**
+- Card layout with header 'خيارات الكمية والأسعار'
+- Description: 'أضف خيارات كمية مختلفة مع أسعارها (مثال: 100 نسخة بسعر 1500 ريال، 500 نسخة بسعر 6000 ريال)'
+- Dynamic quantity rows, each row contains:
+  1. **الكمية *** (Quantity): Number input, required, placeholder: 'مثال: 100', with black border
+  2. **السعر (ر.س) *** (Price): Number input, required, placeholder: 'مثال: 1500', with black border
+  3. **الإجمالي شامل الضريبة** (Total with Tax): Display-only field showing calculated total (price +15% VAT) in yellow/orange color, formatted to 2 decimals with'ر.س'\n  4. Remove button (X icon) - red destructive variant, only shown if more than 1 row exists
+- Each row has gray background (bg-gray-50) with border and padding
+- 'إضافة خيار كمية آخر' button with Plus icon to add new quantity row
+- Info note with blue background: '💡 ملاحظة: هذه الخيارات ستظهر للعميل ليختار الكمية المناسبة مع السعر المحدد لكل كمية.'
+
+**Section 3: Size Options with Additional Pricing (خيارات المقاس مع الأسعار الإضافية)**
+- Card layout with header 'خيارات المقاس مع الأسعار الإضافية'
+- Label: 'المقاسات المتاحة والسعر الإضافي'
+- Dynamic size option rows, each row contains:
+  1. **اسم المقاس** (Size Name): Text input, placeholder: 'اسم المقاس X', flex-1
+  2. **السعر الإضافي** (Additional Price): Number input, placeholder: 'السعر الإضافي', width: w-32
+  3. Currency label: 'ر.س'
+  4. Remove button (X icon) - red destructive variant\n- '+ إضافة مقاس آخر' button to add new size option
+\n**Section 4: Paper Type Options with Additional Pricing (خيارات نوع الورق مع الأسعار الإضافية)**
+- Same structure as Size Options section
+- Card layout with header 'خيارات نوع الورق مع الأسعار الإضافية'
+- Label: 'أنواع الورق المتاحة والسعر الإضافي'
+- Dynamic paper type option rows with:
+  1. Paper type name input
+  2. Additional price input
+  3. Currency label
+  4. Remove button\n- '+ إضافة نوع ورق آخر' button\n
+**Section 5: Design Service Options with Additional Pricing (خيارات خدمة التصميم مع الأسعار الإضافية)**
+- Same structure as previous option sections
+- Card layout with header 'خيارات خدمة التصميم مع الأسعار الإضافية'
+- Dynamic design service option rows\n- '+ إضافة خيار تصميم آخر' button
+
+**Section 6: Implementation Duration Options with Additional Pricing (خيارات مدة التنفيذ مع الأسعار الإضافية)**
+- Same structure as previous option sections
+- Card layout with header 'خيارات مدة التنفيذ مع الأسعار الإضافية'
+- Dynamic duration option rows\n- '+ إضافة مدة تنفيذ أخرى' button
+\n**Section 7: Sample Request Options with Additional Pricing (خيارات تصوير العينة مع الأسعار الإضافية)**
+- Same structure as previous option sections
+- Card layout with header 'خيارات تصوير العينة مع الأسعار الإضافية'
+- Dynamic sample option rows
+- '+ إضافة خيار عينة آخر' button\n
+**Section 8: Product Images (صور المنتج)**\n- Card layout with drag-and-drop image upload zone
+- Support multiple image uploads\n- Image preview with remove option
+- Accepted formats: JPG, PNG, WebP\n\n**Form Actions:**
+- 'حفظ المنتج' (Save Product) button - primary action, yellow/orange color
+- 'إلغاء' (Cancel) button - secondary action\n- Form validation for all required fields before submission
+- Success message upon successful save
+- Error messages for validation failures
+
+**Technical Implementation Notes:**
+- All option sections use same component structure for consistency
+- Dynamic array management for adding/removing option rows
+- Real-time calculation of totals including15% VAT
+- Form state management with React hooks
+- Validation on all required fields
+- Black borders on quantity/price input fields as specified
+- Gray background (bg-gray-50/bg-gray-100) for calculated price displays
+- Yellow/orange (brand-yellow) color for total price displays
+- Responsive grid layout (grid-cols-1 md:grid-cols-2) for form fields
+
+#### 3.9.3 Blog Management
 - View all blog posts
 - Create new blog posts
 - Edit existing blog posts
 - Delete blog posts
 - Manage blog categories and tags
 - Schedule blog post publication
-\n#### 3.8.5 Order Management
+\n#### 3.9.4 Order Management
 - View all orders with filtering options (status, date, customer, payment method)
 - Update order status (pending, processing, shipped, delivered, cancelled)
-- View order details including:
-  - Customer-selected product configurations
+- View order details including:\n  - Customer-selected product configurations
   - Uploaded design files
   - Customer information
   - Payment method and status
-  - Total amount\n- Process refunds and cancellations
+  - Total amount
+- Process refunds and cancellations
 - Generate order reports
 - Mark orders as paid/unpaid for cash on delivery
+- **Service Request Orders**:
+  - View service request details
+  - Service name clearly displayed
+  - Customer contact information
+  - Service requirements and uploaded files
+  - Send notification message to admin when new service request is received
 
-#### 3.8.6 Message Management
+#### 3.9.5 Message Management
 - View all customer messages and inquiries
-- Respond to customer messages
-- Mark messages as read/unread
+- Respond to customer messages\n- Mark messages as read/unread
 - Archive or delete messages
 - Filter messages by status or date
-
-#### 3.8.7 User Management
+- **Service Request Notifications**:
+  - Receive notifications for new service requests
+  - Notification includes service name and customer details
+  - Quick access to full service request information
+\n#### 3.9.6 User Management
 - Manage user accounts\n- View user activity and order history
-\n#### 3.8.8 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
+\n#### 3.9.7 Portfolio Management (إدارة معرض الأعمال)\n- Add new portfolio projects with drag-and-drop image upload
 - Edit existing portfolio projects
 - Delete portfolio projects
 - Categorize projects by type (special occasions, commercial, etc.)
 - Manage project details (title, description, images, date)
 - Control visibility of portfolio items on user interface
 
-#### 3.8.9 Who We Are Management (إدارة من نحن)
-- Edit company information and history
+#### 3.9.8 Who We Are Management (إدارة من نحن)\n- Edit company information and history
 - Update team member profiles
 - Manage company values and achievements
 - Upload and update company images
-\n#### 3.8.10 Special Occasions Works Management (إدارة مناسباتك الخاصة)
+\n#### 3.9.9 Special Occasions Works Management (إدارة مناسباتك الخاصة)
 - Add new special occasion projects with multiple images
 - Edit project details and descriptions
 - Delete projects
 - Organize projects by occasion type
 - Control display order on user interface
 
-#### 3.8.11 Settings and Configuration
+#### 3.9.10 Settings and Configuration
 - Configure payment and delivery settings
 - Update website content and information
 - View sales reports and analytics
@@ -450,9 +520,17 @@ Arabic (RTL layout)
 - Social login buttons with brand colors (Google and Facebook)
 - Profile page with clean card-based layout for user information sections
 - Admin dashboard with sidebar navigation and data tables
-- Form-based interface for product options configuration with add/edit/delete controls
-- Admin input fields for entering specific option values (size, quantity) and corresponding price modifiers
-\n### 4.3 Layout Style
+- **Admin Product Form Styling**:
+  - Card-based sections with clear headers
+  - Gray backgrounds (bg-gray-50, bg-gray-100) for calculated price displays
+  - Black borders on input fields in quantity section
+  - Yellow/orange (brand-yellow) color for total price displays
+  - Blue info boxes for helper notes
+  - Consistent spacing and padding across all sections
+  - Responsive two-column grid for form fields
+  - Icon buttons (Plus, X) for add/remove actions
+
+### 4.3 Layout Style
 
 - Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
 - Sticky navigation header\n- Clear call-to-action buttons in yellow/orange
@@ -465,8 +543,13 @@ Arabic (RTL layout)
 - Centered authentication forms with social login buttons below main form
 - Profile page with sidebar navigation and main content area
 - Admin dashboard with collapsible sidebar and main content area
-- Product options configuration page with tabbed sections for each option type
-- Admin interface with table layout displaying configured options (Option Type, Value, Price Modifier, Actions)
+- **Admin Product Form Layout**:
+  - Vertical card stack layout for different sections
+  - Each section in separate card component
+  - Responsive grid within cards (1 column mobile, 2 columns desktop)
+  - Dynamic rows for quantity and option inputs
+  - Consistent button placement (add buttons at bottom of each section)
+  - Form actions (Save/Cancel) at bottom of entire form
 \n## 5. Reference Images
 
 1. Product configuration interface reference: image.png
