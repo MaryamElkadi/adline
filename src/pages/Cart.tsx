@@ -1,13 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Cart() {
-  const { items, updateItem, removeItem, totalPrice, totalItems } = useCart();
+  const { items, updateItem, removeItem, totalPrice, totalItems, loading } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -18,15 +19,27 @@ export default function Cart() {
           <Card className="text-center py-12">
             <CardContent>
               <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">يرجى تسجيل الدخول</h2>
+              <h2 className="text-2xl font-bold mb-2">Please Sign In</h2>
               <p className="text-muted-foreground mb-6">
-                يجب تسجيل الدخول لعرض سلة التسوق
+                You need to sign in to view your shopping cart
               </p>
               <Button asChild>
-                <Link to="/login">تسجيل الدخول</Link>
+                <Link to="/login">Sign In</Link>
               </Button>
             </CardContent>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background py-12">
+        <div className="max-w-4xl mx-auto px-4 xl:px-6">
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
         </div>
       </div>
     );
@@ -39,14 +52,14 @@ export default function Cart() {
           <Card className="text-center py-12">
             <CardContent>
               <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">السلة فارغة</h2>
+              <h2 className="text-2xl font-bold mb-2">Your Cart is Empty</h2>
               <p className="text-muted-foreground mb-6">
-                لم تقم بإضافة أي منتجات إلى السلة بعد
+                You haven't added any products to your cart yet
               </p>
               <Button asChild>
                 <Link to="/products">
-                  تصفح المنتجات
-                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Browse Products
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </CardContent>
@@ -59,6 +72,7 @@ export default function Cart() {
   const calculateItemPrice = (item: typeof items[0]) => {
     let price = item.product?.base_price || 0;
     
+    // Add selected options price modifiers
     if (item.selected_options && item.product?.options) {
       Object.values(item.selected_options).forEach((optionId) => {
         const option = item.product.options?.find((opt) => opt.id === optionId);
@@ -75,11 +89,13 @@ export default function Cart() {
           ? JSON.parse(item.custom_options) 
           : item.custom_options;
         
-        Object.values(customOpts).forEach((value: any) => {
-          if (value && typeof value === 'object' && 'price_modifier' in value) {
-            price += value.price_modifier || 0;
-          }
-        });
+        if (customOpts && typeof customOpts === 'object') {
+          Object.values(customOpts).forEach((value: any) => {
+            if (value && typeof value === 'object' && 'price_modifier' in value) {
+              price += value.price_modifier || 0;
+            }
+          });
+        }
       } catch (e) {
         console.error('Error parsing custom_options:', e);
       }
@@ -88,22 +104,33 @@ export default function Cart() {
     return price * item.quantity;
   };
 
+  const handleQuantityChange = async (itemId: string, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    await updateItem(itemId, newQuantity);
+  };
+
+  const handleCheckout = () => {
+    navigate('/checkout');
+  };
+
   return (
     <div className="min-h-screen bg-background py-12">
       <div className="max-w-6xl mx-auto px-4 xl:px-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">سلة التسوق</h1>
+          <h1 className="text-4xl font-bold mb-2">Shopping Cart</h1>
           <p className="text-muted-foreground">
-            لديك {totalItems} {totalItems === 1 ? 'منتج' : 'منتجات'} في السلة
+            You have {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
           </p>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* Cart Items */}
           <div className="xl:col-span-2 space-y-4">
             {items.map((item) => (
               <Card key={item.id}>
                 <CardContent className="p-6">
                   <div className="flex gap-4">
+                    {/* Product Image */}
                     <div className="w-24 h-24 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
                       <img
                         src={item.product?.image_url || 'https://via.placeholder.com/200'}
@@ -112,6 +139,7 @@ export default function Cart() {
                       />
                     </div>
 
+                    {/* Product Details */}
                     <div className="flex-grow">
                       <div className="flex items-start justify-between mb-2">
                         <div>
@@ -121,6 +149,9 @@ export default function Cart() {
                           >
                             {item.product?.name_ar || 'Product'}
                           </Link>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Base Price: {item.product?.base_price?.toFixed(2)} SAR
+                          </p>
                         </div>
                         <Button
                           variant="ghost"
@@ -132,18 +163,19 @@ export default function Cart() {
                         </Button>
                       </div>
 
+                      {/* Selected Options */}
                       {item.selected_options && Object.keys(item.selected_options).length > 0 && item.product?.options && (
                         <div className="mb-3 space-y-1">
-                          <p className="text-sm text-muted-foreground mb-2">الخيارات المحددة:</p>
+                          <p className="text-sm font-medium mb-2">Selected Options:</p>
                           {Object.entries(item.selected_options).map(([type, optionId]) => {
                             const option = item.product?.options?.find(opt => opt.id === optionId);
                             return option ? (
                               <div key={type} className="flex items-center justify-between text-sm">
                                 <span className="text-muted-foreground">{option.option_name_ar}</span>
                                 {option.price_modifier !== 0 && (
-                                  <span className="text-primary font-medium">
-                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier.toFixed(2)} ر.س
-                                  </span>
+                                  <Badge variant="outline" className={option.price_modifier > 0 ? 'text-green-600' : 'text-red-600'}>
+                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier.toFixed(2)} SAR
+                                  </Badge>
                                 )}
                               </div>
                             ) : null;
@@ -151,72 +183,80 @@ export default function Cart() {
                         </div>
                       )}
 
+                      {/* Custom Options */}
                       {item.custom_options && (() => {
                         try {
                           const customOpts = typeof item.custom_options === 'string' 
                             ? JSON.parse(item.custom_options) 
                             : item.custom_options;
                           
-                          const entries = Object.entries(customOpts);
-                          if (entries.length === 0) return null;
-                          
-                          return (
-                            <div className="mb-3 space-y-1">
-                              <p className="text-sm text-muted-foreground mb-2">خيارات إضافية:</p>
-                              {entries.map(([key, value]: [string, any]) => {
-                                if (!value || typeof value !== 'object') return null;
-                                return (
-                                  <div key={key} className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">{value.label_ar || key}</span>
-                                    {value.price_modifier !== 0 && (
-                                      <span className="text-primary font-medium">
-                                        {value.price_modifier > 0 ? '+' : ''}{value.price_modifier.toFixed(2)} ر.س
-                                      </span>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          );
+                          if (customOpts && typeof customOpts === 'object' && Object.keys(customOpts).length > 0) {
+                            return (
+                              <div className="mb-3 space-y-1">
+                                <p className="text-sm font-medium mb-2">Custom Options:</p>
+                                {Object.entries(customOpts).map(([key, value]: [string, any]) => {
+                                  if (value && typeof value === 'object') {
+                                    return (
+                                      <div key={key} className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                          {value.label || key}: {value.value || value.value_en || 'Selected'}
+                                        </span>
+                                        {value.price_modifier && value.price_modifier !== 0 && (
+                                          <Badge variant="outline" className={value.price_modifier > 0 ? 'text-green-600' : 'text-red-600'}>
+                                            {value.price_modifier > 0 ? '+' : ''}{value.price_modifier.toFixed(2)} SAR
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                })}
+                              </div>
+                            );
+                          }
                         } catch (e) {
-                          console.error('Error parsing custom_options:', e);
-                          return null;
+                          console.error('Error rendering custom options:', e);
                         }
+                        return null;
                       })()}
 
+                      {/* Notes */}
                       {item.notes && (
-                        <p className="text-sm text-muted-foreground mb-3">
-                          ملاحظات: {item.notes}
-                        </p>
+                        <div className="mb-3">
+                          <p className="text-sm font-medium mb-1">Notes:</p>
+                          <p className="text-sm text-muted-foreground">{item.notes}</p>
+                        </div>
                       )}
 
-                      <div className="flex items-center justify-between">
+                      {/* Quantity and Price */}
+                      <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => updateItem(item.id, Math.max(1, item.quantity - 1))}
+                            className="h-8 w-8"
+                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                             disabled={item.quantity <= 1}
                           >
-                            <Minus className="h-4 w-4" />
+                            <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-12 text-center font-medium">
-                            {item.quantity}
-                          </span>
+                          <span className="w-12 text-center font-medium">{item.quantity}</span>
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => updateItem(item.id, item.quantity + 1)}
+                            className="h-8 w-8"
+                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" />
                           </Button>
                         </div>
-
-                        <div className="text-left">
-                          <span className="text-xl font-bold text-primary">
-                            {calculateItemPrice(item).toFixed(2)}
-                          </span>
-                          <span className="text-sm text-muted-foreground mr-1">ر.س</span>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-primary">
+                            {calculateItemPrice(item).toFixed(2)} SAR
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {(calculateItemPrice(item) / item.quantity).toFixed(2)} SAR each
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -226,40 +266,52 @@ export default function Cart() {
             ))}
           </div>
 
-          <div>
-            <Card className="sticky top-20">
-              <CardHeader>
-                <CardTitle>ملخص الطلب</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">المجموع الفرعي</span>
-                  <span className="font-medium">{totalPrice.toFixed(2)} ر.س</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">الشحن</span>
-                  <span className="font-medium">يحسب عند الدفع</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="font-semibold text-lg">الإجمالي</span>
-                  <div className="text-left">
-                    <span className="text-2xl font-bold text-primary">
-                      {totalPrice.toFixed(2)}
-                    </span>
-                    <span className="text-sm text-muted-foreground mr-1">ر.س</span>
+          {/* Order Summary */}
+          <div className="xl:col-span-1">
+            <Card className="sticky top-4">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+                
+                <div className="space-y-3 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal ({totalItems} items)</span>
+                    <span className="font-medium">{totalPrice.toFixed(2)} SAR</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span className="font-medium">Calculated at checkout</span>
                   </div>
                 </div>
+
+                <Separator className="my-4" />
+
+                <div className="flex justify-between mb-6">
+                  <span className="text-lg font-bold">Total</span>
+                  <span className="text-2xl font-bold text-primary">{totalPrice.toFixed(2)} SAR</span>
+                </div>
+
+                <Button 
+                  className="w-full mb-3" 
+                  size="lg"
+                  onClick={handleCheckout}
+                >
+                  Proceed to Checkout
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  asChild
+                >
+                  <Link to="/products">Continue Shopping</Link>
+                </Button>
+
+                <div className="mt-6 p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Note:</strong> Final price will be calculated at checkout including shipping and any applicable taxes.
+                  </p>
+                </div>
               </CardContent>
-              <CardFooter className="flex-col gap-3">
-                <Button className="w-full" size="lg" onClick={() => navigate('/checkout')}>
-                  إتمام الطلب
-                  <ArrowLeft className="mr-2 h-5 w-5" />
-                </Button>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/products">متابعة التسوق</Link>
-                </Button>
-              </CardFooter>
             </Card>
           </div>
         </div>

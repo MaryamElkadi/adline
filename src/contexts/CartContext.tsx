@@ -43,8 +43,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error loading cart:', error);
       toast({
-        title: 'خطأ',
-        description: 'فشل تحميل سلة التسوق',
+        title: 'Error',
+        description: 'Failed to load shopping cart',
         variant: 'destructive',
       });
     } finally {
@@ -60,8 +60,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   ) => {
     if (!user) {
       toast({
-        title: 'تسجيل الدخول مطلوب',
-        description: 'يرجى تسجيل الدخول لإضافة منتجات إلى السلة',
+        title: 'Sign In Required',
+        description: 'Please sign in to add products to cart',
         variant: 'destructive',
       });
       return;
@@ -81,14 +81,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await loadCart();
       
       toast({
-        title: 'تمت الإضافة',
-        description: 'تم إضافة المنتج إلى سلة التسوق',
+        title: 'Added to Cart',
+        description: 'Product added to shopping cart successfully',
       });
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast({
-        title: 'خطأ',
-        description: 'فشل إضافة المنتج إلى السلة',
+        title: 'Error',
+        description: 'Failed to add product to cart',
         variant: 'destructive',
       });
     }
@@ -101,8 +101,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error updating cart item:', error);
       toast({
-        title: 'خطأ',
-        description: 'فشل تحديث المنتج',
+        title: 'Error',
+        description: 'Failed to update product',
         variant: 'destructive',
       });
     }
@@ -113,14 +113,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await api.removeFromCart(id);
       await loadCart();
       toast({
-        title: 'تم الحذف',
-        description: 'تم حذف المنتج من السلة',
+        title: 'Removed',
+        description: 'Product removed from cart',
       });
     } catch (error) {
       console.error('Error removing from cart:', error);
       toast({
-        title: 'خطأ',
-        description: 'فشل حذف المنتج',
+        title: 'Error',
+        description: 'Failed to remove product',
         variant: 'destructive',
       });
     }
@@ -135,8 +135,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error clearing cart:', error);
       toast({
-        title: 'خطأ',
-        description: 'فشل تفريغ السلة',
+        title: 'Error',
+        description: 'Failed to clear cart',
         variant: 'destructive',
       });
     }
