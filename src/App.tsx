@@ -19,6 +19,7 @@ import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import About from './pages/About';
 import PortfolioPage from './pages/PortfolioPage';
+import ServicesPage from './pages/ServicesPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
@@ -31,6 +32,8 @@ import AdminUsers from './pages/admin/Users';
 import AdminBlogPosts from './pages/admin/BlogPosts';
 import AdminMessages from './pages/admin/Messages';
 import AdminPortfolio from './pages/admin/Portfolio';
+import AdminServices from './pages/admin/Services';
+import AdminServiceInquiries from './pages/admin/ServiceInquiries';
 
 // Layout wrapper for user-facing pages
 function UserLayout() {
@@ -53,6 +56,7 @@ function UserLayout() {
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/services" element={<ServicesPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -81,6 +85,8 @@ export default function App() {
               <Route path="blog" element={<AdminBlogPosts />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="portfolio" element={<AdminPortfolio />} />
+              <Route path="services" element={<AdminServices />} />
+              <Route path="service-inquiries" element={<AdminServiceInquiries />} />
             </Route>
             <Route path="*" element={<UserLayout />} />
           </Routes>

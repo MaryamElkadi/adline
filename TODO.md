@@ -54,23 +54,23 @@ Implement comprehensive product options system with quantity tiers, size/materia
 - [ ] 3.6 Update cart integration
 
 ## Phase 4: Services Section
-- [ ] 4.1 Create Admin Services Management Page
-  - [ ] List all services
-  - [ ] Add/Edit/Delete services
-  - [ ] Upload service images
-  - [ ] Manage service details
-- [ ] 4.2 Create User Services Page
-  - [ ] Display all active services
-  - [ ] Show service details
-  - [ ] Contact/Inquiry button
-- [ ] 4.3 Create Service Inquiry Form
-  - [ ] Customer name, email, phone
-  - [ ] Message field
-  - [ ] Submit inquiry
-- [ ] 4.4 Admin Service Inquiries Page
-  - [ ] View all inquiries
-  - [ ] Mark as contacted/resolved
-  - [ ] Send response
+- [x] 4.1 Create Admin Services Management Page
+  - [x] List all services
+  - [x] Add/Edit/Delete services
+  - [x] Upload service images
+  - [x] Manage service details
+- [x] 4.2 Create User Services Page
+  - [x] Display all active services
+  - [x] Show service details
+  - [x] Contact/Inquiry button
+- [x] 4.3 Create Service Inquiry Form
+  - [x] Customer name, email, phone
+  - [x] Message field
+  - [x] Submit inquiry
+- [x] 4.4 Admin Service Inquiries Page
+  - [x] View all inquiries
+  - [x] Mark as contacted/resolved
+  - [x] Send response
 
 ## Phase 5: Testing & Validation
 - [ ] 5.1 Test product creation with all options
