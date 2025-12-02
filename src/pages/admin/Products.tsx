@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -43,11 +43,12 @@ import { Badge } from '@/components/ui/badge';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/db/api';
-import type { Product, Category } from '@/types';
+import type { Product, Category, ProductOptionTemplate } from '@/types';
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [optionTemplates, setOptionTemplates] = useState<ProductOptionTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -68,6 +69,7 @@ export default function Products() {
     featured: false,
     min_quantity: 1,
     production_time_days: 3,
+    selected_option_ids: [] as string[],
   });
 
   useEffect(() => {
@@ -77,12 +79,14 @@ export default function Products() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [productsData, categoriesData] = await Promise.all([
+      const [productsData, categoriesData, templatesData] = await Promise.all([
         api.getProducts(),
         api.getCategories(),
+        api.getProductOptionTemplates(),
       ]);
       setProducts(productsData);
       setCategories(categoriesData);
+      setOptionTemplates(templatesData);
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
@@ -95,9 +99,15 @@ export default function Products() {
     }
   };
 
-  const handleOpenDialog = (product?: Product) => {
+  const handleOpenDialog = async (product?: Product) => {
     if (product) {
       setEditingProduct(product);
+      
+      // Load assigned options for this product
+      const assignments = await api.getProductOptionAssignments();
+      const productAssignments = assignments.filter(a => a.product_id === product.id);
+      const assignedOptionIds = productAssignments.map(a => a.template_id);
+      
       setFormData({
         name_ar: product.name_ar,
         slug: product.slug,
@@ -110,6 +120,7 @@ export default function Products() {
         featured: product.featured,
         min_quantity: product.min_quantity,
         production_time_days: product.production_time_days,
+        selected_option_ids: assignedOptionIds,
       });
     } else {
       setEditingProduct(null);
@@ -125,6 +136,7 @@ export default function Products() {
         featured: false,
         min_quantity: 1,
         production_time_days: 3,
+        selected_option_ids: [],
       });
     }
     setDialogOpen(true);
@@ -132,19 +144,43 @@ export default function Products() {
 
   const handleSave = async () => {
     try {
+      let productId: string;
+      
       if (editingProduct) {
         await api.updateProduct(editingProduct.id, formData);
+        productId = editingProduct.id;
         toast({
           title: 'Success',
           description: 'Product updated successfully',
         });
       } else {
-        await api.createProduct(formData);
+        const newProduct = await api.createProduct(formData);
+        productId = newProduct.id;
         toast({
           title: 'Success',
           description: 'Product created successfully',
         });
       }
+      
+      // Update option assignments
+      const currentAssignments = await api.getProductOptionAssignments();
+      const productAssignments = currentAssignments.filter(a => a.product_id === productId);
+      const currentOptionIds = productAssignments.map(a => a.template_id);
+      
+      // Remove unselected options
+      for (const assignment of productAssignments) {
+        if (!formData.selected_option_ids.includes(assignment.template_id)) {
+          await api.deleteProductOptionAssignment(assignment.id);
+        }
+      }
+      
+      // Add newly selected options
+      for (const templateId of formData.selected_option_ids) {
+        if (!currentOptionIds.includes(templateId)) {
+          await api.assignOptionToProduct(productId, templateId);
+        }
+      }
+      
       setDialogOpen(false);
       loadData();
     } catch (error) {
@@ -400,6 +436,62 @@ export default function Products() {
                 onChange={(url) => setFormData({ ...formData, image_url: url })}
                 onRemove={() => setFormData({ ...formData, image_url: '' })}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Product Options</Label>
+              <p className="text-sm text-muted-foreground mb-2">
+                Select which options customers can choose for this product
+              </p>
+              <div className="border rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto">
+                {optionTemplates.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No options available. Create options in Product Options page first.
+                  </p>
+                ) : (
+                  optionTemplates.map((template) => (
+                    <div key={template.id} className="flex items-center justify-between p-2 hover:bg-muted rounded">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id={`option-${template.id}`}
+                          checked={formData.selected_option_ids.includes(template.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({
+                                ...formData,
+                                selected_option_ids: [...formData.selected_option_ids, template.id],
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                selected_option_ids: formData.selected_option_ids.filter(id => id !== template.id),
+                              });
+                            }
+                          }}
+                          className="h-4 w-4"
+                        />
+                        <Label htmlFor={`option-${template.id}`} className="cursor-pointer">
+                          {template.option_name_en} ({template.option_name_ar})
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={template.is_required ? 'default' : 'secondary'}>
+                          {template.is_required ? 'Required' : 'Optional'}
+                        </Badge>
+                        <Badge variant="outline">
+                          {template.option_type}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              {formData.selected_option_ids.length > 0 && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {formData.selected_option_ids.length} option(s) selected
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
