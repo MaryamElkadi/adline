@@ -190,6 +190,23 @@ export interface ProductOptionValueWithTiers extends ProductOptionValue {
   quantity_tiers: QuantityPricingTier[];
 }
 
+export interface SimpleProductOption {
+  id: string;
+  product_id: string;
+  option_name_ar: string;
+  option_name_en: string | null;
+  option_value_ar: string;
+  option_value_en: string | null;
+  price_modifier: number;
+  is_available: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+export interface SimpleProductOptionWithTiers extends SimpleProductOption {
+  quantity_tiers: QuantityPricingTier[];
+}
+
 export interface ProductOptionAssignment {
   id: string;
   product_id: string;

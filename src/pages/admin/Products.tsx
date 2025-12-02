@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Pencil, Trash2, Search, X, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -46,6 +47,7 @@ import { api } from '@/db/api';
 import type { Product, Category, ProductOptionTemplate, ProductOptionValue } from '@/types';
 
 export default function Products() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [optionTemplates, setOptionTemplates] = useState<ProductOptionTemplate[]>([]);
@@ -308,6 +310,14 @@ export default function Products() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/admin/products/${product.id}/options`)}
+                          >
+                            <Settings className="h-4 w-4 mr-1" />
+                            Options
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"

@@ -18,6 +18,8 @@ import type {
   CheckoutData,
   ShippingAddress,
   QuantityPricingTier,
+  SimpleProductOption,
+  SimpleProductOptionWithTiers,
 } from '@/types';
 
 export const api = {
@@ -911,6 +913,130 @@ export const api = {
       
       if (valueError) throw valueError;
       return valueData?.price_modifier || 0;
+    }
+    
+    return data.price_modifier;
+  },
+
+  // Simple Product Options APIs (New Simplified System)
+  async getSimpleProductOptions(productId: string): Promise<SimpleProductOption[]> {
+    const { data, error } = await supabase
+      .from('simple_product_options')
+      .select('*')
+      .eq('product_id', productId)
+      .order('display_order', { ascending: true })
+      .order('option_name_en', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getSimpleProductOptionsWithTiers(productId: string): Promise<SimpleProductOptionWithTiers[]> {
+    const options = await api.getSimpleProductOptions(productId);
+    
+    const optionsWithTiers = await Promise.all(
+      options.map(async (option) => {
+        const { data: tiers, error } = await supabase
+          .from('quantity_pricing_tiers')
+          .select('*')
+          .eq('simple_option_id', option.id)
+          .order('min_quantity', { ascending: true });
+        
+        if (error) throw error;
+        
+        return {
+          ...option,
+          quantity_tiers: Array.isArray(tiers) ? tiers : [],
+        };
+      })
+    );
+    
+    return optionsWithTiers;
+  },
+
+  async createSimpleProductOption(option: Omit<SimpleProductOption, 'id' | 'created_at'>): Promise<SimpleProductOption> {
+    const { data, error } = await supabase
+      .from('simple_product_options')
+      .insert(option)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to create product option');
+    return data;
+  },
+
+  async updateSimpleProductOption(id: string, updates: Partial<SimpleProductOption>): Promise<SimpleProductOption> {
+    const { data, error } = await supabase
+      .from('simple_product_options')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to update product option');
+    return data;
+  },
+
+  async deleteSimpleProductOption(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('simple_product_options')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  async getQuantityTiersForSimpleOption(optionId: string): Promise<QuantityPricingTier[]> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .select('*')
+      .eq('simple_option_id', optionId)
+      .order('min_quantity', { ascending: true });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
+
+  async createQuantityTierForSimpleOption(tier: Omit<QuantityPricingTier, 'id' | 'created_at' | 'option_value_id'> & { simple_option_id: string }): Promise<QuantityPricingTier> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .insert({
+        ...tier,
+        option_value_id: null, // Not using old system
+      })
+      .select()
+      .maybeSingle();
+    
+    if (error) throw error;
+    if (!data) throw new Error('Failed to create quantity tier');
+    return data;
+  },
+
+  async getPriceForSimpleOption(optionId: string, quantity: number): Promise<number> {
+    const { data, error } = await supabase
+      .from('quantity_pricing_tiers')
+      .select('price_modifier')
+      .eq('simple_option_id', optionId)
+      .lte('min_quantity', quantity)
+      .or(`max_quantity.gte.${quantity},max_quantity.is.null`)
+      .order('min_quantity', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    if (error) throw error;
+    
+    // If no tier found, return the base price_modifier from the option
+    if (!data) {
+      const { data: optionData, error: optionError } = await supabase
+        .from('simple_product_options')
+        .select('price_modifier')
+        .eq('id', optionId)
+        .maybeSingle();
+      
+      if (optionError) throw optionError;
+      return optionData?.price_modifier || 0;
     }
     
     return data.price_modifier;
