@@ -14,15 +14,13 @@ Arabic (RTL layout)
 
 ## 2. Technical Stack
 
-### 2.1 Frontend
-
-- React with JavaScript
-- Tailwind CSS for styling
+### 2.1 Frontend\n\n- React with JavaScript\n- Tailwind CSS for styling
 - RTL (Right-to-Left) support for Arabic language
 - Drag-and-drop library for image upload (e.g., react-dropzone)
 - Animation library for seasonal offers carousel (e.g., Swiper.js or Framer Motion)
 
-### 2.2 Backend\n
+### 2.2 Backend
+
 - Node.js\n\n## 3. Core Features
 \n### 3.1 Product Categories
 
@@ -56,14 +54,15 @@ Arabic (RTL layout)
   - Box holder
 - Banners and posters
 - paper products
-  - Files\n  - Engineering plans
+  - Files
+  - Engineering plans
   - Envelopes
   - Business cards
   - Tags
   - Correspondence envelopes
   - Covering paper
-  - Menu\n  - Brochures
-  - Flyers\n  - Certificates of appreciation
+  - Menu\n  - Brochures\n  - Flyers
+  - Certificates of appreciation
   - Letter paper
   - Printing of booklets and notebooks
   - Calendars
@@ -136,12 +135,9 @@ Arabic (RTL layout)
   - Blog categories and tags navigation
   - Search functionality for blog content
 - Who We Are (من نحن)
-  - User interface displaying company information
-  - Company history and mission
+  - User interface displaying company information\n  - Company history and mission
   - Team introduction
-  - Values and achievements
-- Portfolio (معرض الأعمال)
-  - User interface showcasing completed projects
+  - Values and achievements\n- Portfolio (معرض الأعمال)\n  - User interface showcasing completed projects
   - Project gallery with categories\n  - Project details and descriptions
 - contact and redirect to whatsap or email or facebook
 - **User Profile Page (صفحة الملف الشخصي)**
@@ -201,7 +197,9 @@ Arabic (RTL layout)
 - Form validation with error messages\n- **Login Redirect Logic**:
   - If user role is 'user': redirect to home page
   - If user role is 'admin': redirect to admin dashboard
-\n### 3.4 Home Page - Main Categories Section (الأقسام الرئيسية)
+\n### 3.4 Home Page Layout and Sections
+
+#### 3.4.1 Main Categories Section (الأقسام الرئيسية)
 \n- Display main product categories in card-based grid layout on home page
 - Each category card shows:
   - Category icon/image
@@ -211,10 +209,49 @@ Arabic (RTL layout)
   - التغليف والتعبئة (Packaging)\n  - مطبوعات ورقية (Paper Products)
   - طباعة الملصقات (Stickers Printing)
   - طباعة الأكياس (Bags Printing)
-  - طباعة بوكسات (Boxes Printing)
-  - العروض والباكجات (Offers and Packages)
+  - طباعة بوكسات (Boxes Printing)\n  - العروض والباكجات (Offers and Packages)
 - Reference design: image-2.png and image-3.png
-\n### 3.5 E-commerce Features
+\n#### 3.4.2 Services Section on Home Page (قسم الخدمات)\n
+- Prominent services section displayed on home page
+- Display maximum 6 service cards in grid layout
+- Each service card shows:
+  - Service icon/image
+  - Service name in Arabic
+  - Brief service description (1-2 lines)
+  - 'طلب الخدمة' (Request Service) button
+- Responsive grid layout: 3 columns on desktop, 2 columns on tablet, 1 column on mobile\n- Section header: 'خدماتنا' (Our Services) with decorative styling
+- Clicking on service card or button redirects to full service details page
+- Admin controls which services appear on home page and their display order
+- Cards have hover effects with subtle elevation
+- Consistent card styling matching overall website design
+
+#### 3.4.3 Seasonal Offers Section on Home Page (العروض الموسمية)\n
+- Prominent seasonal offers section displayed on home page\n- Animated carousel/slider showcasing current seasonal promotions
+- Animation features:
+  - Auto-scrolling carousel with smooth transitions
+  - Fade-in/fade-out effects between slides
+  - Hover pause functionality
+  - Navigation arrows and dot indicators
+  - Responsive touch/swipe support for mobile devices
+  - Configurable animation speed and transition effects
+- Each offer card displays:
+  - Offer banner image
+  - Offer title in Arabic
+  - Offer description and discount details
+  - Validity period (start and end dates)
+  - 'اطلب الآن' (Order Now) button linking to offer products
+- Section header: 'عروض موسمية' with decorative styling
+- Display active offers only (based on current date)
+- Click on offer card to view full offer details or redirect to related products
+- Admin has full control over which offers appear and their display order
+
+#### 3.4.4 Home Page Section Order\n
+1. Hero section / Banner\n2. Main Categories Section (الأقسام الرئيسية)
+3. Services Section (خدماتنا) - Maximum 6 cards
+4. Seasonal Offers Section (العروض الموسمية) - Animated carousel
+5. Featured products or other content sections
+
+### 3.5 E-commerce Features
 
 - Product catalog with images and descriptions
 - Pricing display\n- Add to cart functionality
@@ -252,7 +289,8 @@ Arabic (RTL layout)
   - Subtotal (مجموع فرعي)
   - Shipping cost (تكلفة الشحن)
   - Tax (15% VAT) (ضريبة القيمة المضافة)
-  - Total amount (الإجمالي)\n-'إتمام الطلب' (Complete Order) button to proceed to checkout
+  - Total amount (الإجمالي)
+-'إتمام الطلب' (Complete Order) button to proceed to checkout
 - 'متابعة التسوق' (Continue Shopping) button to return to products\n- **Cart Functionality Fixes**:
   - Ensure cart state persists across page navigation
   - Fix quantity update functionality to correctly recalculate totals
@@ -263,7 +301,8 @@ Arabic (RTL layout)
   - Display empty cart message when no items: 'Your Cart is Empty' with'Browse Products' button
   - Implement proper error handling for cart operations
 
-#### 3.6.2 Checkout Process (إتمام الطلب)\n- **Step 1: Customer Information**
+#### 3.6.2 Checkout Process (إتمام الطلب)
+- **Step 1: Customer Information**
   - Full name (required)
   - Email address (required, with email format validation)
   - Phone number (required, with phone format validation)
@@ -304,28 +343,24 @@ Arabic (RTL layout)
 - Display clear error messages in Arabic for each validation failure
 - Prevent form submission until all validations pass
 
-### 3.7 Seasonal Offers Section (عروض موسمية)
+### 3.7 Seasonal Offers Management
 
 #### 3.7.1 User Interface - Seasonal Offers Display
 - Prominent section on home page displaying seasonal offers
-- Animated carousel/slider showcasing current seasonal promotions
-- Animation features:
+- Animated carousel/slider showcasing current seasonal promotions\n- Animation features:
   - Auto-scrolling carousel with smooth transitions
-  - Fade-in/fade-out effects between slides
-  - Hover pause functionality
-  - Navigation arrows and dot indicators
+  - Fade-in/fade-out effects between slides\n  - Hover pause functionality\n  - Navigation arrows and dot indicators
   - Responsive touch/swipe support for mobile devices
 - Each offer card displays:
   - Offer banner image
   - Offer title in Arabic
-  - Offer description and discount details
-  - Validity period (start and end dates)
+  - Offer description and discount details\n  - Validity period (start and end dates)
   - 'اطلب الآن' (Order Now) button linking to offer products
 - Section header: 'عروض موسمية' with decorative styling
 - Display active offers only (based on current date)
-- Responsive grid layout for multiple offers\n- Click on offer card to view full offer details or redirect to related products
-
-#### 3.7.2 Admin Interface - Seasonal Offers Management
+- Responsive grid layout for multiple offers
+- Click on offer card to view full offer details or redirect to related products
+\n#### 3.7.2 Admin Interface - Seasonal Offers Management
 - Dedicated 'عروض موسمية' (Seasonal Offers) section in admin dashboard sidebar
 - **View All Offers**:
   - List all seasonal offers in table format
@@ -340,8 +375,8 @@ Arabic (RTL layout)
     + End date (required, date picker)
     + Related products/categories (optional, multi-select dropdown)
     + Display order/priority (optional, number input)
-    + Active/inactive status toggle
-  - Form validation for all required fields
+    + Show on home page toggle (control visibility on home page)
+    + Active/inactive status toggle\n  - Form validation for all required fields
   - Preview option to see how offer will appear on user interface
   - 'حفظ العرض' (Save Offer) button
 - **Edit Existing Offer**:
@@ -353,20 +388,19 @@ Arabic (RTL layout)
   - Soft delete option to archive offers instead of permanent deletion
 - **Offer Status Management**:
   - Automatic status update based on validity dates (active/expired)
-  - Manual toggle to activate/deactivate offers
-  - Display offer status indicators (green for active, red for expired, gray for inactive)
+  - Manual toggle to activate/deactivate offers\n  - Display offer status indicators (green for active, red for expired, gray for inactive)
 - **Analytics** (optional):
   - View offer performance metrics (views, clicks, conversions)
   - Track which offers generate most orders
-\n### 3.8 Services Section (قسم الخدمات)\n
+\n### 3.8 Services Section
+
 #### 3.8.1 User Interface - Services Page
 - Dedicated services page accessible from main navigation
 - Display available services in card-based grid layout
 - Each service card shows:
   - Service icon/image
   - Service name in Arabic
-  - Brief service description
-  - 'طلب الخدمة' (Request Service) button
+  - Brief service description\n  - 'طلب الخدمة' (Request Service) button
 - Clicking on service card or button opens service details modal/page with:
   - Full service description
   - Service features and benefits
@@ -385,9 +419,17 @@ Arabic (RTL layout)
 - Add new services with:
   - Service name (required)\n  - Service description (required)\n  - Service icon/image upload with drag-and-drop
   - Pricing information (optional)
-  - Service features list\n  - Active/inactive status toggle
+  - Service features list\n  - Show on home page toggle (control if service appears in home page services section)
+  - Display order/priority for home page (number input)
+  - Active/inactive status toggle
 - Edit existing services\n- Delete services
-- View all service requests with:\n  - Request date and time
+- **Home Page Display Control**:
+  - Maximum 6 services can be shown on home page
+  - Admin selects which services appear on home page via toggle
+  - Admin sets display order/priority for home page services
+  - If more than 6 services are marked for home page, system shows top 6 by priority
+- View all service requests with:
+  - Request date and time
   - Customer information
   - Service name
   - Service requirements
@@ -402,7 +444,8 @@ Arabic (RTL layout)
 - FAQ section
 - Delivery information
 - Company information pages
-\n### 3.10 Admin Dashboard\n
+\n### 3.10 Admin Dashboard
+
 - Full control and management of all website content\n\n#### 3.10.1 Category Management
 - View all product categories\n- Add new categories\n- Edit existing categories
 - Delete categories
@@ -433,7 +476,7 @@ Arabic (RTL layout)
 - Dynamic quantity rows, each row contains:
   1. **الكمية *** (Quantity): Number input, required, placeholder: 'مثال: 100', with black border
   2. **السعر (ر.س) *** (Price): Number input, required, placeholder: 'مثال: 1500', with black border
-  3. **الإجمالي شامل الضريبة** (Total with Tax): Display-only field showing calculated total (price +15% VAT) in yellow/orange color, formatted to 2 decimals with'ر.س'\n  4. Remove button (X icon) - red destructive variant, only shown if more than 1 row exists
+  3. **الإجمالي شامل الضريبة** (Total with Tax): Display-only field showing calculated total (price +15% VAT) in yellow/orange color, formatted to 2 decimals with 'ر.س'\n  4. Remove button (X icon) - red destructive variant, only shown if more than 1 row exists
 - Each row has gray background (bg-gray-50) with border and padding
 -'إضافة خيار كمية آخر' button with Plus icon to add new quantity row
 - Info note with blue background: '💡 ملاحظة: هذه الخيارات ستظهر للعميل ليختار الكمية المناسبة مع السعر المحدد لكل كمية.'
@@ -452,7 +495,8 @@ Arabic (RTL layout)
 - Dynamic paper type option rows with:
   1. Paper type name input
   2. Additional price input
-  3. Currency label\n  4. Remove button\n- '+ إضافة نوع ورق آخر' button\n
+  3. Currency label
+  4. Remove button\n- '+ إضافة نوع ورق آخر' button\n
 **Section 5: Design Service Options with Additional Pricing (خيارات خدمة التصميم مع الأسعار الإضافية)**
 - Same structure as previous option sections
 - Card layout with header 'خيارات خدمة التصميم مع الأسعار الإضافية'
@@ -462,9 +506,8 @@ Arabic (RTL layout)
 - Same structure as previous option sections\n- Card layout with header 'خيارات مدة التنفيذ مع الأسعار الإضافية'
 - Dynamic duration option rows
 - '+ إضافة مدة تنفيذ أخرى' button
-\n**Section 7: Sample Request Options with Additional Pricing (خيارات تصوير العينة مع الأسعار الإضافية)**\n- Same structure as previous option sections
-- Card layout with header 'خيارات تصوير العينة مع الأسعار الإضافية'
-- Dynamic sample option rows
+\n**Section 7: Sample Request Options with Additional Pricing (خيارات تصوير العينة مع الأسعار الإضافية)**
+- Same structure as previous option sections\n- Card layout with header 'خيارات تصوير العينة مع الأسعار الإضافية'\n- Dynamic sample option rows
 - '+ إضافة خيار عينة آخر' button\n
 **Section 8: Product Images (صور المنتج)**
 - Card layout with drag-and-drop image upload zone
@@ -557,16 +600,18 @@ Arabic (RTL layout)
 - Modern and clean interface with RTL layout
 - Card-based product display with hover effects
 - Card-based category display on home page with icons and labels
+- Card-based services display on home page (maximum 6 cards) with hover effects
 - Rounded corners (8-12px) for buttons and cards
 - Subtle shadows for depth and hierarchy
 - Clear typography optimized for Arabic text
-- Responsive grid layout for product categories and main categories section
+- Responsive grid layout for product categories, services section, and main categories section
 - Drag-and-drop zone withdashed border and upload icon for image uploads
 - Product configuration panel with tabbed interface (orange active tab, gray inactive tab)
 - Dropdown fields with downward arrow indicators and price display beside each option
 - File upload button with outlined style
 - Orange call-to-action buttons for'Add to Cart' and 'Complete Order'
-- Required field indicators with red asterisks\n- Error message styling in red with clear visibility
+- Required field indicators with red asterisks
+- Error message styling in red with clear visibility
 - Success message styling in green with checkmark icon
 - Scrolling hero section with smooth transitions for celebrations page
 - Gallery-style layout for portfolio and special occasions pages with lightbox functionality
@@ -590,6 +635,8 @@ Arabic (RTL layout)
 \n### 4.3 Layout Style
 
 - Grid-based product catalog\n- Grid-based main categories section on home page (الأقسام الرئيسية)
+- Grid-based services section on home page (maximum 6 cards,3 columns desktop, 2 columns tablet, 1 column mobile)
+- Full-width animated carousel for seasonal offers section
 - Sticky navigation header\n- Clear call-to-action buttons in yellow/orange
 - Blue accents for links and secondary actions
 - Two-column product detail layout: product image on left, configuration options on right
@@ -602,14 +649,14 @@ Arabic (RTL layout)
 - Admin dashboard with collapsible sidebar and main content area
 - **Seasonal Offers Section Layout**:
   - Full-width carousel section on home page
-  - Prominent placement below hero section or main categories
+  - Prominent placement below main categories or services section
   - Responsive card layout within carousel
   - Navigation controls positioned at carousel edges
   - Dot indicators centered below carousel
 - **Admin Product Form Layout**:
   - Vertical card stack layout for different sections
   - Each section in separate card component
-  - Responsive grid within cards (1column mobile, 2 columns desktop)
+  - Responsive grid within cards (1 column mobile, 2 columns desktop)
   - Dynamic rows for quantity and option inputs
   - Consistent button placement (add buttons at bottom of each section)
   - Form actions (Save/Cancel) at bottom of entire form
