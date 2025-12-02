@@ -68,12 +68,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      // Extract price modifiers from custom options
+      const priceModifiers: Record<string, number> = {};
+      if (customOptions) {
+        Object.entries(customOptions).forEach(([key, value]) => {
+          if (value && typeof value === 'object' && 'priceModifier' in value) {
+            priceModifiers[key] = value.priceModifier || 0;
+          }
+        });
+      }
+
       await api.addToCart({
         user_id: user.id,
         product_id: productId,
         quantity,
-        selected_options: {},
-        custom_options: customOptions ? JSON.stringify(customOptions) : null,
+        selected_options: customOptions || {},
+        custom_options: customOptions ? JSON.stringify({ ...customOptions, priceModifiers }) : null,
         notes: notes || null,
         custom_design_url: null,
       });

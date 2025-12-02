@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -43,12 +43,14 @@ import { Badge } from '@/components/ui/badge';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/db/api';
-import type { Product, Category, ProductOptionTemplate } from '@/types';
+import type { Product, Category, ProductOptionTemplate, ProductOptionValue } from '@/types';
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [optionTemplates, setOptionTemplates] = useState<ProductOptionTemplate[]>([]);
+  const [optionValues, setOptionValues] = useState<ProductOptionValue[]>([]);
+  const [expandedOptions, setExpandedOptions] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -79,14 +81,16 @@ export default function Products() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [productsData, categoriesData, templatesData] = await Promise.all([
+      const [productsData, categoriesData, templatesData, valuesData] = await Promise.all([
         api.getProducts(),
         api.getCategories(),
         api.getProductOptionTemplates(),
+        api.getProductOptionValues(),
       ]);
       setProducts(productsData);
       setCategories(categoriesData);
       setOptionTemplates(templatesData);
+      setOptionValues(valuesData);
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
@@ -443,48 +447,97 @@ export default function Products() {
               <p className="text-sm text-muted-foreground mb-2">
                 Select which options customers can choose for this product
               </p>
-              <div className="border rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto">
+              <div className="border rounded-lg p-4 space-y-2 max-h-96 overflow-y-auto">
                 {optionTemplates.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
                     No options available. Create options in Product Options page first.
                   </p>
                 ) : (
-                  optionTemplates.map((template) => (
-                    <div key={template.id} className="flex items-center justify-between p-2 hover:bg-muted rounded">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`option-${template.id}`}
-                          checked={formData.selected_option_ids.includes(template.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormData({
-                                ...formData,
-                                selected_option_ids: [...formData.selected_option_ids, template.id],
-                              });
-                            } else {
-                              setFormData({
-                                ...formData,
-                                selected_option_ids: formData.selected_option_ids.filter(id => id !== template.id),
-                              });
-                            }
-                          }}
-                          className="h-4 w-4"
-                        />
-                        <Label htmlFor={`option-${template.id}`} className="cursor-pointer">
-                          {template.option_name_en} ({template.option_name_ar})
-                        </Label>
+                  optionTemplates.map((template) => {
+                    const templateValues = optionValues.filter(v => v.template_id === template.id);
+                    const isExpanded = expandedOptions.has(template.id);
+                    const isChecked = formData.selected_option_ids.includes(template.id);
+                    
+                    return (
+                      <div key={template.id} className="border rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 flex-1">
+                            <input
+                              type="checkbox"
+                              id={`option-${template.id}`}
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({
+                                    ...formData,
+                                    selected_option_ids: [...formData.selected_option_ids, template.id],
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    selected_option_ids: formData.selected_option_ids.filter(id => id !== template.id),
+                                  });
+                                }
+                              }}
+                              className="h-4 w-4"
+                            />
+                            <Label htmlFor={`option-${template.id}`} className="cursor-pointer font-medium">
+                              {template.option_name_en} ({template.option_name_ar})
+                            </Label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={template.is_required ? 'default' : 'secondary'} className="text-xs">
+                              {template.is_required ? 'Required' : 'Optional'}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {template.option_type}
+                            </Badge>
+                            {templateValues.length > 0 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const newExpanded = new Set(expandedOptions);
+                                  if (isExpanded) {
+                                    newExpanded.delete(template.id);
+                                  } else {
+                                    newExpanded.add(template.id);
+                                  }
+                                  setExpandedOptions(newExpanded);
+                                }}
+                                className="h-6 w-6 p-0"
+                              >
+                                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {isExpanded && templateValues.length > 0 && (
+                          <div className="ml-6 mt-2 space-y-1 bg-muted/50 rounded p-2">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Available Values:</p>
+                            {templateValues.map((value) => (
+                              <div key={value.id} className="flex items-center justify-between text-sm py-1">
+                                <span className="text-foreground">
+                                  {value.value_en} ({value.value_ar})
+                                </span>
+                                <span className={`font-medium ${value.price_modifier > 0 ? 'text-green-600' : value.price_modifier < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
+                                  {value.price_modifier > 0 ? '+' : ''}{value.price_modifier} SAR
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {templateValues.length === 0 && (
+                          <p className="ml-6 text-xs text-muted-foreground italic">
+                            No values defined for this option
+                          </p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={template.is_required ? 'default' : 'secondary'}>
-                          {template.is_required ? 'Required' : 'Optional'}
-                        </Badge>
-                        <Badge variant="outline">
-                          {template.option_type}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
               {formData.selected_option_ids.length > 0 && (
