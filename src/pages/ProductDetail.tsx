@@ -1,24 +1,102 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowRight, Upload } from 'lucide-react';
+import { ShoppingCart, ArrowRight, Upload, Plus, Minus, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { api } from '@/db/api';
-import type { ProductWithOptions, SimpleProductOptionWithTiers } from '@/types';
+import type { ProductWithOptions } from '@/types';
+
+// --- Interfaces for Product Options ---
+interface ProductOptionType {
+  id: string;
+  name_ar: string;
+  price_addition: number;
+  type: 'size' | 'material' | 'side' | 'custom';
+  product_id: string;
+  description_ar?: string;
+}
+
+interface QuantityTier {
+  id: string;
+  product_id: string;
+  quantity: number;
+  price: number;
+}
+
+// --- Reusable Option Group Component ---
+interface Option {
+  id: string;
+  name_ar: string;
+  price_addition: number;
+}
+
+interface OptionGroupListProps {
+  label: string;
+  options: Option[];
+  selectedValue: string;
+  onSelect: (value: string) => void;
+  tooltipContent: string;
+}
+
+function OptionGroupList({ label, options, selectedValue, onSelect, tooltipContent }: OptionGroupListProps) {
+  if (options.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-base flex items-center gap-2">
+        {label} (اختياري)
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tooltipContent}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </Label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* Option to select none/default */}
+        <Button
+          type="button"
+          variant={!selectedValue ? "default" : "outline"}
+          onClick={() => onSelect('')}
+          className="justify-center"
+        >
+          بدون تحديد
+        </Button>
+        {/* List of available options */}
+        {options.map((option) => (
+          <Button
+            key={option.id}
+            type="button"
+            variant={selectedValue === option.id ? "default" : "outline"}
+            onClick={() => onSelect(option.id)}
+            className="h-auto py-3 justify-between"
+          >
+            <span>{option.name_ar}</span>
+            {option.price_addition !== 0 && (
+              <span className={`text-sm px-2 py-1 rounded ${option.price_addition > 0 ? 'bg-primary/20' : 'bg-green-100 text-green-800'}`}>
+                {option.price_addition > 0 ? '+' : ''}{option.price_addition.toFixed(2)} ر.س
+              </span>
+            )}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+// --- End Reusable Option Group Component ---
+
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,26 +106,28 @@ export default function ProductDetail() {
   const { toast } = useToast();
 
   const [product, setProduct] = useState<ProductWithOptions | null>(null);
-  const [productOptions, setProductOptions] = useState<SimpleProductOptionWithTiers[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Form state - store selected option IDs
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  // Dynamic product options from different tables
+  const [sizeOptions, setSizeOptions] = useState<ProductOptionType[]>([]);
+  const [materialOptions, setMaterialOptions] = useState<ProductOptionType[]>([]);
+  const [sideOptions, setSideOptions] = useState<ProductOptionType[]>([]);
+  const [customOptions, setCustomOptions] = useState<ProductOptionType[]>([]);
+  const [quantityTiers, setQuantityTiers] = useState<QuantityTier[]>([]);
+  
+  // Form state - ALL OPTIONAL
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedMaterial, setSelectedMaterial] = useState<string>('');
+  const [selectedSide, setSelectedSide] = useState<string>('');
+  const [selectedCustomOptions, setSelectedCustomOptions] = useState<Record<string, boolean>>({});
   const [quantity, setQuantity] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [unitPrice, setUnitPrice] = useState(0);
   const [designFile, setDesignFile] = useState<File | null>(null);
-  const [wantSample, setWantSample] = useState('');
+  const [notes, setNotes] = useState('');
   const [addingToCart, setAddingToCart] = useState(false);
+  const [customText, setCustomText] = useState('');
 
-  // Recalculate price when options or quantity change
-  useEffect(() => {
-    const updatePrice = async () => {
-      const price = await calculateTotalPrice();
-      setTotalPrice(price);
-    };
-    updatePrice();
-  }, [selectedOptions, quantity, product, productOptions]);
-
+  // Load all product data
   useEffect(() => {
     if (slug) {
       loadProduct();
@@ -59,21 +139,32 @@ export default function ProductDetail() {
 
     setLoading(true);
     try {
-      const data = await api.getProductBySlug(slug);
-      if (data) {
-        setProduct(data);
-        
-        // Load simplified product options with tiers
-        const options = await api.getSimpleProductOptionsWithTiers(data.id);
-        setProductOptions(options);
-      } else {
+      // Load product
+      const productData = await api.getProductBySlug(slug);
+      if (!productData) {
         toast({
           title: 'Product Not Found',
           description: 'The requested product could not be found',
           variant: 'destructive',
         });
         navigate('/products');
+        return;
       }
+
+      setProduct(productData);
+      setUnitPrice(productData.base_price);
+
+      // Set initial quantity to minimum
+      setQuantity(productData.min_quantity || 1);
+
+      // Load all product options in parallel
+      await Promise.all([
+        loadSizeOptions(productData.id),
+        loadMaterialOptions(productData.id),
+        loadSideOptions(productData.id),
+        loadQuantityTiers(productData.id),
+      ]);
+
     } catch (error) {
       console.error('Error loading product:', error);
       toast({
@@ -86,154 +177,211 @@ export default function ProductDetail() {
     }
   };
 
-  const handleOptionChange = (optionId: string) => {
-    setSelectedOptions(prev => {
-      // Group options by name - only one value per option name
-      const option = productOptions.find(o => o.id === optionId);
-      if (!option) return prev;
-      
-      // Remove any previously selected option with the same name
-      const newOptions: Record<string, string> = {};
-      Object.entries(prev).forEach(([key, value]) => {
-        const existingOption = productOptions.find(o => o.id === key);
-        if (existingOption && existingOption.option_name_en !== option.option_name_en) {
-          newOptions[key] = value;
-        }
-      });
-      
-      // Add the new selection
-      newOptions[optionId] = optionId;
-      return newOptions;
-    });
+  const loadSizeOptions = async (productId: string) => {
+    try {
+      const options = await api.getProductSizeOptions(productId);
+      setSizeOptions(options.map(opt => ({
+        id: opt.id,
+        name_ar: opt.name_ar,
+        price_addition: opt.price_addition,
+        type: 'size' as const,
+        product_id: productId
+      })));
+    } catch (error) {
+      console.error('Error loading size options:', error);
+    }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const loadMaterialOptions = async (productId: string) => {
+    try {
+      const options = await api.getProductMaterialOptions(productId);
+      setMaterialOptions(options.map(opt => ({
+        id: opt.id,
+        name_ar: opt.name_ar,
+        price_addition: opt.price_addition,
+        type: 'material' as const,
+        product_id: productId
+      })));
+    } catch (error) {
+      console.error('Error loading material options:', error);
+    }
+  };
+
+  const loadSideOptions = async (productId: string) => {
+    try {
+      const options = await api.getProductSideOptions(productId);
+      setSideOptions(options.map(opt => ({
+        id: opt.id,
+        name_ar: opt.name_ar,
+        price_addition: opt.price_addition,
+        type: 'side' as const,
+        product_id: productId
+      })));
+    } catch (error) {
+      console.error('Error loading side options:', error);
+    }
+  };
+
+  const loadQuantityTiers = async (productId: string) => {
+    try {
+      const tiers = await api.getProductQuantityTiers(productId);
+      setQuantityTiers(tiers);
+    } catch (error) {
+      console.error('Error loading quantity tiers:', error);
+    }
+  };
+
+  // Calculate total price using useMemo
+  const { totalPrice, finalUnitPrice, priceBreakdown } = useMemo(() => {
+    if (!product) {
+      return { totalPrice: 0, finalUnitPrice: 0, priceBreakdown: [] };
+    }
+
+    let price = unitPrice;
+    const breakdown = [];
+
+    // Add base price to breakdown
+    breakdown.push({
+      label: 'السعر الأساسي',
+      value: unitPrice,
+      isTotal: false
+    });
+
+    // Check quantity tier pricing
+    if (quantityTiers.length > 0) {
+      const tier = quantityTiers
+        .sort((a, b) => b.quantity - a.quantity)
+        .find(t => quantity >= t.quantity);
+      
+      if (tier && tier.price !== unitPrice) {
+        // Find the unit price with tier discount applied
+        price = tier.price;
+        // Adjust the base price entry in the breakdown to reflect the tiered price
+        breakdown[0].value = tier.price;
+        breakdown.push({
+          label: `خصم الكمية (${tier.quantity}+)`,
+          // We calculate the discount amount (Base price - Tier price)
+          value: tier.price - product.base_price,
+          isTotal: false,
+          isDiscount: true
+        });
+      } else {
+        // If no tier is applied, the starting price is the product's base price
+        price = product.base_price;
+        breakdown[0].value = product.base_price;
+      }
+    } else {
+      // If no tiers exist, the starting price is the product's base price
+      price = product.base_price;
+      breakdown[0].value = product.base_price;
+    }
+
+
+    // Add size option price if selected
+    if (selectedSize) {
+      const size = sizeOptions.find(s => s.id === selectedSize);
+      if (size && size.price_addition !== 0) {
+        price += size.price_addition;
+        breakdown.push({
+          label: `الحجم: ${size.name_ar}`,
+          value: size.price_addition,
+          isTotal: false
+        });
+      }
+    }
+
+    // Add material option price if selected
+    if (selectedMaterial) {
+      const material = materialOptions.find(m => m.id === selectedMaterial);
+      if (material && material.price_addition !== 0) {
+        price += material.price_addition;
+        breakdown.push({
+          label: `المادة: ${material.name_ar}`,
+          value: material.price_addition,
+          isTotal: false
+        });
+      }
+    }
+
+    // Add side option price if selected
+    if (selectedSide) {
+      const side = sideOptions.find(s => s.id === selectedSide);
+      if (side && side.price_addition !== 0) {
+        price += side.price_addition;
+        breakdown.push({
+          label: `الوجه: ${side.name_ar}`,
+          value: side.price_addition,
+          isTotal: false
+        });
+      }
+    }
+
+    // Add custom options price if selected (Assuming customOptions state is loaded here, but it's not implemented in load functions provided)
+    // If you plan to use custom options, you'd need to add loadCustomOptions(productData.id) and populate customOptions state.
+
+    // Object.entries(selectedCustomOptions).forEach(([optionId, isSelected]) => {
+    //   if (isSelected) {
+    //     const option = customOptions.find(c => c.id === optionId);
+    //     if (option && option.price_addition !== 0) {
+    //       price += option.price_addition;
+    //       breakdown.push({
+    //         label: `${option.name_ar}`,
+    //         value: option.price_addition,
+    //         isTotal: false
+    //       });
+    //     }
+    //   }
+    // });
+
+    const finalUnitPrice = price;
+    const totalPrice = price * quantity;
+
+    return { totalPrice, finalUnitPrice, priceBreakdown: breakdown };
+  }, [product, unitPrice, quantityTiers, quantity, selectedSize, selectedMaterial, selectedSide, selectedCustomOptions, sizeOptions, materialOptions, sideOptions, customOptions]);
+
+  // Handle custom option toggle (kept for potential future use)
+  const handleCustomOptionToggle = useCallback((optionId: string) => {
+    setSelectedCustomOptions(prev => ({
+      ...prev,
+      [optionId]: !prev[optionId]
+    }));
+  }, []);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
     if (!validTypes.includes(file.type)) {
       toast({
-        title: 'Invalid File Type',
-        description: 'Please upload an image (JPG, PNG) or PDF file only',
+        title: 'نوع ملف غير صالح',
+        description: 'الرجاء رفع صورة (JPG, PNG) أو ملف PDF فقط',
         variant: 'destructive',
       });
       return;
     }
 
-    // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: 'File Too Large',
-        description: 'Maximum file size is 10MB',
+        title: 'الملف كبير جداً',
+        description: 'الحد الأقصى لحجم الملف هو 10 ميجابايت',
         variant: 'destructive',
       });
       return;
     }
 
     setDesignFile(file);
-  };
-
-  const calculateTotalPrice = async (): Promise<number> => {
-    if (!product) return 0;
-
-    let total = product.base_price;
-
-    // Add price modifiers from selected options with quantity tiers
-    for (const optionId of Object.keys(selectedOptions)) {
-      const option = productOptions.find(o => o.id === optionId);
-      if (option) {
-        // Check if there are quantity tiers
-        if (option.quantity_tiers && option.quantity_tiers.length > 0) {
-          // Find the appropriate tier for the current quantity
-          const tier = option.quantity_tiers.find(t => 
-            t.min_quantity <= quantity && 
-            (t.max_quantity === null || t.max_quantity >= quantity)
-          );
-          
-          if (tier) {
-            total += tier.price_modifier;
-          } else {
-            // No tier found, use base price modifier
-            total += option.price_modifier;
-          }
-        } else {
-          // No tiers, use base price modifier
-          total += option.price_modifier;
-        }
-      }
-    }
-
-    return total;
-  };
-
-  const getPriceModifiers = (): Record<string, number> => {
-    const modifiers: Record<string, number> = {};
-
-    Object.keys(selectedOptions).forEach(optionId => {
-      const option = productOptions.find(o => o.id === optionId);
-      if (option) {
-        // Check for quantity tiers
-        if (option.quantity_tiers && option.quantity_tiers.length > 0) {
-          const tier = option.quantity_tiers.find(t => 
-            t.min_quantity <= quantity && 
-            (t.max_quantity === null || t.max_quantity >= quantity)
-          );
-          
-          if (tier && tier.price_modifier !== 0) {
-            modifiers[option.option_name_en || option.option_name_ar] = tier.price_modifier;
-          } else if (option.price_modifier !== 0) {
-            modifiers[option.option_name_en || option.option_name_ar] = option.price_modifier;
-          }
-        } else if (option.price_modifier !== 0) {
-          modifiers[option.option_name_en || option.option_name_ar] = option.price_modifier;
-        }
-      }
-    });
-
-    return modifiers;
-  };
-
-  const validateForm = (): string | null => {
-    // If no options are configured, validation passes
-    if (productOptions.length === 0) {
-      return null;
-    }
-
-    // Get unique option names
-    const optionNames = new Set(productOptions.map(o => o.option_name_en || o.option_name_ar));
-    
-    // Check if at least one option from each group is selected
-    for (const optionName of optionNames) {
-      const optionsInGroup = productOptions.filter(o => 
-        (o.option_name_en || o.option_name_ar) === optionName
-      );
-      
-      const hasSelection = optionsInGroup.some(o => selectedOptions[o.id]);
-      
-      if (!hasSelection && optionsInGroup.length > 0) {
-        return `Please select ${optionName}`;
-      }
-    }
-
-    return null;
-  };
+  }, [toast]);
 
   const handleAddToCart = async () => {
     if (!product) return;
 
-    console.log('Add to cart clicked');
-    console.log('Product options:', productOptions);
-    console.log('Selected options:', selectedOptions);
-    console.log('Quantity:', quantity);
-
-    const validationError = validateForm();
-    if (validationError) {
-      console.log('Validation error:', validationError);
+    // Basic validation - only quantity is required
+    const minQuantity = product.min_quantity || 1;
+    if (quantity < minQuantity) {
       toast({
-        title: 'Please Complete All Fields',
-        description: validationError,
+        title: 'خطأ في الكمية',
+        description: `الحد الأدنى للطلب هو ${minQuantity} قطعة`,
         variant: 'destructive',
       });
       return;
@@ -241,58 +389,143 @@ export default function ProductDetail() {
 
     setAddingToCart(true);
     try {
-      // Build custom options object with selected option details
-      const customOptions: Record<string, any> = {
-        priceModifiers: getPriceModifiers(),
-        quantity,
+      // Build custom options object
+      const customOptionsObj: Record<string, any> = {
+        base_price: unitPrice,
+        final_unit_price: finalUnitPrice,
       };
 
-      // Add selected option details
-      Object.keys(selectedOptions).forEach(optionId => {
-        const option = productOptions.find(o => o.id === optionId);
-        if (option) {
-          const optionKey = option.option_name_en || option.option_name_ar;
-          customOptions[optionKey] = {
-            optionId: option.id,
-            value: option.option_value_en || option.option_value_ar,
-            priceModifier: option.price_modifier,
+      // Check if quantity tier was applied
+      if (quantityTiers.length > 0) {
+        const tier = quantityTiers
+          .sort((a, b) => b.quantity - a.quantity)
+          .find(t => quantity >= t.quantity);
+        if (tier && tier.price !== unitPrice) {
+          customOptionsObj.quantity_tier_applied = true;
+          customOptionsObj.tier_price = tier.price;
+          customOptionsObj.tier_quantity = tier.quantity;
+        }
+      }
+
+      // Add selected options with their details (all optional)
+      if (selectedSize) {
+        const size = sizeOptions.find(s => s.id === selectedSize);
+        if (size) {
+          customOptionsObj.size = {
+            id: size.id,
+            name: size.name_ar,
+            price_addition: size.price_addition
           };
         }
-      });
+      }
 
+      if (selectedMaterial) {
+        const material = materialOptions.find(m => m.id === selectedMaterial);
+        if (material) {
+          customOptionsObj.material = {
+            id: material.id,
+            name: material.name_ar,
+            price_addition: material.price_addition
+          };
+        }
+      }
+
+      if (selectedSide) {
+        const side = sideOptions.find(s => s.id === selectedSide);
+        if (side) {
+          customOptionsObj.side = {
+            id: side.id,
+            name: side.name_ar,
+            price_addition: side.price_addition
+          };
+        }
+      }
+
+      // Add selected custom options
+      const selectedCustoms = Object.entries(selectedCustomOptions)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([optionId]) => customOptions.find(c => c.id === optionId))
+        .filter(Boolean);
+
+      if (selectedCustoms.length > 0) {
+        customOptionsObj.custom_options = selectedCustoms.map(opt => ({
+          id: opt!.id,
+          name: opt!.name_ar,
+          price_addition: opt!.price_addition
+        }));
+      }
+
+      // Add custom text if provided
+      if (customText.trim()) {
+        customOptionsObj.custom_text = customText.trim();
+      }
+
+      // Add design file info
       if (designFile) {
-        customOptions.designFileName = designFile.name;
+        customOptionsObj.design_file = {
+          name: designFile.name,
+          size: designFile.size,
+          type: designFile.type
+        };
       }
 
-      if (wantSample) {
-        customOptions.wantSample = wantSample;
-      }
+      console.log('Adding to cart with options:', customOptionsObj);
 
-      console.log('Adding to cart with options:', customOptions);
-
-      await addItem(product.id, quantity, customOptions);
+      await addItem(product.id, quantity, customOptionsObj, notes.trim() || undefined);
 
       toast({
-        title: 'Added to Cart',
-        description: 'Product added to cart successfully',
+        title: 'تمت الإضافة إلى السلة',
+        description: 'تمت إضافة المنتج إلى سلة التسوق بنجاح',
       });
 
-      // Reset form
-      setSelectedOptions({});
-      setQuantity(1);
+      // Reset form (keep some selections)
+      setQuantity(minQuantity);
       setDesignFile(null);
-      setWantSample('');
+      setCustomText('');
+      setNotes('');
+
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to add product to cart',
+        title: 'خطأ',
+        description: error instanceof Error ? error.message : 'فشل إضافة المنتج إلى السلة',
         variant: 'destructive',
       });
     } finally {
       setAddingToCart(false);
     }
   };
+
+  // Handle quantity change safely
+  const handleQuantityChange = useCallback((newQuantity: number) => {
+    const minQuantity = product?.min_quantity || 1;
+    const safeQuantity = Math.max(minQuantity, newQuantity);
+    setQuantity(safeQuantity);
+  }, [product]);
+
+  const incrementQuantity = useCallback(() => {
+    handleQuantityChange(quantity + 1);
+  }, [quantity, handleQuantityChange]);
+
+  const decrementQuantity = useCallback(() => {
+    handleQuantityChange(quantity - 1);
+  }, [quantity, handleQuantityChange]);
+
+  // Clear all selections
+  const clearAllSelections = useCallback(() => {
+    setSelectedSize('');
+    setSelectedMaterial('');
+    setSelectedSide('');
+    setSelectedCustomOptions({});
+    setCustomText('');
+    setNotes('');
+    setDesignFile(null);
+    
+    toast({
+      title: 'تم إعادة التعيين',
+      description: 'تم مسح جميع الاختيارات',
+    });
+  }, [toast]);
 
   if (loading) {
     return (
@@ -314,18 +547,30 @@ export default function ProductDetail() {
   }
 
   if (!product) {
-    return null;
+    return (
+      <div className="min-h-screen bg-background py-12">
+        <div className="max-w-7xl mx-auto px-4 xl:px-6 text-center">
+          <h1 className="text-2xl font-bold text-destructive">المنتج غير موجود</h1>
+          <Button onClick={() => navigate('/products')} className="mt-4">
+            تصفح المنتجات
+          </Button>
+        </div>
+      </div>
+    );
   }
 
+  const minQuantity = product.min_quantity || 1;
+  const hasAnyOptions = sizeOptions.length > 0 || materialOptions.length > 0 || sideOptions.length > 0 || customOptions.length > 0;
+
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className="min-h-screen bg-background py-12" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 xl:px-6">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6"
         >
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
           العودة
         </Button>
 
@@ -338,25 +583,12 @@ export default function ProductDetail() {
                   src={product.image_url || 'https://via.placeholder.com/600'}
                   alt={product.name_ar}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600';
+                  }}
                 />
               </div>
             </Card>
-
-            {product.images && product.images.length > 0 && (
-              <div className="grid grid-cols-4 gap-4 mt-4">
-                {product.images.map((image, index) => (
-                  <Card key={index} className="overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-smooth">
-                    <div className="aspect-square bg-muted">
-                      <img
-                        src={image}
-                        alt={`${product.name_ar} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Product Options Form */}
@@ -370,218 +602,237 @@ export default function ProductDetail() {
                       {product.category.name_ar}
                     </p>
                   )}
-                  <div className="mt-4 flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">رقم الموديل:</span>
-                    <span className="font-medium">{product.id.slice(0, 8)}</span>
-                  </div>
+                  <p className="text-lg font-semibold text-primary mt-2">
+                    السعر الأساسي: {product.base_price.toFixed(2)} ر.س
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    جميع الخيارات أدناه اختيارية - يمكنك إضافة المنتج بالسعر الأساسي
+                  </p>
                 </div>
 
-                <Tabs defaultValue="options" className="mb-6">
-                  <TabsList className="w-full">
-                    <TabsTrigger value="options" className="flex-1">خيارات المنتج</TabsTrigger>
-                    <TabsTrigger value="description" className="flex-1">تفاصيل المنتج</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="options" className="space-y-4 mt-6">
-                    {/* Quantity Input */}
-                    <div className="space-y-2">
-                      <Label htmlFor="quantity" className="text-base">
-                        Quantity <span className="text-destructive">*</span>
-                      </Label>
+                <div className="space-y-6">
+                  {/* Quantity Input - Only Required Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="quantity" className="text-base">
+                      الكمية <span className="text-destructive">*</span>
+                      <span className="text-sm text-muted-foreground block">
+                        الحد الأدنى: {minQuantity} قطعة
+                      </span>
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={decrementQuantity}
+                        disabled={quantity <= minQuantity}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
                       <Input
                         id="quantity"
                         type="number"
-                        min="1"
+                        min={minQuantity}
                         value={quantity}
-                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                        className="w-32"
+                        onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
+                        className="w-32 text-center"
                       />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={incrementQuantity}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
                     </div>
+                  </div>
 
-                    {/* Dynamic Options from Database - Grouped by Option Name */}
-                    {productOptions.length === 0 ? (
-                      <div className="p-4 bg-muted/50 rounded-lg text-center text-muted-foreground">
-                        <p>No product options configured. You can still add this product to cart.</p>
-                      </div>
-                    ) : (
-                      (() => {
-                        // Group options by name
-                        const optionGroups = new Map<string, SimpleProductOptionWithTiers[]>();
-                        productOptions.forEach(option => {
-                          const key = option.option_name_en || option.option_name_ar;
-                          if (!optionGroups.has(key)) {
-                            optionGroups.set(key, []);
-                          }
-                          optionGroups.get(key)!.push(option);
-                        });
-
-                        return Array.from(optionGroups.entries()).map(([optionName, options]) => (
-                          <div key={optionName} className="space-y-2">
-                            <Label className="text-base">
-                              {optionName} <span className="text-destructive">*</span>
-                            </Label>
-                            <RadioGroup
-                              value={Object.keys(selectedOptions).find(id => 
-                                options.some(o => o.id === id)
-                              ) || ''}
-                              onValueChange={(value) => handleOptionChange(value)}
-                            >
-                              <div className="grid grid-cols-1 gap-2">
-                                {options.filter(o => o.is_available).map((option) => {
-                                  // Calculate price for this option based on quantity
-                                  let displayPrice = option.price_modifier;
-                                  if (option.quantity_tiers && option.quantity_tiers.length > 0) {
-                                    const tier = option.quantity_tiers.find(t => 
-                                      t.min_quantity <= quantity && 
-                                      (t.max_quantity === null || t.max_quantity >= quantity)
-                                    );
-                                    if (tier) {
-                                      displayPrice = tier.price_modifier;
-                                    }
-                                  }
-
-                                  return (
-                                    <div key={option.id} className="flex items-center space-x-2 space-x-reverse border rounded-lg p-3 hover:bg-muted/50 cursor-pointer">
-                                      <RadioGroupItem value={option.id} id={option.id} />
-                                      <Label htmlFor={option.id} className="flex-1 cursor-pointer flex items-center justify-between">
-                                        <span>{option.option_value_en || option.option_value_ar}</span>
-                                        {displayPrice !== 0 && (
-                                          <span className="text-sm font-medium text-primary">
-                                            {displayPrice > 0 ? '+' : ''}
-                                            {displayPrice.toFixed(2)} SAR
-                                          </span>
-                                        )}
-                                      </Label>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </RadioGroup>
-                            
-                            {/* Show quantity tier info if available */}
-                            {options.some(o => o.quantity_tiers && o.quantity_tiers.length > 0) && (
-                              <p className="text-xs text-muted-foreground mt-2">
-                                💡 Prices vary based on quantity. Adjust quantity to see different pricing tiers.
-                              </p>
-                            )}
-                          </div>
-                        ));
-                      })()
-                    )}
-
-                    {/* File Upload */}
-                    <div className="space-y-2">
-                      <Label htmlFor="designFile" className="text-base">
-                        Upload Design File (Optional)
-                      </Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="designFile"
-                          type="file"
-                          accept="image/*,.pdf"
-                          onChange={handleFileChange}
-                          className="hidden"
-                        />
+                  {/* Optional Options Header */}
+                  {hasAnyOptions && (
+                    <div className="border-t pt-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-semibold text-lg">خيارات إضافية (اختيارية)</h3>
                         <Button
-                          type="button"
                           variant="outline"
-                          onClick={() => document.getElementById('designFile')?.click()}
-                          className="w-full"
+                          size="sm"
+                          onClick={clearAllSelections}
+                          className="text-xs"
                         >
-                          <Upload className="mr-2 h-4 w-4" />
-                          {designFile ? designFile.name : 'Choose File'}
+                          مسح الكل
                         </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Max: 10MB (JPG, PNG, PDF)
-                      </p>
                     </div>
+                  )}
 
-                    {/* Sample Request */}
-                    <div className="space-y-2">
-                      <Label className="text-base">
-                        Do you want a sample before production?
-                      </Label>
-                      <RadioGroup value={wantSample} onValueChange={setWantSample}>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="yes" id="sample-yes" />
-                            <Label htmlFor="sample-yes" className="cursor-pointer">Yes</Label>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="no" id="sample-no" />
-                            <Label htmlFor="sample-no" className="cursor-pointer">No</Label>
-                          </div>
-                        </div>
-                      </RadioGroup>
+                  {/* Size Options - Refactored */}
+                  <OptionGroupList
+                    label="الحجم"
+                    options={sizeOptions}
+                    selectedValue={selectedSize}
+                    onSelect={setSelectedSize}
+                    tooltipContent="اختيار الحجم المناسب للمنتج"
+                  />
+
+                  {/* Material Options - Refactored */}
+                  <OptionGroupList
+                    label="المادة"
+                    options={materialOptions}
+                    selectedValue={selectedMaterial}
+                    onSelect={setSelectedMaterial}
+                    tooltipContent="اختيار نوع المادة المستخدمة"
+                  />
+
+                  {/* Side Options - Refactored */}
+                  <OptionGroupList
+                    label="الوجه"
+                    options={sideOptions}
+                    selectedValue={selectedSide}
+                    onSelect={setSelectedSide}
+                    tooltipContent="عدد الوجوه المطلوبة للمنتج"
+                  />
+
+                  {/* Custom Text Input - Optional */}
+                  <div className="space-y-2">
+                    <Label htmlFor="customText" className="text-base">
+                      نص مخصص (اختياري)
+                    </Label>
+                    <Input
+                      id="customText"
+                      value={customText}
+                      onChange={(e) => setCustomText(e.target.value)}
+                      placeholder="أدخل النص المطلوب طباعته..."
+                    />
+                  </div>
+
+                  {/* File Upload - Optional */}
+                  <div className="space-y-2">
+                    <Label htmlFor="designFile" className="text-base">
+                      رفع تصميم (اختياري)
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="designFile"
+                        type="file"
+                        accept="image/*,.pdf,.ai,.eps,.cdr"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('designFile')?.click()}
+                        className="w-full"
+                      >
+                        <Upload className="ml-2 h-4 w-4" />
+                        {designFile ? designFile.name : 'اختر ملف'}
+                      </Button>
+                      {designFile && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDesignFile(null)}
+                          className="text-destructive"
+                        >
+                          إزالة
+                        </Button>
+                      )}
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      الحجم الأقصى: 10 ميجابايت (صور، PDF، AI، EPS، CDR)
+                    </p>
+                  </div>
 
-                    {/* Price Display with Breakdown */}
-                    <div className="pt-4 border-t space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Base Price:</span>
-                        <span className="font-medium">{product.base_price.toFixed(2)} SAR</span>
-                      </div>
-                      
-                      {/* Show price modifiers */}
-                      {Object.entries(getPriceModifiers()).map(([optionName, modifier]) => (
-                        <div key={optionName} className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{optionName}:</span>
-                          <span className="font-medium text-primary">
-                            {modifier > 0 ? '+' : ''}{modifier.toFixed(2)} SAR
+                  {/* Notes - Optional */}
+                  <div className="space-y-2">
+                    <Label htmlFor="notes" className="text-base">
+                      ملاحظات إضافية (اختياري)
+                    </Label>
+                    <Input
+                      id="notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="أي متطلبات أو تفاصيل إضافية..."
+                    />
+                  </div>
+
+                  {/* Price Display */}
+                  <Card className="bg-muted/50">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-lg">تفاصيل السعر</h3>
+                        
+                        {priceBreakdown.map((item, index) => (
+                          <div key={index} className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              {item.label}
+                              {item.isDiscount && ' 🔻'}
+                            </span>
+                            <span className={`font-medium ${item.isDiscount ? 'text-green-600' : item.value < 0 ? 'text-green-600' : 'text-foreground'}`}>
+                              {item.value > 0 && !item.isDiscount ? '+' : ''}
+                              {item.value.toFixed(2)} ر.س
+                              {item.isDiscount && ' (خصم)'}
+                            </span>
+                          </div>
+                        ))}
+
+                        {priceBreakdown.length === 1 && (
+                          <div className="text-center py-2 text-muted-foreground text-sm">
+                            لم يتم اختيار أي خيارات إضافية
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-sm pt-2 border-t">
+                          <span className="text-muted-foreground">سعر القطعة الواحدة:</span>
+                          <span className="font-bold text-primary">
+                            {finalUnitPrice.toFixed(2)} ر.س
                           </span>
                         </div>
-                      ))}
 
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Quantity:</span>
-                        <span className="font-medium">×{quantity}</span>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">الكمية:</span>
+                          <span className="font-medium">×{quantity}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t">
+                          <span className="text-lg font-semibold">السعر الإجمالي:</span>
+                          <span className="text-2xl font-bold text-primary">
+                            {totalPrice.toFixed(2)} ر.س
+                          </span>
+                        </div>
                       </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t">
-                        <span className="text-lg font-semibold">Total Price:</span>
-                        <span className="text-2xl font-bold text-primary">
-                          {(totalPrice * quantity).toFixed(2)} SAR
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Price includes tax
-                      </p>
-                    </div>
-
-                    {/* Add to Cart Button */}
-                    <Button
-                      onClick={handleAddToCart}
-                      disabled={addingToCart}
-                      className="w-full h-12 text-lg"
-                      size="lg"
-                    >
-                      <ShoppingCart className="ml-2 h-5 w-5" />
-                      {addingToCart ? 'جاري الإضافة...' : 'إضافة للسلة'}
-                    </Button>
-                  </TabsContent>
-
-                  <TabsContent value="description" className="mt-6">
-                    <div className="space-y-4">
-                      {product.description_ar && (
-                        <div>
-                          <h3 className="font-semibold mb-2">الوصف</h3>
-                          <p className="text-muted-foreground leading-relaxed">
-                            {product.description_ar}
+                      
+                      {quantityTiers.length > 0 && (
+                        <div className="mt-3 p-3 bg-primary/5 rounded-lg">
+                          <p className="text-xs text-muted-foreground mb-2">
+                            💡 خصومات الكمية المتاحة:
                           </p>
+                          <div className="space-y-1">
+                            {quantityTiers
+                              .sort((a, b) => a.quantity - b.quantity)
+                              .map((tier, index) => (
+                                <div key={index} className="flex justify-between text-xs">
+                                  <span>{tier.quantity}+ قطع</span>
+                                  <span className="font-medium text-green-600">
+                                    {tier.price.toFixed(2)} ر.س للقطعة
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
                         </div>
                       )}
-                      <div>
-                        <h3 className="font-semibold mb-2">المواصفات</h3>
-                        <ul className="space-y-2 text-muted-foreground">
-                          <li>• الحد الأدنى للطلب: {product.min_quantity} قطعة</li>
-                          <li>• مدة التنفيذ: {product.production_time_days} أيام</li>
-                          <li>• متوفر للطلب</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                    </CardContent>
+                  </Card>
+
+                  {/* Add to Cart Button */}
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={addingToCart}
+                    className="w-full h-12 text-lg"
+                  >
+                    <ShoppingCart className="ml-2 h-5 w-5" />
+                    {addingToCart ? 'جاري الإضافة...' : `أضف ${quantity} إلى السلة`}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>

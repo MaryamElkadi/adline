@@ -470,15 +470,27 @@ export const api = {
   },
 
   async createContactMessage(message: Omit<ContactMessage, 'id' | 'is_read' | 'created_at'>): Promise<ContactMessage> {
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .insert(message)
-      .select()
-      .maybeSingle();
-    
-    if (error) throw error;
-    if (!data) throw new Error('Failed to send message');
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert(message)
+        .select()
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Supabase error creating contact message:', error);
+        throw new Error(`فشل إرسال الرسالة: ${error.message}`);
+      }
+      
+      if (!data) {
+        throw new Error('لم يتم إرجاع بيانات بعد إرسال الرسالة');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error in createContactMessage:', error);
+      throw error;
+    }
   },
 
   async markMessageAsRead(id: string): Promise<void> {
@@ -786,28 +798,39 @@ export const api = {
     const totalAmount = cartItems.reduce((sum, item) => {
       let itemTotal = item.product.base_price * item.quantity;
       
-      if (item.custom_options) {
-        const options = typeof item.custom_options === 'string' 
-          ? JSON.parse(item.custom_options) 
-          : item.custom_options;
-        
-        if (options.priceModifiers) {
-          const modifiersTotal = Object.values(options.priceModifiers as Record<string, number>)
-            .reduce((sum, mod) => sum + mod, 0);
-          itemTotal += modifiersTotal * item.quantity;
-        }
+      // Add price modifiers from selected options
+      if (item.selected_options && item.product?.options) {
+        Object.entries(item.selected_options).forEach(([optionId, _selectedValue]) => {
+          const option = item.product.options.find(opt => opt.id === optionId);
+          if (option && option.price_modifier) {
+            itemTotal += option.price_modifier * item.quantity;
+          }
+        });
       }
       
       return sum + itemTotal;
     }, 0);
 
+    // Prepare order items first (required for NOT NULL constraint)
+    const orderItems = cartItems.map(item => ({
+      product_id: item.product_id,
+      product_name: item.product.name_ar,
+      quantity: item.quantity,
+      unit_price: item.product.base_price,
+      selected_options: item.selected_options,
+      custom_design_url: item.custom_design_url,
+      notes: item.notes,
+    }));
+
+    // Include items in the initial insert (items column is NOT NULL)
     const orderData = {
       user_id: userId || null,
       status: 'pending' as const,
       total_amount: totalAmount,
       shipping_address: checkoutData.shipping_address,
       payment_method: checkoutData.payment_method,
-      notes: checkoutData.notes || null,
+      customer_notes: checkoutData.notes || null,
+      items: orderItems,
     };
 
     const { data: order, error: orderError } = await supabase
@@ -816,23 +839,13 @@ export const api = {
       .select()
       .maybeSingle();
 
-    if (orderError) throw orderError;
+    if (orderError) {
+      console.error('Supabase order error:', orderError);
+      throw orderError;
+    }
     if (!order) throw new Error('Failed to create order');
 
-    const orderItems = cartItems.map(item => ({
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      unit_price: item.product.base_price,
-      custom_options: item.custom_options,
-    }));
-
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
-
-    if (itemsError) throw itemsError;
-
+    // Clear cart if user is logged in
     if (userId) {
       const { error: clearCartError } = await supabase
         .from('cart_items')

@@ -3,7 +3,12 @@ import { Mail, Phone, Facebook, Instagram, Twitter } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-
+  const handleWhatsAppClick = () => {
+    const phoneNumber = '966562699286'; // Remove the + sign for WhatsApp
+    const message = encodeURIComponent('مرحباً، أريد الاستفسار عن خدماتكم');
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  };
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="max-w-7xl mx-auto py-12 px-4 xl:px-6">
@@ -67,18 +72,18 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">تواصل معنا</h3>
             <div className="space-y-3">
               <a
-                href="mailto:info@khat-alailan.com"
+                href="mailto:sales@adlineksa.com"
                 className="flex items-center gap-2 text-secondary-foreground/80 hover:text-primary transition-smooth"
               >
                 <Mail className="h-5 w-5" />
-                info@khat-alailan.com
+                sales@adlineksa.com
               </a>
               <a
-                href="tel:+966500000000"
+                href="tel:+966562699286"
                 className="flex items-center gap-2 text-secondary-foreground/80 hover:text-primary transition-smooth"
               >
                 <Phone className="h-5 w-5" />
-                +966 50 000 0000
+                +966 56 269 9286
               </a>
               <div className="flex gap-4 mt-4">
                 <a
@@ -105,6 +110,15 @@ export default function Footer() {
                 >
                   <Twitter className="h-6 w-6" />
                 </a>
+                  <a
+                    href="https://wa.me/966562699286"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full  flex items-center justify-center text-green-700 hover:bg-green-200 hover:text-green-800 transition-smooth"
+                    title="واتساب"
+                  >
+                    <span className="text-lg">💬</span>
+                  </a>
               </div>
             </div>
           </div>

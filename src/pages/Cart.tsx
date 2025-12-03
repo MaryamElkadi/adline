@@ -33,17 +33,18 @@ export default function Cart() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background py-12" dir="rtl">
-        <div className="max-w-4xl mx-auto px-4 xl:px-6">
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+
+if (loading) {
+  return (
+    <div className="min-h-screen bg-background py-12" dir="rtl">
+      <div className="max-w-4xl mx-auto px-4 xl:px-6">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (items.length === 0) {
     return (

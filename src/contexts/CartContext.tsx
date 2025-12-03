@@ -68,22 +68,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Extract price modifiers from custom options
-      const priceModifiers: Record<string, number> = {};
-      if (customOptions) {
-        Object.entries(customOptions).forEach(([key, value]) => {
-          if (value && typeof value === 'object' && 'priceModifier' in value) {
-            priceModifiers[key] = value.priceModifier || 0;
-          }
-        });
-      }
-
       await api.addToCart({
         user_id: user.id,
         product_id: productId,
         quantity,
         selected_options: customOptions || {},
-        custom_options: customOptions ? JSON.stringify({ ...customOptions, priceModifiers }) : null,
         notes: notes || null,
         custom_design_url: null,
       });
@@ -162,17 +151,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return items.reduce((sum, item) => {
       let itemPrice = item.product?.base_price || 0;
       
-      // Add price modifiers from custom options
-      if (item.custom_options) {
-        const options = typeof item.custom_options === 'string' 
-          ? JSON.parse(item.custom_options) 
-          : item.custom_options;
-        
-        if (options?.priceModifiers) {
-          const modifiersTotal = Object.values(options.priceModifiers as Record<string, number>)
-            .reduce((sum, mod) => sum + mod, 0);
-          itemPrice += modifiersTotal;
-        }
+      // Add price modifiers from selected options
+      if (item.selected_options && item.product?.options) {
+        Object.entries(item.selected_options).forEach(([optionId, _selectedValue]) => {
+          const option = item.product.options.find(opt => opt.id === optionId);
+          if (option && option.price_modifier) {
+            itemPrice += option.price_modifier;
+          }
+        });
       }
       
       return sum + (itemPrice * item.quantity);
