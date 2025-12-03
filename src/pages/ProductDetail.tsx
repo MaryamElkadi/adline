@@ -52,7 +52,7 @@ function OptionGroupList({ label, options, selectedValue, onSelect, tooltipConte
   return (
     <div className="space-y-2">
       <Label className="text-base flex items-center gap-2">
-        {label} (اختياري)
+        {label}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -65,15 +65,17 @@ function OptionGroupList({ label, options, selectedValue, onSelect, tooltipConte
         </TooltipProvider>
       </Label>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {/* Option to select none/default */}
-        <Button
-          type="button"
-          variant={!selectedValue ? "default" : "outline"}
-          onClick={() => onSelect('')}
-          className="justify-center"
-        >
-          بدون تحديد
-        </Button>
+        {/* Option to select none/default - only for optional fields */}
+        {label !== 'الكمية' && (
+          <Button
+            type="button"
+            variant={!selectedValue ? "default" : "outline"}
+            onClick={() => onSelect('')}
+            className="justify-center"
+          >
+            بدون تحديد
+          </Button>
+        )}
         {/* List of available options */}
         {options.map((option) => (
           <Button
@@ -97,7 +99,6 @@ function OptionGroupList({ label, options, selectedValue, onSelect, tooltipConte
 }
 // --- End Reusable Option Group Component ---
 
-
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -115,68 +116,109 @@ export default function ProductDetail() {
   const [customOptions, setCustomOptions] = useState<ProductOptionType[]>([]);
   const [quantityTiers, setQuantityTiers] = useState<QuantityTier[]>([]);
   
-  // Form state - ALL OPTIONAL
+  // Form state
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedMaterial, setSelectedMaterial] = useState<string>('');
   const [selectedSide, setSelectedSide] = useState<string>('');
   const [selectedCustomOptions, setSelectedCustomOptions] = useState<Record<string, boolean>>({});
-  const [quantity, setQuantity] = useState(1);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const [selectedQuantityId, setSelectedQuantityId] = useState<string>('');
   const [unitPrice, setUnitPrice] = useState(0);
   const [designFile, setDesignFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
   const [addingToCart, setAddingToCart] = useState(false);
   const [customText, setCustomText] = useState('');
 
-  // Load all product data
+  // Load product and options
   useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        const productData = await api.getProductBySlug(slug!);
+        setProduct(productData);
+        setUnitPrice(productData.base_price);
+        setSelectedQuantity(productData.min_quantity || 1);
+
+        // Load all options in parallel
+        await Promise.all([
+          loadSizeOptions(productData.id),
+          loadMaterialOptions(productData.id),
+          loadSideOptions(productData.id),
+          loadQuantityTiers(productData.id),
+        ]);
+      } catch (error) {
+        console.error('Error loading product:', error);
+        toast({
+          title: 'خطأ',
+          description: 'فشل تحميل المنتج',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (slug) {
       loadProduct();
     }
-  }, [slug]);
+  }, [slug, toast]);
 
-  const loadProduct = async () => {
-    if (!slug) return;
+  // Create quantity options for OptionGroupList
+  const quantityOptions = useMemo(() => {
+    if (!product) return [];
 
-    setLoading(true);
-    try {
-      // Load product
-      const productData = await api.getProductBySlug(slug);
-      if (!productData) {
-        toast({
-          title: 'Product Not Found',
-          description: 'The requested product could not be found',
-          variant: 'destructive',
-        });
-        navigate('/products');
-        return;
-      }
+    const minQty = product.min_quantity || 1;
+    const options: Option[] = [];
 
-      setProduct(productData);
-      setUnitPrice(productData.base_price);
+    // Add minimum quantity as base option
+    options.push({
+      id: `qty_${minQty}`,
+      name_ar: `${minQty} قطعة`,
+      price_addition: 0,
+    });
 
-      // Set initial quantity to minimum
-      setQuantity(productData.min_quantity || 1);
-
-      // Load all product options in parallel
-      await Promise.all([
-        loadSizeOptions(productData.id),
-        loadMaterialOptions(productData.id),
-        loadSideOptions(productData.id),
-        loadQuantityTiers(productData.id),
-      ]);
-
-    } catch (error) {
-      console.error('Error loading product:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load product details',
-        variant: 'destructive',
+    // Add quantity tiers if available
+    quantityTiers.forEach(tier => {
+      const priceDifference = tier.price - product.base_price;
+      options.push({
+        id: tier.id,
+        name_ar: `${tier.quantity} قطعة`,
+        price_addition: priceDifference,
       });
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
 
+    return options;
+  }, [product, quantityTiers]);
+
+  // Set initial selected quantity ID
+  useEffect(() => {
+    if (product && quantityOptions.length > 0) {
+      const minQty = product.min_quantity || 1;
+      setSelectedQuantityId(`qty_${minQty}`);
+    }
+  }, [product, quantityOptions]);
+
+  // Calculate unit price based on selected quantity
+  useEffect(() => {
+    if (!product) return;
+
+    let price = product.base_price;
+    
+    // Check if selected quantity qualifies for a tier
+    if (selectedQuantity > (product.min_quantity || 1)) {
+      const tier = quantityTiers
+        .sort((a, b) => b.quantity - a.quantity)
+        .find(t => selectedQuantity >= t.quantity);
+      
+      if (tier) {
+        price = tier.price;
+      }
+    }
+
+    setUnitPrice(price);
+  }, [selectedQuantity, product, quantityTiers]);
+
+  // Load options functions
   const loadSizeOptions = async (productId: string) => {
     try {
       const options = await api.getProductSizeOptions(productId);
@@ -231,7 +273,27 @@ export default function ProductDetail() {
     }
   };
 
-  // Calculate total price using useMemo
+  // Handle quantity selection
+  const handleQuantitySelect = useCallback((value: string) => {
+    if (!value) return;
+
+    // Handle base quantity (qty_XX format)
+    if (value.startsWith('qty_')) {
+      const qty = parseInt(value.replace('qty_', ''));
+      setSelectedQuantity(qty);
+      setSelectedQuantityId(value);
+      return;
+    }
+
+    // Handle tier quantity
+    const tier = quantityTiers.find(t => t.id === value);
+    if (tier) {
+      setSelectedQuantity(tier.quantity);
+      setSelectedQuantityId(value);
+    }
+  }, [quantityTiers]);
+
+  // Calculate total price
   const { totalPrice, finalUnitPrice, priceBreakdown } = useMemo(() => {
     if (!product) {
       return { totalPrice: 0, finalUnitPrice: 0, priceBreakdown: [] };
@@ -243,39 +305,26 @@ export default function ProductDetail() {
     // Add base price to breakdown
     breakdown.push({
       label: 'السعر الأساسي',
-      value: unitPrice,
+      value: product.base_price,
       isTotal: false
     });
 
     // Check quantity tier pricing
-    if (quantityTiers.length > 0) {
+    if (selectedQuantity > (product.min_quantity || 1)) {
       const tier = quantityTiers
         .sort((a, b) => b.quantity - a.quantity)
-        .find(t => quantity >= t.quantity);
+        .find(t => selectedQuantity >= t.quantity);
       
-      if (tier && tier.price !== unitPrice) {
-        // Find the unit price with tier discount applied
-        price = tier.price;
-        // Adjust the base price entry in the breakdown to reflect the tiered price
-        breakdown[0].value = tier.price;
+      if (tier && tier.price !== product.base_price) {
         breakdown.push({
           label: `خصم الكمية (${tier.quantity}+)`,
-          // We calculate the discount amount (Base price - Tier price)
           value: tier.price - product.base_price,
           isTotal: false,
           isDiscount: true
         });
-      } else {
-        // If no tier is applied, the starting price is the product's base price
-        price = product.base_price;
-        breakdown[0].value = product.base_price;
+        price = tier.price;
       }
-    } else {
-      // If no tiers exist, the starting price is the product's base price
-      price = product.base_price;
-      breakdown[0].value = product.base_price;
     }
-
 
     // Add size option price if selected
     if (selectedSize) {
@@ -316,30 +365,24 @@ export default function ProductDetail() {
       }
     }
 
-    // Add custom options price if selected (Assuming customOptions state is loaded here, but it's not implemented in load functions provided)
-    // If you plan to use custom options, you'd need to add loadCustomOptions(productData.id) and populate customOptions state.
-
-    // Object.entries(selectedCustomOptions).forEach(([optionId, isSelected]) => {
-    //   if (isSelected) {
-    //     const option = customOptions.find(c => c.id === optionId);
-    //     if (option && option.price_addition !== 0) {
-    //       price += option.price_addition;
-    //       breakdown.push({
-    //         label: `${option.name_ar}`,
-    //         value: option.price_addition,
-    //         isTotal: false
-    //       });
-    //     }
-    //   }
-    // });
-
     const finalUnitPrice = price;
-    const totalPrice = price * quantity;
+    const totalPrice = finalUnitPrice * selectedQuantity;
 
     return { totalPrice, finalUnitPrice, priceBreakdown: breakdown };
-  }, [product, unitPrice, quantityTiers, quantity, selectedSize, selectedMaterial, selectedSide, selectedCustomOptions, sizeOptions, materialOptions, sideOptions, customOptions]);
+  }, [
+    product, 
+    unitPrice, 
+    selectedQuantity, 
+    quantityTiers, 
+    selectedSize, 
+    selectedMaterial, 
+    selectedSide, 
+    sizeOptions, 
+    materialOptions, 
+    sideOptions
+  ]);
 
-  // Handle custom option toggle (kept for potential future use)
+  // Handle custom option toggle
   const handleCustomOptionToggle = useCallback((optionId: string) => {
     setSelectedCustomOptions(prev => ({
       ...prev,
@@ -376,9 +419,9 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     if (!product) return;
 
-    // Basic validation - only quantity is required
+    // Basic validation
     const minQuantity = product.min_quantity || 1;
-    if (quantity < minQuantity) {
+    if (selectedQuantity < minQuantity) {
       toast({
         title: 'خطأ في الكمية',
         description: `الحد الأدنى للطلب هو ${minQuantity} قطعة`,
@@ -399,7 +442,7 @@ export default function ProductDetail() {
       if (quantityTiers.length > 0) {
         const tier = quantityTiers
           .sort((a, b) => b.quantity - a.quantity)
-          .find(t => quantity >= t.quantity);
+          .find(t => selectedQuantity >= t.quantity);
         if (tier && tier.price !== unitPrice) {
           customOptionsObj.quantity_tier_applied = true;
           customOptionsObj.tier_price = tier.price;
@@ -407,7 +450,7 @@ export default function ProductDetail() {
         }
       }
 
-      // Add selected options with their details (all optional)
+      // Add selected options with their details
       if (selectedSize) {
         const size = sizeOptions.find(s => s.id === selectedSize);
         if (size) {
@@ -441,20 +484,6 @@ export default function ProductDetail() {
         }
       }
 
-      // Add selected custom options
-      const selectedCustoms = Object.entries(selectedCustomOptions)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([optionId]) => customOptions.find(c => c.id === optionId))
-        .filter(Boolean);
-
-      if (selectedCustoms.length > 0) {
-        customOptionsObj.custom_options = selectedCustoms.map(opt => ({
-          id: opt!.id,
-          name: opt!.name_ar,
-          price_addition: opt!.price_addition
-        }));
-      }
-
       // Add custom text if provided
       if (customText.trim()) {
         customOptionsObj.custom_text = customText.trim();
@@ -469,17 +498,17 @@ export default function ProductDetail() {
         };
       }
 
-      console.log('Adding to cart with options:', customOptionsObj);
-
-      await addItem(product.id, quantity, customOptionsObj, notes.trim() || undefined);
+      await addItem(product.id, selectedQuantity, customOptionsObj, notes.trim() || undefined);
 
       toast({
         title: 'تمت الإضافة إلى السلة',
         description: 'تمت إضافة المنتج إلى سلة التسوق بنجاح',
       });
 
-      // Reset form (keep some selections)
-      setQuantity(minQuantity);
+      // Reset form
+      const minQty = product.min_quantity || 1;
+      setSelectedQuantity(minQty);
+      setSelectedQuantityId(`qty_${minQty}`);
       setDesignFile(null);
       setCustomText('');
       setNotes('');
@@ -496,21 +525,6 @@ export default function ProductDetail() {
     }
   };
 
-  // Handle quantity change safely
-  const handleQuantityChange = useCallback((newQuantity: number) => {
-    const minQuantity = product?.min_quantity || 1;
-    const safeQuantity = Math.max(minQuantity, newQuantity);
-    setQuantity(safeQuantity);
-  }, [product]);
-
-  const incrementQuantity = useCallback(() => {
-    handleQuantityChange(quantity + 1);
-  }, [quantity, handleQuantityChange]);
-
-  const decrementQuantity = useCallback(() => {
-    handleQuantityChange(quantity - 1);
-  }, [quantity, handleQuantityChange]);
-
   // Clear all selections
   const clearAllSelections = useCallback(() => {
     setSelectedSize('');
@@ -521,11 +535,17 @@ export default function ProductDetail() {
     setNotes('');
     setDesignFile(null);
     
+    if (product) {
+      const minQty = product.min_quantity || 1;
+      setSelectedQuantity(minQty);
+      setSelectedQuantityId(`qty_${minQty}`);
+    }
+    
     toast({
       title: 'تم إعادة التعيين',
       description: 'تم مسح جميع الاختيارات',
     });
-  }, [toast]);
+  }, [product, toast]);
 
   if (loading) {
     return (
@@ -611,39 +631,25 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Quantity Input - Only Required Field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="quantity" className="text-base">
-                      الكمية <span className="text-destructive">*</span>
-                      <span className="text-sm text-muted-foreground block">
-                        الحد الأدنى: {minQuantity} قطعة
-                      </span>
-                    </Label>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={decrementQuantity}
-                        disabled={quantity <= minQuantity}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        min={minQuantity}
-                        value={quantity}
-                        onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
-                        className="w-32 text-center"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={incrementQuantity}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  {/* Quantity Options - Now using OptionGroupList */}
+                  <OptionGroupList
+                    label="الكمية"
+                    options={quantityOptions}
+                    selectedValue={selectedQuantityId}
+                    onSelect={handleQuantitySelect}
+                    tooltipContent="اختر كمية الطباعة المناسبة للحصول على سعر مخفّض"
+                  />
+
+                  {/* Show selected quantity info */}
+                  <div className="text-center p-3 bg-primary/10 rounded-lg">
+                    <p className="text-sm font-medium">
+                      الكمية المحددة: <span className="text-primary font-bold">{selectedQuantity} قطعة</span>
+                    </p>
+                    {selectedQuantity > minQuantity && (
+                      <p className="text-xs text-green-600 mt-1">
+                        ✓ تحصل على سعر مخفّض للكميات الكبيرة
+                      </p>
+                    )}
                   </div>
 
                   {/* Optional Options Header */}
@@ -663,7 +669,7 @@ export default function ProductDetail() {
                     </div>
                   )}
 
-                  {/* Size Options - Refactored */}
+                  {/* Size Options */}
                   <OptionGroupList
                     label="الحجم"
                     options={sizeOptions}
@@ -672,7 +678,7 @@ export default function ProductDetail() {
                     tooltipContent="اختيار الحجم المناسب للمنتج"
                   />
 
-                  {/* Material Options - Refactored */}
+                  {/* Material Options */}
                   <OptionGroupList
                     label="المادة"
                     options={materialOptions}
@@ -681,7 +687,7 @@ export default function ProductDetail() {
                     tooltipContent="اختيار نوع المادة المستخدمة"
                   />
 
-                  {/* Side Options - Refactored */}
+                  {/* Side Options */}
                   <OptionGroupList
                     label="الوجه"
                     options={sideOptions}
@@ -790,7 +796,7 @@ export default function ProductDetail() {
 
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">الكمية:</span>
-                          <span className="font-medium">×{quantity}</span>
+                          <span className="font-medium">×{selectedQuantity}</span>
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t">
@@ -830,7 +836,7 @@ export default function ProductDetail() {
                     className="w-full h-12 text-lg"
                   >
                     <ShoppingCart className="ml-2 h-5 w-5" />
-                    {addingToCart ? 'جاري الإضافة...' : `أضف ${quantity} إلى السلة`}
+                    {addingToCart ? 'جاري الإضافة...' : `أضف ${selectedQuantity} إلى السلة`}
                   </Button>
                 </div>
               </CardContent>
