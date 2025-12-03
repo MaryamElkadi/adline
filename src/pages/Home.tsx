@@ -41,7 +41,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 xl:px-6 relative z-10">
           <div className="text-center">
             <h1 className="text-4xl xl:text-6xl font-bold text-primary-foreground mb-6">
-              خدمات الطباعة الاحترافية
+               خدمات الطباعة الاحترافية واللوحات الاعلانية
             </h1>
             <p className="text-xl xl:text-2xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto">
               نقدم لكم أفضل خدمات الطباعة بجودة عالية وأسعار تنافسية. من بطاقات الأعمال إلى التغليف المخصص
