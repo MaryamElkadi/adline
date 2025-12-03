@@ -1,6 +1,18 @@
 {
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm run build",
-  "devCommand": "pnpm dev",
-  "framework": "vite"
+"version": 2,
+"builds": [
+{
+"src": "package.json",
+"use": "@vercel/static-build",
+"config": {
+"outputDirectory": "dist"
+}
+}
+],
+"routes": [
+{
+"src": "/[^.]+",
+"dest": "/index.html"
+}
+]
 }
