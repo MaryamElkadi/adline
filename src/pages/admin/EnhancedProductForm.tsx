@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Plus, X, ArrowRight, Save } from 'lucide-react';
+import { Plus, X, ArrowRight, Save, Upload, ArrowLeft, ArrowRight as ArrowRightIcon, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { ImageUpload } from '@/components/ui/image-upload';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/db/api';
 import type { Product, Category } from '@/types';
+import { cn } from '@/lib/utils';
 
 const TAX_RATE = 0.15; // 15% VAT
 
@@ -24,20 +25,191 @@ interface OptionRow {
   priceAddition: string;
 }
 
+// Multiple Image Upload Component
+interface MultiImageUploadProps {
+  value: string[];
+  onChange: (urls: string[]) => void;
+  max?: number;
+  className?: string;
+}
+
+function MultiImageUpload({
+  value = [],
+  onChange,
+  max = 10,
+  className,
+}: MultiImageUploadProps) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Check if adding these files would exceed max
+    if (value.length + files.length > max) {
+      alert(`Maximum ${max} images allowed`);
+      return;
+    }
+
+    setUploading(true);
+    
+    const uploadedUrls: string[] = [];
+    
+    // Simulate multiple file uploads
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      // Simulate upload delay (replace with actual upload)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Create object URL for preview
+      const objectUrl = URL.createObjectURL(file);
+      uploadedUrls.push(objectUrl);
+    }
+    
+    if (uploadedUrls.length > 0) {
+      // Add new images to existing ones
+      onChange([...value, ...uploadedUrls]);
+    }
+    
+    setUploading(false);
+    // Clear the input
+    e.target.value = '';
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...value];
+    newImages.splice(index, 1);
+    onChange(newImages);
+  };
+
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    const newImages = [...value];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    onChange(newImages);
+  };
+
+  return (
+    <div className={cn('space-y-4', className)}>
+      {/* Current Images Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        {value.map((url, index) => (
+          <div key={index} className="relative group">
+            <div className="aspect-square rounded-lg overflow-hidden border-2 border-muted bg-muted">
+              <img
+                src={url}
+                alt={`Product image ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            {/* Remove button */}
+            <button
+              type="button"
+              onClick={() => removeImage(index)}
+              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90 z-10"
+            >
+              <X className="h-3 w-3" />
+            </button>
+            
+            {/* Move buttons */}
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => moveImage(index, index - 1)}
+                  className="bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-background border"
+                  title="Move left"
+                >
+                  <ArrowLeft className="h-3 w-3" />
+                </button>
+              )}
+              {index < value.length - 1 && (
+                <button
+                  type="button"
+                  onClick={() => moveImage(index, index + 1)}
+                  className="bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-background border"
+                  title="Move right"
+                >
+                  <ArrowRightIcon className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+            
+            {/* Image number indicator */}
+            <div className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm text-xs font-medium rounded-full w-6 h-6 flex items-center justify-center border">
+              {index + 1}
+            </div>
+          </div>
+        ))}
+        
+        {/* Upload button */}
+        {value.length < max && (
+          <label className="cursor-pointer">
+            <div className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 flex flex-col items-center justify-center transition-all hover:bg-muted/30">
+              {uploading ? (
+                <div className="flex flex-col items-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mb-2"></div>
+                  <span className="text-sm text-muted-foreground">Uploading...</span>
+                </div>
+              ) : (
+                <>
+                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                  <span className="text-sm text-muted-foreground">Add Images</span>
+                  <span className="text-xs text-muted-foreground mt-1">Click or drag</span>
+                </>
+              )}
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+                disabled={uploading}
+              />
+            </div>
+          </label>
+        )}
+      </div>
+      
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">
+          {value.length} of {max} images uploaded
+        </span>
+        {value.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange([])}
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Remove All
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function EnhancedProductForm() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // Basic product info
+  // Basic product info - now includes multiple images
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     price: '',
     category: '',
-    image_url: '',
+    image_url: '', // Main image (single)
+    images: [] as string[], // Additional images (multiple)
   });
 
   // Quantity tiers
@@ -88,12 +260,14 @@ export default function EnhancedProductForm() {
       setLoading(true);
       const product = await api.getProductById(productId);
       if (product) {
+        // Load product data including multiple images
         setFormData({
           title: product.name_ar,
           description: product.description_ar || '',
           price: product.base_price.toString(),
           category: product.category_id || '',
           image_url: product.image_url || '',
+          images: product.images || [], // Load multiple images array
         });
 
         // Load quantity tiers
@@ -146,7 +320,11 @@ export default function EnhancedProductForm() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData({ ...formData, [field]: value });
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleMultipleImagesChange = (images: string[]) => {
+    setFormData(prev => ({ ...prev, images }));
   };
 
   const calculatePrice = (subtotal: number) => {
@@ -236,7 +414,10 @@ export default function EnhancedProductForm() {
     }
 
     try {
-      setLoading(true);
+      setSaving(true);
+
+      // Prepare all images (main + additional)
+      const allImages = [formData.image_url, ...formData.images].filter(img => img);
 
       // Create or update product
       const productData = {
@@ -245,8 +426,8 @@ export default function EnhancedProductForm() {
         description_ar: formData.description,
         category_id: formData.category,
         base_price: parseFloat(formData.price),
-        image_url: formData.image_url,
-        images: formData.image_url ? [formData.image_url] : [],
+        image_url: formData.image_url || (allImages.length > 0 ? allImages[0] : ''),
+        images: allImages, // Send all images array
         is_active: true,
         featured: false,
         min_quantity: 1,
@@ -323,11 +504,22 @@ export default function EnhancedProductForm() {
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   const availableCategories = categories.filter(c => c.is_active);
+
+  if (loading) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto" dir="rtl">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">جاري تحميل بيانات المنتج...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto" dir="rtl">
@@ -385,7 +577,7 @@ export default function EnhancedProductForm() {
                   value={formData.price}
                   onChange={(e) => handleInputChange('price', e.target.value)}
                   placeholder="1500"
-                  required
+                  
                 />
               </div>
               <div>
@@ -412,13 +604,34 @@ export default function EnhancedProductForm() {
               </div>
             </div>
 
+            {/* Main Image Upload */}
             <div>
-              <Label>صورة المنتج</Label>
-              <ImageUpload
-                value={formData.image_url}
-                onChange={(url) => handleInputChange('image_url', url)}
-                onRemove={() => handleInputChange('image_url', '')}
-              />
+              <Label>الصورة الرئيسية للمنتج</Label>
+              <div className="mt-2">
+                <ImageUpload
+                  value={formData.image_url}
+                  onChange={(url) => handleInputChange('image_url', url)}
+                  onRemove={() => handleInputChange('image_url', '')}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                هذه الصورة ستظهر كصورة رئيسية للمنتج في القوائم والصفحات الرئيسية
+              </p>
+            </div>
+
+            {/* Additional Images Upload */}
+            <div>
+              <Label>صور إضافية للمنتج</Label>
+              <div className="mt-2">
+                <MultiImageUpload
+                  value={formData.images}
+                  onChange={handleMultipleImagesChange}
+                  max={10}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                يمكنك إضافة صور إضافية للمنتج لعرض زوايا مختلفة أو تفاصيل إضافية
+              </p>
             </div>
 
             {/* Tax and Total Price Display */}
@@ -463,7 +676,7 @@ export default function EnhancedProductForm() {
                       placeholder="مثال: 100"
                       value={q.quantity}
                       onChange={(e) => handleQuantityChange(index, 'quantity', e.target.value)}
-                      required
+                      
                     />
                   </div>
                   <div className="flex-1">
@@ -661,9 +874,18 @@ export default function EnhancedProductForm() {
           <Button variant="outline" onClick={() => navigate('/admin/products')}>
             إلغاء
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            <Save className="ml-2 h-4 w-4" />
-            {loading ? 'جاري الحفظ...' : productId ? 'تحديث المنتج' : 'إضافة المنتج'}
+          <Button onClick={handleSubmit} disabled={saving}>
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                جاري الحفظ...
+              </>
+            ) : (
+              <>
+                <Save className="ml-2 h-4 w-4" />
+                {productId ? 'تحديث المنتج' : 'إضافة المنتج'}
+              </>
+            )}
           </Button>
         </div>
       </div>

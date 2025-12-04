@@ -64,7 +64,6 @@ export interface CartItem {
   product_id: string;
   quantity: number;
   selected_options: Record<string, string>;
-  custom_options?: Record<string, any> | string | null;
   custom_design_url: string | null;
   notes: string | null;
   created_at: string;
@@ -219,11 +218,40 @@ export interface ProductOptionTemplateWithValues extends ProductOptionTemplate {
 }
 
 export type PaymentMethod = 'card' | 'cash';
+export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
+export type CardType = 'visa' | 'mastercard' | 'amex' | 'discover' | 'unknown';
 
 export interface CheckoutData {
   shipping_address: ShippingAddress;
   payment_method: PaymentMethod;
   notes?: string;
+  card_data?: CreditCardData;
+}
+
+export interface CreditCardData {
+  card_number: string;
+  cardholder_name: string;
+  expiry_month: string;
+  expiry_year: string;
+  cvv: string;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  order_id: string;
+  payment_method: string;
+  card_type: string | null;
+  card_last_four: string | null;
+  cardholder_name: string | null;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  transaction_id: string | null;
+  gateway_response: Record<string, unknown> | null;
+  error_message: string | null;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // Enhanced Product Options Types
@@ -319,4 +347,3 @@ export interface QuoteRequest {
   created_at: string;
   updated_at: string;
 }
-

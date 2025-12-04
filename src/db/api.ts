@@ -1558,4 +1558,70 @@ export const api = {
     if (error) throw error;
     return Array.isArray(data) ? data : [];
   },
+
+  // Payment Processing APIs
+  async processPayment(
+    orderId: string,
+    amount: number,
+    currency: string,
+    cardData: {
+      card_number: string;
+      cardholder_name: string;
+      expiry_month: string;
+      expiry_year: string;
+      cvv: string;
+    }
+  ): Promise<{
+    success: boolean;
+    transaction_id?: string;
+    gateway_transaction_id?: string;
+    error_message?: string;
+  }> {
+    try {
+      const { data, error } = await supabase.functions.invoke('process-payment', {
+        body: JSON.stringify({
+          order_id: orderId,
+          amount,
+          currency,
+          card_data: cardData,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (error) {
+        const errorMsg = await error?.context?.text();
+        console.error('Edge function error in process-payment:', errorMsg);
+        throw new Error(errorMsg || 'فشل في معالجة الدفع');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      throw error;
+    }
+  },
+
+  async getPaymentTransaction(transactionId: string) {
+    const { data, error } = await supabase
+      .from('payment_transactions')
+      .select('*')
+      .eq('id', transactionId)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getPaymentTransactionsByOrderId(orderId: string) {
+    const { data, error } = await supabase
+      .from('payment_transactions')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  },
 };
