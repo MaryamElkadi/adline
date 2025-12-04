@@ -132,7 +132,7 @@ export default function Contact() {
 
   // Handle phone click
   const handlePhoneClick = () => {
-    const phoneNumber = '+966562699286';
+    const phoneNumber = '+966503502717';
     
     // Try to open phone dialer
     window.location.href = `tel:${phoneNumber}`;
@@ -145,7 +145,7 @@ export default function Contact() {
 
   // WhatsApp function
   const handleWhatsAppClick = () => {
-    const phoneNumber = '966562699286';
+    const phoneNumber = '966503502717';
     const message = encodeURIComponent('مرحباً، أريد الاستفسار عن خدماتكم');
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
@@ -334,7 +334,7 @@ export default function Contact() {
                           onClick={handlePhoneClick}
                           className="text-muted-foreground hover:text-primary transition-colors text-left"
                         >
-                          +966 56 269 9286
+                          +966 50 350 2717
                         </button>
                         <Button
                           variant="ghost"
@@ -423,7 +423,7 @@ export default function Contact() {
                     <Twitter className="h-5 w-5" />
                   </a>
                   <a
-                    href="https://wa.me/966562699286"
+                    href="https://wa.me/966503502717"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 hover:bg-green-200 hover:text-green-800 transition-smooth"

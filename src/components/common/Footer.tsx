@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, Facebook, Instagram, Twitter } from 'lucide-react';
+import { Button } from '../ui/button';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const handleWhatsAppClick = () => {
-    const phoneNumber = '966562699286'; // Remove the + sign for WhatsApp
+    const phoneNumber = '966503502717'; // Remove the + sign for WhatsApp
     const message = encodeURIComponent('مرحباً، أريد الاستفسار عن خدماتكم');
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
@@ -111,7 +112,7 @@ export default function Footer() {
                   <Twitter className="h-6 w-6" />
                 </a>
                   <a
-                    href="https://wa.me/966562699286"
+                    href="https://wa.me/966503502717"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full  flex items-center justify-center text-green-700 hover:bg-green-200 hover:text-green-800 transition-smooth"
@@ -119,6 +120,7 @@ export default function Footer() {
                   >
                     <span className="text-lg">💬</span>
                   </a>
+                  
               </div>
             </div>
           </div>
@@ -129,6 +131,12 @@ export default function Footer() {
             {currentYear} خط الاعلان
           </p>
         </div>
+           <Button
+                      onClick={handleWhatsAppClick}
+                      className="w-full bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 border-green-200"
+                    >
+                      💬 تواصل عبر واتساب
+                    </Button>
       </div>
     </footer>
   );
