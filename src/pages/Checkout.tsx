@@ -325,7 +325,7 @@ export default function Checkout() {
                       }
 
                       // Calculate the total price for this item's quantity
-                      const itemTotal = (basePrice + optionsPrice) * item.quantity;
+                      const itemTotal = (basePrice + optionsPrice);
 
                       return (
                         <div key={item.id} className="flex gap-3">
