@@ -149,19 +149,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   
   const calculateTotalPrice = () => {
     return items.reduce((sum, item) => {
-      let itemPrice = item.product?.base_price || 0;
+      let basePrice = item.product?.base_price || 0;
+      let optionsPrice = 0;
       
-      // Add price modifiers from selected options
+      // Add price modifiers from selected options (as a whole, not per item)
       if (item.selected_options && item.product?.options) {
         Object.entries(item.selected_options).forEach(([optionId, _selectedValue]) => {
           const option = item.product.options.find(opt => opt.id === optionId);
           if (option && option.price_modifier) {
-            itemPrice += option.price_modifier;
+            optionsPrice += option.price_modifier;
           }
         });
       }
       
-      return sum + (itemPrice * item.quantity);
+      // Base price + options price (no quantity multiplication)
+      return sum + basePrice + optionsPrice;
     }, 0);
   };
 

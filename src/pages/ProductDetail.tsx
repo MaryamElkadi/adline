@@ -366,7 +366,7 @@ export default function ProductDetail() {
     }
 
     const finalUnitPrice = price;
-    const totalPrice = finalUnitPrice * selectedQuantity;
+    const totalPrice = finalUnitPrice 
 
     return { totalPrice, finalUnitPrice, priceBreakdown: breakdown };
   }, [

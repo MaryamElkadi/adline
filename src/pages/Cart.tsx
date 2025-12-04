@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { PLACEHOLDER_IMAGE_SMALL } from '@/lib/constants';
 
 export default function Cart() {
   const { items, updateItem, removeItem, totalPrice, totalItems, loading } = useCart();
@@ -33,18 +34,17 @@ export default function Cart() {
     );
   }
 
-
-if (loading) {
-  return (
-    <div className="min-h-screen bg-background py-12" dir="rtl">
-      <div className="max-w-4xl mx-auto px-4 xl:px-6">
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background py-12" dir="rtl">
+        <div className="max-w-4xl mx-auto px-4 xl:px-6">
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -71,38 +71,21 @@ if (loading) {
   }
 
   const calculateItemPrice = (item: typeof items[0]) => {
-    let price = item.product?.base_price || 0;
+    let basePrice = item.product?.base_price || 0;
+    let optionsPrice = 0;
     
-    // Add selected options price modifiers
+    // Add selected options price modifiers (as a whole, not per item)
     if (item.selected_options && item.product?.options) {
       Object.values(item.selected_options).forEach((optionId) => {
         const option = item.product.options?.find((opt) => opt.id === optionId);
         if (option) {
-          price += option.price_modifier;
+          optionsPrice += option.price_modifier;
         }
       });
     }
     
-    // Add custom options price modifiers
-    if (item.custom_options) {
-      try {
-        const customOpts = typeof item.custom_options === 'string' 
-          ? JSON.parse(item.custom_options) 
-          : item.custom_options;
-        
-        if (customOpts && typeof customOpts === 'object') {
-          Object.values(customOpts).forEach((value: any) => {
-            if (value && typeof value === 'object' && 'price_modifier' in value) {
-              price += value.price_modifier || 0;
-            }
-          });
-        }
-      } catch (e) {
-        console.error('Error parsing custom_options:', e);
-      }
-    }
-    
-    return price * item.quantity;
+    // Base price + options price (no quantity multiplication)
+    return basePrice + optionsPrice;
   };
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
@@ -134,7 +117,7 @@ if (loading) {
                     {/* Product Image */}
                     <div className="w-24 h-24 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
                       <img
-                        src={item.product?.image_url || 'https://via.placeholder.com/200'}
+                        src={item.product?.image_url || PLACEHOLDER_IMAGE_SMALL}
                         alt={item.product?.name_ar || 'Product'}
                         className="w-full h-full object-cover"
                       />
@@ -183,43 +166,6 @@ if (loading) {
                           })}
                         </div>
                       )}
-
-                      {/* Custom Options */}
-                      {item.custom_options && (() => {
-                        try {
-                          const customOpts = typeof item.custom_options === 'string' 
-                            ? JSON.parse(item.custom_options) 
-                            : item.custom_options;
-                          
-                          if (customOpts && typeof customOpts === 'object' && Object.keys(customOpts).length > 0) {
-                            return (
-                              <div className="mb-3 space-y-1">
-                                <p className="text-sm font-medium mb-2">خيارات مخصصة:</p>
-                                {Object.entries(customOpts).map(([key, value]: [string, any]) => {
-                                  if (value && typeof value === 'object') {
-                                    return (
-                                      <div key={key} className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">
-                                          {value.label || key}: {value.value || value.value_en || 'محدد'}
-                                        </span>
-                                        {value.price_modifier && value.price_modifier !== 0 && (
-                                          <Badge variant="outline" className={value.price_modifier > 0 ? 'text-green-600' : 'text-red-600'}>
-                                            {value.price_modifier > 0 ? '+' : ''}{value.price_modifier.toFixed(2)} ريال
-                                          </Badge>
-                                        )}
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                })}
-                              </div>
-                            );
-                          }
-                        } catch (e) {
-                          console.error('Error rendering custom options:', e);
-                        }
-                        return null;
-                      })()}
 
                       {/* Notes */}
                       {item.notes && (

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Banknote, MapPin, Phone, User, Home, AlertCircle } from 'lucide-react';
+import { CreditCard, Banknote, MapPin, Phone, User, Home, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,24 +8,20 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { api } from '@/db/api';
 import type { ShippingAddress, PaymentMethod } from '@/types';
+import { PLACEHOLDER_IMAGE_SMALL } from '@/lib/constants';
+// The TermsModal import should now resolve correctly
+import TermsModal from '@/components/modals/TermsModal'; 
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { items, getTotalPrice, clearCart, refreshCart } = useCart();
+  const { items, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
 
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
@@ -40,14 +36,16 @@ export default function Checkout() {
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [notes, setNotes] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showTermsModal, setShowTermsModal] = useState(false); // Modal state
 
-  // Calculate total with tax
-  const calculateTotalWithTax = () => {
-    const subtotal = getTotalPrice();
-    const tax = subtotal * 0.15; // 15% VAT for Saudi Arabia
-    return subtotal + tax;
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setShippingAddress(prev => ({
+      ...prev,
+      [id]: value,
+    }));
   };
 
   const validateForm = (): string | null => {
@@ -57,13 +55,10 @@ export default function Checkout() {
     if (!shippingAddress.phone.trim()) {
       return 'يرجى إدخال رقم الهاتف';
     }
-    
-    // Clean phone number
-    const cleanPhone = shippingAddress.phone.replace(/\s/g, '');
-    if (!/^(05|5)\d{8}$/.test(cleanPhone)) {
-      return 'رقم الهاتف غير صحيح (يجب أن يبدأ بـ 05 ويتكون من 10 أرقام)';
+    // Updated phone validation to allow both 05 and 5 prefixes
+    if (!/^(05|5)\d{8}$/.test(shippingAddress.phone.replace(/\s/g, ''))) {
+      return 'رقم الهاتف غير صحيح (يجب أن يبدأ بـ 05 أو 5 ويتكون من 10 أرقام)';
     }
-    
     if (!shippingAddress.address_line1.trim()) {
       return 'يرجى إدخال العنوان';
     }
@@ -75,120 +70,63 @@ export default function Checkout() {
     }
     return null;
   };
-// In Checkout.tsx, update the handlePlaceOrder function:
-const handlePlaceOrder = async () => {
-  setError(null);
-  
-  if (items.length === 0) {
-    toast({
-      title: 'السلة فارغة',
-      description: 'يرجى إضافة منتجات إلى السلة أولاً',
-      variant: 'destructive',
-    });
-    return;
-  }
 
-  const validationError = validateForm();
-  if (validationError) {
-    toast({
-      title: 'يرجى إكمال جميع الحقول',
-      description: validationError,
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  setProcessing(true);
-  try {
-    console.log('Placing order with:', {
-      userId: user?.id,
-      itemCount: items.length,
-      total: getTotalPrice()
-    });
-
-    // Format phone number
-    const formattedPhone = shippingAddress.phone.replace(/\s/g, '');
-    const formattedAddress = {
-      ...shippingAddress,
-      phone: formattedPhone,
-    };
-
-    // Create checkout data WITHOUT notes since your table doesn't have it
-    const checkoutData = {
-      shipping_address: formattedAddress,
-      payment_method: paymentMethod,
-      // Don't include notes for now
-      // notes: notes.trim() || null,
-    };
-
-    console.log('Checkout data:', checkoutData);
-    console.log('Cart items:', items);
-
-    // Try to create order
-    const order = await api.createOrder(checkoutData, items, user?.id);
-    console.log('Order created successfully:', order);
-
-    // Clear cart
-    await clearCart();
-
-    // Navigate to success page
-    navigate(`/order-success/${order.id}`, {
-      state: { orderNumber: order.order_number || order.id }
-    });
-
-  } catch (error: any) {
-    console.error('Error placing order:', error);
-    
-    // More detailed error logging
-    if (error?.message) {
-      console.error('Error message:', error.message);
-    }
-    if (error?.details) {
-      console.error('Error details:', error.details);
-    }
-    if (error?.hint) {
-      console.error('Error hint:', error.hint);
-    }
-    if (error?.code) {
-      console.error('Error code:', error.code);
+  const handlePlaceOrder = async () => {
+    if (items.length === 0) {
+      toast({
+        title: 'السلة فارغة',
+        description: 'يرجى إضافة منتجات إلى السلة أولاً',
+        variant: 'destructive',
+      });
+      return;
     }
 
-    let errorMessage = 'حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.';
-    
-    if (error?.message?.includes('notes') || error?.code === 'PGRST204') {
-      errorMessage = 'خطأ في قاعدة البيانات. يرجى التواصل مع الدعم الفني.';
-      console.error('Database schema mismatch - notes column missing');
-    } else if (error?.message?.includes('400')) {
-      errorMessage = 'بيانات الطلب غير صحيحة. يرجى التحقق من معلوماتك وإعادة المحاولة.';
-    } else if (error?.message?.includes('network')) {
-      errorMessage = 'مشكلة في الاتصال بالإنترنت. يرجى التحقق من اتصالك وإعادة المحاولة.';
-    } else if (error?.message?.includes('auth') || error?.message?.includes('session')) {
-      errorMessage = 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.';
+    const validationError = validateForm();
+    if (validationError) {
+      toast({
+        title: 'يرجى إكمال جميع الحقول',
+        description: validationError,
+        variant: 'destructive',
+      });
+      return;
     }
 
-    setError(errorMessage);
-    
-    toast({
-      title: 'خطأ في معالجة الطلب',
-      description: errorMessage,
-      variant: 'destructive',
-    });
+    if (!acceptedTerms) {
+      toast({
+        title: 'الشروط والأحكام',
+        description: 'يرجى الموافقة على الشروط والأحكام للمتابعة',
+        variant: 'destructive',
+      });
+      setShowTermsModal(true); // Show modal when terms not accepted
+      return;
+    }
 
-    // Refresh cart in case of partial failure
-    await refreshCart();
-  } finally {
-    setProcessing(false);
-  }
-};
-  // Handle retry
-  const handleRetry = () => {
-    setError(null);
-    refreshCart();
+    setProcessing(true);
+    try {
+      const checkoutData = {
+        shipping_address: shippingAddress,
+        payment_method: paymentMethod,
+        notes: notes.trim() || undefined,
+      };
+
+      const order = await api.createOrder(checkoutData, items, user?.id);
+
+      // Clear cart
+      await clearCart();
+
+      // Navigate to success page
+      navigate(`/order-success/${order.id}`);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      navigate('/order-failed');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background py-12" dir="rtl">
+      <div className="min-h-screen bg-background py-12">
         <div className="max-w-4xl mx-auto px-4 xl:px-6">
           <Card>
             <CardContent className="p-12 text-center">
@@ -206,362 +144,298 @@ const handlePlaceOrder = async () => {
     );
   }
 
+  const subtotal = getTotalPrice();
+  const taxRate = 0.15;
+  const taxAmount = subtotal * taxRate;
+  const total = subtotal + taxAmount;
+  const shippingCost = 0; // Assuming free shipping
+
   return (
-    <div className="min-h-screen bg-background py-12" dir="rtl">
-      <div className="max-w-6xl mx-auto px-4 xl:px-6">
-        <h1 className="text-3xl font-bold mb-8">إتمام الطلب</h1>
+    <>
+      <div className="min-h-screen bg-background py-12">
+        <div className="max-w-6xl mx-auto px-4 xl:px-6">
+          <h1 className="text-3xl font-bold mb-8">إتمام الطلب</h1>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error}
-              <div className="mt-2 flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleRetry}>
-                  المحاولة مرة أخرى
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setError(null)}>
-                  إغلاق
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Checkout Form */}
-          <div className="xl:col-span-2 space-y-6">
-            {/* Shipping Address */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  عنوان التوصيل
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">
-                      الاسم الكامل <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="relative">
-                      <User className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            {/* Checkout Form */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Shipping Address */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    عنوان التوصيل
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Shipping Address Form Fields - FIX APPLIED HERE */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="full_name" className="flex items-center gap-1">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        الاسم الكامل
+                      </Label>
                       <Input
                         id="full_name"
                         value={shippingAddress.full_name}
-                        onChange={(e) => setShippingAddress(prev => ({ ...prev, full_name: e.target.value }))}
+                        onChange={handleAddressChange}
                         placeholder="أدخل الاسم الكامل"
-                        className="pr-10"
-                        required
                       />
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">
-                      رقم الهاتف <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Phone className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="flex items-center gap-1">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        رقم الهاتف (مثال: 05xxxxxxx)
+                      </Label>
                       <Input
                         id="phone"
                         type="tel"
                         value={shippingAddress.phone}
-                        onChange={(e) => setShippingAddress(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="05XXXXXXXX"
-                        className="pr-10"
-                        required
-                        pattern="(05|5)[0-9]{8}"
-                        maxLength={10}
+                        onChange={handleAddressChange}
+                        placeholder="05xxxxxxxx"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      مثال: 0512345678 أو 512345678
-                    </p>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="address_line1">
-                    العنوان <span className="text-destructive">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Home className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="space-y-2">
+                    <Label htmlFor="address_line1" className="flex items-center gap-1">
+                      <Home className="h-4 w-4 text-muted-foreground" />
+                      الشارع/اسم الحي/المبنى
+                    </Label>
                     <Input
                       id="address_line1"
                       value={shippingAddress.address_line1}
-                      onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line1: e.target.value }))}
-                      placeholder="الشارع، رقم المبنى"
-                      className="pr-10"
-                      required
+                      onChange={handleAddressChange}
+                      placeholder="رقم الشارع، اسم الحي، رقم المبنى"
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="address_line2">
-                    تفاصيل إضافية (اختياري)
-                  </Label>
-                  <Input
-                    id="address_line2"
-                    value={shippingAddress.address_line2}
-                    onChange={(e) => setShippingAddress(prev => ({ ...prev, address_line2: e.target.value }))}
-                    placeholder="رقم الشقة، الدور، إلخ"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 @md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">
-                      المدينة <span className="text-destructive">*</span>
-                    </Label>
+                    <Label htmlFor="address_line2">وصف إضافي (اختياري)</Label>
                     <Input
-                      id="city"
-                      value={shippingAddress.city}
-                      onChange={(e) => setShippingAddress(prev => ({ ...prev, city: e.target.value }))}
-                      placeholder="المدينة"
-                      required
+                      id="address_line2"
+                      value={shippingAddress.address_line2}
+                      onChange={handleAddressChange}
+                      placeholder="شقة، طابق، معلومات إضافية"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="region">
-                      المنطقة <span className="text-destructive">*</span>
-                    </Label>
-                    <Select
-                      value={shippingAddress.region}
-                      onValueChange={(value) => setShippingAddress(prev => ({ ...prev, region: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المنطقة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="الرياض">الرياض</SelectItem>
-                        <SelectItem value="مكة المكرمة">مكة المكرمة</SelectItem>
-                        <SelectItem value="المدينة المنورة">المدينة المنورة</SelectItem>
-                        <SelectItem value="الشرقية">الشرقية</SelectItem>
-                        <SelectItem value="القصيم">القصيم</SelectItem>
-                        <SelectItem value="حائل">حائل</SelectItem>
-                        <SelectItem value="تبوك">تبوك</SelectItem>
-                        <SelectItem value="الحدود الشمالية">الحدود الشمالية</SelectItem>
-                        <SelectItem value="جازان">جازان</SelectItem>
-                        <SelectItem value="نجران">نجران</SelectItem>
-                        <SelectItem value="الباحة">الباحة</SelectItem>
-                        <SelectItem value="الجوف">الجوف</SelectItem>
-                        <SelectItem value="عسير">عسير</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="postal_code">
-                      الرمز البريدي (اختياري)
-                    </Label>
-                    <Input
-                      id="postal_code"
-                      value={shippingAddress.postal_code}
-                      onChange={(e) => setShippingAddress(prev => ({ ...prev, postal_code: e.target.value }))}
-                      placeholder="12345"
-                      pattern="[0-9]{5}"
-                      maxLength={5}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Payment Method */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  طريقة الدفع
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-smooth">
-                      <RadioGroupItem value="cash" id="payment-cash" />
-                      <Label htmlFor="payment-cash" className="flex items-center gap-3 cursor-pointer flex-1">
-                        <Banknote className="h-5 w-5 text-primary" />
-                        <div>
-                          <p className="font-medium">الدفع عند الاستلام</p>
-                          <p className="text-sm text-muted-foreground">ادفع نقداً عند استلام الطلب</p>
-                        </div>
-                      </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="city">المدينة</Label>
+                      <Input
+                        id="city"
+                        value={shippingAddress.city}
+                        onChange={handleAddressChange}
+                        placeholder="الرياض"
+                      />
                     </div>
-
-                    <div className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-smooth">
-                      <RadioGroupItem value="card" id="payment-card" />
-                      <Label htmlFor="payment-card" className="flex items-center gap-3 cursor-pointer flex-1">
-                        <CreditCard className="h-5 w-5 text-primary" />
-                        <div>
-                          <p className="font-medium">الدفع ببطاقة الائتمان</p>
-                          <p className="text-sm text-muted-foreground">ادفع بأمان باستخدام بطاقتك</p>
-                        </div>
-                      </Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="region">المنطقة/المقاطعة</Label>
+                      <Input
+                        id="region"
+                        value={shippingAddress.region}
+                        onChange={handleAddressChange}
+                        placeholder="المنطقة الوسطى"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="postal_code">الرمز البريدي (اختياري)</Label>
+                      <Input
+                        id="postal_code"
+                        value={shippingAddress.postal_code}
+                        onChange={handleAddressChange}
+                        placeholder="11564"
+                      />
                     </div>
                   </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Order Notes */}
-            <Card>
-              <CardHeader>
-                <CardTitle>ملاحظات الطلب (اختياري)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="أضف أي ملاحظات أو تعليمات خاصة بالطلب..."
-                  rows={4}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Order Summary */}
-          <div>
-            <Card className="sticky top-6">
-              <CardHeader>
-                <CardTitle>ملخص الطلب</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-                  {items.map((item) => {
-                    // Calculate item price with options
-                    let itemPrice = item.product?.base_price || 0;
+              {/* Payment Method */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    طريقة الدفع
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Payment Method Options - FIX APPLIED HERE */}
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
+                    className="space-y-4"
+                  >
+                    <div className="flex items-center space-x-3 space-x-reverse border p-4 rounded-lg">
+                      <RadioGroupItem value="cash" id="cash" />
+                      <Banknote className="h-5 w-5 text-green-600 ml-2" />
+                      <Label htmlFor="cash" className="font-medium">
+                        الدفع عند الاستلام (كاش)
+                      </Label>
+                    </div>
                     
-                    // Check for custom options price modifiers
-                    if (item.custom_options) {
-                      try {
-                        const customOpts = typeof item.custom_options === 'string' 
-                          ? JSON.parse(item.custom_options) 
-                          : item.custom_options;
-                        
-                        if (customOpts?.final_unit_price) {
-                          itemPrice = customOpts.final_unit_price;
-                        } else if (customOpts?.priceModifiers) {
-                          // Sum up price modifiers
-                          const modifiersTotal = Object.values(customOpts.priceModifiers as Record<string, number>)
-                            .reduce((sum: number, mod) => sum + (mod || 0), 0);
-                          itemPrice += modifiersTotal;
-                        }
-                      } catch (e) {
-                        console.error('Error parsing custom options:', e);
+                    {/* Placeholder for Card/Online payment */}
+                    <div className="flex items-center space-x-3 space-x-reverse border p-4 rounded-lg opacity-50 cursor-not-allowed">
+                      <RadioGroupItem value="card" id="card" disabled />
+                      <CreditCard className="h-5 w-5 text-blue-600 ml-2" />
+                      <Label htmlFor="card" className="font-medium">
+                        بطاقة ائتمانية (غير متاح حالياً)
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </CardContent>
+              </Card>
+
+              {/* Order Notes */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>ملاحظات الطلب (اختياري)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="أضف أي ملاحظات أو تعليمات خاصة بالطلب (مثل: وقت التوصيل المفضل، ملاحظات للسائق)..."
+                    rows={4}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Order Summary */}
+            <div>
+              <Card className="sticky top-6">
+                <CardHeader>
+                  <CardTitle>ملخص الطلب</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                    {items.map((item) => {
+                      let basePrice = item.product.base_price;
+                      let optionsPrice = 0;
+                      
+                      if (item.selected_options && item.product?.options) {
+                        Object.entries(item.selected_options).forEach(([optionId, _selectedValue]) => {
+                          const option = item.product.options.find(opt => opt.id === optionId);
+                          if (option && option.price_modifier) {
+                            optionsPrice += option.price_modifier;
+                          }
+                        });
                       }
-                    }
 
-                    return (
-                      <div key={item.id} className="flex gap-3 pb-3 border-b last:border-0 last:pb-0">
-                        <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
-                          <img
-                            src={item.product?.image_url || '/placeholder-image.svg'}
-                            alt={item.product?.name_ar || 'Product'}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder-image.svg';
-                            }}
-                          />
+                      // Calculate the total price for this item's quantity
+                      const itemTotal = (basePrice + optionsPrice) * item.quantity;
+
+                      return (
+                        <div key={item.id} className="flex gap-3">
+                          <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
+                            <img
+                              src={item.product.image_url || PLACEHOLDER_IMAGE_SMALL}
+                              alt={item.product.name_ar}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{item.product.name_ar}</p>
+                            <p className="text-xs text-muted-foreground">الكمية: {item.quantity}</p>
+                            {/* Display single item price for context */}
+                            <p className="text-sm text-muted-foreground">
+                              سعر الوحدة: {(basePrice + optionsPrice).toFixed(2)} ر.س
+                            </p>
+                            <p className="text-sm font-bold text-primary">
+                              الإجمالي: {itemTotal.toFixed(2)} ر.س
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">
-                            {item.product?.name_ar || 'Product'}
-                          </p>
-                          <p className="text-xs text-muted-foreground">الكمية: {item.quantity}</p>
-                          
-                          {/* Show selected options if any */}
-                          {item.custom_options && (
-                            <div className="mt-1 space-y-1">
-                              {(() => {
-                                try {
-                                  const customOpts = typeof item.custom_options === 'string' 
-                                    ? JSON.parse(item.custom_options) 
-                                    : item.custom_options;
-                                  
-                                  return Object.entries(customOpts)
-                                    .filter(([key, value]) => 
-                                      key !== 'base_price' && 
-                                      key !== 'final_unit_price' && 
-                                      key !== 'priceModifiers' &&
-                                      value && 
-                                      typeof value === 'object' && 
-                                      'name' in (value as any)
-                                    )
-                                    .map(([key, value]: [string, any]) => (
-                                      <div key={key} className="flex items-center gap-1 text-xs">
-                                        <span className="text-muted-foreground">{value.name}:</span>
-                                        {value.price_addition !== 0 && (
-                                          <span className={`font-medium ${value.price_addition > 0 ? 'text-primary' : 'text-green-600'}`}>
-                                            {value.price_addition > 0 ? '+' : ''}{value.price_addition.toFixed(2)} ر.س
-                                          </span>
-                                        )}
-                                      </div>
-                                    ));
-                                } catch (e) {
-                                  return null;
-                                }
-                              })()}
-                            </div>
-                          )}
-                          
-                          <p className="text-sm font-medium text-primary mt-1">
-                            {(itemPrice * item.quantity).toFixed(2)} ر.س
-                          </p>
-                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">المجموع الفرعي:</span>
+                      <span className="font-medium">{subtotal.toFixed(2)} ر.س</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">الشحن:</span>
+                      <span className="font-medium">{shippingCost === 0 ? 'مجاني' : `${shippingCost.toFixed(2)} ر.س`}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">الضريبة (15%):</span>
+                      <span className="font-medium">{taxAmount.toFixed(2)} ر.س</span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold">الإجمالي:</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {total.toFixed(2)} ر.س
+                    </span>
+                  </div>
+
+                  {/* Updated Terms and Conditions Section */}
+                  <div className="flex items-start gap-3 p-4 border rounded-lg bg-muted/30">
+                    <Checkbox
+                      id="terms"
+                      checked={acceptedTerms}
+                      onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <Label
+                        htmlFor="terms"
+                        className="text-sm leading-relaxed cursor-pointer block mb-1"
+                      >
+                        أوافق على الشروط والأحكام وسياسة الخصوصية
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="link"
+                          size="sm"
+                          className="h-auto p-0 text-primary hover:underline"
+                          onClick={() => setShowTermsModal(true)}
+                        >
+                          <FileText className="h-3 w-3 ml-1" />
+                          عرض الشروط والأحكام
+                        </Button>
+                        <span className="text-xs text-muted-foreground">
+                          (مطلوب للمتابعة)
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">المجموع الفرعي:</span>
-                    <span className="font-medium">{getTotalPrice().toFixed(2)} ر.س</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">الشحن:</span>
-                    <span className="font-medium">مجاني</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">الضريبة (15%):</span>
-                    <span className="font-medium">{(getTotalPrice() * 0.15).toFixed(2)} ر.س</span>
-                  </div>
-                </div>
 
-                <Separator />
+                  <Button
+                    onClick={handlePlaceOrder}
+                    disabled={processing || !acceptedTerms}
+                    className="w-full h-12 text-lg"
+                    size="lg"
+                  >
+                    {processing ? 'جاري معالجة الطلب...' : 'تأكيد الطلب'}
+                  </Button>
 
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold">الإجمالي:</span>
-                  <span className="text-2xl font-bold text-primary">
-                    {calculateTotalWithTax().toFixed(2)} ر.س
-                  </span>
-                </div>
-
-                <Button
-                  onClick={handlePlaceOrder}
-                  disabled={processing}
-                  className="w-full h-12 text-lg"
-                  size="lg"
-                >
-                  {processing ? 'جاري معالجة الطلب...' : 'تأكيد الطلب'}
-                </Button>
-
-                <p className="text-xs text-center text-muted-foreground">
-                  بالنقر على "تأكيد الطلب"، أنت توافق على شروط وأحكام الخدمة
-                </p>
-              </CardContent>
-            </Card>
+                  <p className="text-xs text-center text-muted-foreground">
+                    بالنقر على "تأكيد الطلب"، سيتم إنشاء طلبك وإرساله للمعالجة
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Terms and Conditions Modal */}
+      <TermsModal
+        open={showTermsModal}
+        onOpenChange={setShowTermsModal}
+        onAccept={() => setAcceptedTerms(true)}
+      />
+    </>
   );
 }

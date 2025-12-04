@@ -796,19 +796,20 @@ export const api = {
   // Checkout APIs
   async createOrder(checkoutData: CheckoutData, cartItems: CartItemWithProduct[], userId?: string): Promise<Order> {
     const totalAmount = cartItems.reduce((sum, item) => {
-      let itemTotal = item.product.base_price * item.quantity;
+      let basePrice = item.product.base_price;
+      let optionsPrice = 0;
       
-      // Add price modifiers from selected options
+      // Add price modifiers from selected options (as a whole, not per item)
       if (item.selected_options && item.product?.options) {
         Object.entries(item.selected_options).forEach(([optionId, _selectedValue]) => {
           const option = item.product.options.find(opt => opt.id === optionId);
           if (option && option.price_modifier) {
-            itemTotal += option.price_modifier * item.quantity;
+            optionsPrice += option.price_modifier;
           }
         });
       }
       
-      return sum + itemTotal;
+      return sum + basePrice + optionsPrice;
     }, 0);
 
     // Prepare order items first (required for NOT NULL constraint)
