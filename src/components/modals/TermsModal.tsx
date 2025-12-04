@@ -41,7 +41,7 @@ export default function TermsModal({ open, onOpenChange, onAccept }: TermsModalP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-3xl max-h-full flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <FileText className="h-6 w-6 text-primary" />
@@ -71,6 +71,7 @@ export default function TermsModal({ open, onOpenChange, onAccept }: TermsModalP
                     <li>جميع أسعار المنتجات بالريال السعودي (ر.س) وتشمل ضريبة القيمة المضافة (VAT) بنسبة 15%، ما لم يُذكر خلاف ذلك.</li>
                     <li>قد تختلف أسعار وتوافر المنتجات دون إشعار مسبق.</li>
                     <li>نحتفظ بالحق في رفض أو إلغاء أي طلب يحتوي على سعر غير صحيح أو خطأ في وصف المنتج.</li>
+                     <li>تم اعتماد التصميم والعمل من العميل دون ادنى مسؤولية من المتجر</li>
                 </ul>
             </section>
 
