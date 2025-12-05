@@ -496,7 +496,7 @@ export default function Checkout() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-3 space-x-reverse border p-4 rounded-lg hover:bg-muted/50 cursor-pointer">
+                    {/* <div className="flex items-center space-x-3 space-x-reverse border p-4 rounded-lg hover:bg-muted/50 cursor-pointer">
                       <RadioGroupItem value="card" id="card" />
                       <CreditCard className="h-5 w-5 text-blue-600 ml-2" />
                       <div className="flex-1">
@@ -505,11 +505,11 @@ export default function Checkout() {
                         </Label>
                         <p className="text-sm text-muted-foreground">ادفع بأمان باستخدام بطاقة مدى أو Visa/Mastercard</p>
                       </div>
-                    </div>
+                    </div> */}
                   </RadioGroup>
 
                   {/* Credit Card Form - Show only when card payment is selected */}
-                  {paymentMethod === 'card' && (
+                  {/* {paymentMethod === 'card' && (
                     <div className="mt-6 space-y-6">
                       <Alert className="bg-blue-50 border-blue-200">
                         <Shield className="h-4 w-4 text-blue-600" />
@@ -643,7 +643,7 @@ export default function Checkout() {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </CardContent>
               </Card>
 
