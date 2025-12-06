@@ -1447,14 +1447,22 @@ export const api = {
     image_url?: string;
     is_active?: boolean;
   }) {
+    // تحويل التواريخ إلى صيغة ISO مع الوقت - Convert dates to ISO format with time
+    const startDate = offer.start_date.includes('T') 
+      ? offer.start_date 
+      : `${offer.start_date}T00:00:00`;
+    const endDate = offer.end_date.includes('T') 
+      ? offer.end_date 
+      : `${offer.end_date}T23:59:59`;
+
     const { data, error } = await supabase
       .from('seasonal_offers')
       .insert([{
         title_ar: offer.title_ar,
         description_ar: offer.description_ar,
         discount_percentage: offer.discount_percentage || null,
-        start_date: offer.start_date,
-        end_date: offer.end_date,
+        start_date: startDate,
+        end_date: endDate,
         image_url: offer.image_url || null,
         is_active: offer.is_active !== undefined ? offer.is_active : true,
       }])
@@ -1474,9 +1482,18 @@ export const api = {
     image_url: string | null;
     is_active: boolean;
   }>) {
+    // تحويل التواريخ إلى صيغة ISO إذا كانت موجودة - Convert dates to ISO format if present
+    const processedUpdates = { ...updates };
+    if (updates.start_date && !updates.start_date.includes('T')) {
+      processedUpdates.start_date = `${updates.start_date}T00:00:00`;
+    }
+    if (updates.end_date && !updates.end_date.includes('T')) {
+      processedUpdates.end_date = `${updates.end_date}T23:59:59`;
+    }
+
     const { data, error } = await supabase
       .from('seasonal_offers')
-      .update(updates)
+      .update(processedUpdates)
       .eq('id', id)
       .select()
       .maybeSingle();

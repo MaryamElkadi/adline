@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Percent, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Calendar, Percent, Clock, ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { api } from '@/db/api';
 import type { SeasonalOffer } from '@/types';
 
@@ -136,10 +138,20 @@ export default function SeasonalOffersSection() {
                   )}
 
                   {/* شارة العرض النشط */}
-                  <div className="mt-4">
+                  <div className="mt-4 flex items-center justify-between gap-3">
                     <Badge className="bg-green-500 hover:bg-green-600 text-white">
                       عرض نشط الآن
                     </Badge>
+                  </div>
+
+                  {/* زر طلب العرض */}
+                  <div className="mt-4">
+                    <Button asChild className="w-full" size="lg">
+                      <Link to="/contact">
+                        اطلب العرض الآن
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

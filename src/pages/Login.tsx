@@ -81,9 +81,19 @@ export default function Login() {
     try {
       await signInWithGoogle();
     } catch (error: any) {
+      console.error('خطأ في تسجيل الدخول بواسطة Google:', error);
+      
+      let errorMessage = 'فشل تسجيل الدخول بواسطة Google';
+      
+      if (error?.message?.includes('provider is not enabled') || error?.message?.includes('Unsupported provider')) {
+        errorMessage = 'تسجيل الدخول بواسطة Google غير مفعّل. يرجى التواصل مع الإدارة لتفعيل هذه الخدمة.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: 'Google Sign In Error',
-        description: error.message || 'Failed to sign in with Google',
+        title: 'خطأ في تسجيل الدخول',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -93,9 +103,19 @@ export default function Login() {
     try {
       await signInWithFacebook();
     } catch (error: any) {
+      console.error('خطأ في تسجيل الدخول بواسطة Facebook:', error);
+      
+      let errorMessage = 'فشل تسجيل الدخول بواسطة Facebook';
+      
+      if (error?.message?.includes('provider is not enabled') || error?.message?.includes('Unsupported provider')) {
+        errorMessage = 'تسجيل الدخول بواسطة Facebook غير مفعّل. يرجى التواصل مع الإدارة لتفعيل هذه الخدمة.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: 'Facebook Sign In Error',
-        description: error.message || 'Failed to sign in with Facebook',
+        title: 'خطأ في تسجيل الدخول',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

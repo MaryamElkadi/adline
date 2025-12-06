@@ -54,10 +54,15 @@ export default function SeasonalOffers() {
       setLoading(true);
       const data = await api.getSeasonalOffers();
       setOffers(data);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('خطأ في تحميل العروض:', error);
+      const errorMessage = error?.message?.includes('schema cache') 
+        ? 'جاري تحديث قاعدة البيانات. يرجى الانتظار 30 ثانية ثم إعادة المحاولة.'
+        : error?.message || 'فشل تحميل العروض الموسمية. يرجى إعادة تحميل الصفحة.';
+      
       toast({
         title: 'خطأ',
-        description: 'فشل تحميل العروض الموسمية',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -84,10 +89,22 @@ export default function SeasonalOffers() {
       form.reset();
       setEditingOffer(null);
       loadOffers();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('خطأ في حفظ العرض:', error);
+      
+      let errorMessage = 'فشل حفظ العرض. يرجى التحقق من البيانات المدخلة.';
+      
+      if (error?.message?.includes('schema cache')) {
+        errorMessage = 'جاري تحديث قاعدة البيانات. يرجى الانتظار 30 ثانية ثم إعادة المحاولة.';
+      } else if (error?.message?.includes('date')) {
+        errorMessage = 'يرجى التحقق من التواريخ. يجب أن يكون تاريخ النهاية بعد تاريخ البداية.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: 'خطأ',
-        description: 'فشل حفظ العرض',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -252,7 +269,16 @@ export default function SeasonalOffers() {
                   <FormField
                     control={form.control}
                     name="end_date"
-                    rules={{ required: 'تاريخ النهاية مطلوب' }}
+                    rules={{ 
+                      required: 'تاريخ النهاية مطلوب',
+                      validate: (value) => {
+                        const startDate = form.getValues('start_date');
+                        if (startDate && value && value <= startDate) {
+                          return 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية';
+                        }
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>تاريخ النهاية</FormLabel>
