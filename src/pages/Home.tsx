@@ -60,68 +60,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 xl:px-6">
-          <div className="grid grid-cols-1 @md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Printer className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">جودة عالية</h3>
-                <p className="text-muted-foreground text-sm">
-                  نستخدم أحدث تقنيات الطباعة لضمان أفضل النتائج
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">تسليم سريع</h3>
-                <p className="text-muted-foreground text-sm">
-                  نلتزم بمواعيد التسليم المحددة لجميع الطلبات
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">تصميم مخصص</h3>
-                <p className="text-muted-foreground text-sm">
-                  فريق تصميم محترف لمساعدتك في إنشاء تصاميم فريدة
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Package className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">تنوع المنتجات</h3>
-                <p className="text-muted-foreground text-sm">
-                  مجموعة واسعة من المنتجات لتلبية جميع احتياجاتك
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Seasonal Offers Section */}
-      <SeasonalOffersSection />
-
-      {/* Services Section */}
-      <ServicesSection />
-
-      {/* Main Categories Section */}
+ {/* Main Categories Section */}
       <section className="py-16 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 xl:px-6">
           <div className="text-center mb-12">
@@ -185,6 +124,55 @@ export default function Home() {
           )}
         </div>
       </section>
+      
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 xl:px-6">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">فئات المنتجات</h2>
+              <p className="text-muted-foreground">اختر من بين مجموعة واسعة من خدمات الطباعة</p>
+            </div>
+            <Button asChild variant="outline">
+              <Link to="/products">
+                عرض الكل
+                <ArrowLeft className="mr-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 @md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <div className="aspect-video bg-muted" />
+                  <CardContent className="p-4">
+                    <div className="h-6 bg-muted rounded mb-2" />
+                    <div className="h-4 bg-muted rounded w-2/3" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : categories.length > 0 ? (
+            <div className="grid grid-cols-1 @md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {categories.map((category) => (
+                <CategoryCard key={category.id} category={category} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">لا توجد فئات متاحة حالياً</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Seasonal Offers Section */}
+      <SeasonalOffersSection />
+
+      {/* Services Section */}
+      <ServicesSection />
+
+     
 
       <section className="py-16 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10">
         <div className="max-w-7xl mx-auto px-4 xl:px-6">
@@ -290,46 +278,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 xl:px-6">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">فئات المنتجات</h2>
-              <p className="text-muted-foreground">اختر من بين مجموعة واسعة من خدمات الطباعة</p>
-            </div>
-            <Button asChild variant="outline">
-              <Link to="/products">
-                عرض الكل
-                <ArrowLeft className="mr-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 @md:grid-cols-2 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <div className="aspect-video bg-muted" />
-                  <CardContent className="p-4">
-                    <div className="h-6 bg-muted rounded mb-2" />
-                    <div className="h-4 bg-muted rounded w-2/3" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : categories.length > 0 ? (
-            <div className="grid grid-cols-1 @md:grid-cols-2 xl:grid-cols-4 gap-6">
-              {categories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">لا توجد فئات متاحة حالياً</p>
-            </div>
-          )}
-        </div>
-      </section>
 
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 xl:px-6">
@@ -372,7 +320,59 @@ export default function Home() {
           )}
         </div>
       </section>
+<section className="py-16 bg-background">
+        <div className="max-w-7xl mx-auto px-4 xl:px-6">
+          <div className="grid grid-cols-1 @md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Printer className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">جودة عالية</h3>
+                <p className="text-muted-foreground text-sm">
+                  نستخدم أحدث تقنيات الطباعة لضمان أفضل النتائج
+                </p>
+              </CardContent>
+            </Card>
 
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">تسليم سريع</h3>
+                <p className="text-muted-foreground text-sm">
+                  نلتزم بمواعيد التسليم المحددة لجميع الطلبات
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">تصميم مخصص</h3>
+                <p className="text-muted-foreground text-sm">
+                  فريق تصميم محترف لمساعدتك في إنشاء تصاميم فريدة
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">تنوع المنتجات</h3>
+                <p className="text-muted-foreground text-sm">
+                  مجموعة واسعة من المنتجات لتلبية جميع احتياجاتك
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
       <section className="py-16 bg-secondary text-secondary-foreground">
         <div className="max-w-4xl mx-auto px-4 xl:px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">هل لديك مشروع خاص؟</h2>
