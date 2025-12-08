@@ -393,7 +393,7 @@ export default function EnhancedProductForm() {
 
   const handleSubmit = async () => {
     // Validation
-    if (!formData.title || !formData.description || !formData.price || !formData.category) {
+    if (!formData.title || !formData.price || !formData.category) {
       toast({
         title: 'خطأ',
         description: 'يرجى ملء جميع الحقول المطلوبة',
@@ -416,35 +416,49 @@ export default function EnhancedProductForm() {
     try {
       setSaving(true);
 
+      // Generate a unique slug
+      const generateSlug = () => {
+        const timestamp = Date.now();
+        const randomNum = Math.floor(Math.random() * 1000);
+        return `product-${timestamp}-${randomNum}`;
+      };
+
       // Prepare all images (main + additional)
-      const allImages = [formData.image_url, ...formData.images].filter(img => img);
+      const allImages = formData.images || [];
+      if (formData.image_url && !allImages.includes(formData.image_url)) {
+        allImages.unshift(formData.image_url);
+      }
 
       // Create or update product
       const productData = {
         name_ar: formData.title,
-        slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
-        description_ar: formData.description,
+        slug: generateSlug(), // Use unique slug instead of title
+        description_ar: formData.description || '',
         category_id: formData.category,
-        base_price: parseFloat(formData.price),
+        base_price: parseFloat(formData.price) || 0,
         image_url: formData.image_url || (allImages.length > 0 ? allImages[0] : ''),
-        images: allImages, // Send all images array
+        images: allImages,
         is_active: true,
         featured: false,
         min_quantity: 1,
         production_time_days: 3,
       };
 
+      console.log('Saving product data:', productData);
+
       let savedProductId = productId;
 
       if (productId) {
+        // Update existing product
         await api.updateProduct(productId, productData);
       } else {
+        // Create new product
         const newProduct = await api.createProduct(productData);
-        savedProductId = newProduct?.id;
+        savedProductId = newProduct.id;
       }
 
       if (!savedProductId) {
-        throw new Error('Failed to get product ID');
+        throw new Error('فشل في الحصول على معرف المنتج');
       }
 
       // Save quantity tiers
@@ -457,37 +471,43 @@ export default function EnhancedProductForm() {
         });
       }
 
-      // Save size options
+      // Save size options (only if there are valid ones)
       const validSizes = sizeOptions.filter(s => s.name);
-      await api.deleteAllProductSizeOptions(savedProductId);
-      for (const size of validSizes) {
-        await api.createProductSizeOption({
-          product_id: savedProductId,
-          name_ar: size.name,
-          price_addition: parseFloat(size.priceAddition) || 0,
-        });
+      if (validSizes.length > 0) {
+        await api.deleteAllProductSizeOptions(savedProductId);
+        for (const size of validSizes) {
+          await api.createProductSizeOption({
+            product_id: savedProductId,
+            name_ar: size.name,
+            price_addition: parseFloat(size.priceAddition) || 0,
+          });
+        }
       }
 
-      // Save material options
+      // Save material options (only if there are valid ones)
       const validMaterials = materialOptions.filter(m => m.name);
-      await api.deleteAllProductMaterialOptions(savedProductId);
-      for (const material of validMaterials) {
-        await api.createProductMaterialOption({
-          product_id: savedProductId,
-          name_ar: material.name,
-          price_addition: parseFloat(material.priceAddition) || 0,
-        });
+      if (validMaterials.length > 0) {
+        await api.deleteAllProductMaterialOptions(savedProductId);
+        for (const material of validMaterials) {
+          await api.createProductMaterialOption({
+            product_id: savedProductId,
+            name_ar: material.name,
+            price_addition: parseFloat(material.priceAddition) || 0,
+          });
+        }
       }
 
-      // Save side options
+      // Save side options (only if there are valid ones)
       const validSides = sideOptions.filter(s => s.name);
-      await api.deleteAllProductSideOptions(savedProductId);
-      for (const side of validSides) {
-        await api.createProductSideOption({
-          product_id: savedProductId,
-          name_ar: side.name,
-          price_addition: parseFloat(side.priceAddition) || 0,
-        });
+      if (validSides.length > 0) {
+        await api.deleteAllProductSideOptions(savedProductId);
+        for (const side of validSides) {
+          await api.createProductSideOption({
+            product_id: savedProductId,
+            name_ar: side.name,
+            price_addition: parseFloat(side.priceAddition) || 0,
+          });
+        }
       }
 
       toast({
@@ -496,11 +516,25 @@ export default function EnhancedProductForm() {
       });
 
       navigate('/admin/products');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving product:', error);
+      
+      let errorMessage = 'فشل حفظ المنتج';
+      
+      // Check for specific errors
+      if (error?.message?.includes('duplicate') || error?.message?.includes('unique') || error?.code === '23505') {
+        errorMessage = 'الرابط المختصر (Slug) مستخدم بالفعل. يرجى المحاولة مرة أخرى';
+      } else if (error?.message?.includes('foreign key') || error?.message?.includes('category') || error?.code === '23503') {
+        errorMessage = 'الفئة المحددة غير صالحة';
+      } else if (error?.message?.includes('null value') || error?.code === '23502') {
+        errorMessage = 'يرجى ملء جميع الحقول المطلوبة';
+      } else if (error?.message) {
+        errorMessage = `فشل حفظ المنتج: ${error.message}`;
+      }
+      
       toast({
         title: 'خطأ',
-        description: 'فشل حفظ المنتج',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -557,14 +591,13 @@ export default function EnhancedProductForm() {
             </div>
 
             <div>
-              <Label htmlFor="description">وصف المنتج *</Label>
+              <Label htmlFor="description">وصف المنتج</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 placeholder="اكتب وصفاً مفصلاً للمنتج أو الخدمة..."
                 rows={4}
-                required
               />
             </div>
 
@@ -577,7 +610,7 @@ export default function EnhancedProductForm() {
                   value={formData.price}
                   onChange={(e) => handleInputChange('price', e.target.value)}
                   placeholder="1500"
-                  
+                  required
                 />
               </div>
               <div>
@@ -664,25 +697,23 @@ export default function EnhancedProductForm() {
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 text-black">
+            <div className="space-y-4">
               {quantities.map((q, index) => (
-                <div key={index} className="flex items-center gap-3 p-4 border rounded-lg bg-gray-50">
+                <div key={index} className="flex items-center gap-3 p-4 border rounded-lg bg-muted/50">
                   <div className="flex-1">
                     <Label htmlFor={`quantity-${index}`}>الكمية *</Label>
                     <Input
-                      className="border-black"
                       id={`quantity-${index}`}
                       type="number"
                       placeholder="مثال: 100"
                       value={q.quantity}
                       onChange={(e) => handleQuantityChange(index, 'quantity', e.target.value)}
-                      
+                      required
                     />
                   </div>
                   <div className="flex-1">
                     <Label htmlFor={`price-${index}`}>السعر (ر.س) *</Label>
                     <Input
-                      className="border-black"
                       id={`price-${index}`}
                       type="number"
                       placeholder="مثال: 1500"
@@ -693,7 +724,7 @@ export default function EnhancedProductForm() {
                   </div>
                   <div className="w-32 text-center">
                     <Label>الإجمالي شامل الضريبة</Label>
-                    <div className="font-bold text-lg text-brand-yellow mt-1">
+                    <div className="font-bold text-lg text-primary mt-1">
                       {q.total > 0 ? `${q.total.toFixed(2)} ر.س` : '--'}
                     </div>
                   </div>
@@ -753,14 +784,16 @@ export default function EnhancedProductForm() {
                       className="w-32"
                     />
                     <span className="text-sm text-muted-foreground">ر.س</span>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeOption('size', i)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {sizeOptions.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => removeOption('size', i)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 <Button
@@ -800,14 +833,16 @@ export default function EnhancedProductForm() {
                       className="w-32"
                     />
                     <span className="text-sm text-muted-foreground">ر.س</span>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeOption('material', i)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {materialOptions.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => removeOption('material', i)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 <Button
@@ -847,14 +882,16 @@ export default function EnhancedProductForm() {
                       className="w-32"
                     />
                     <span className="text-sm text-muted-foreground">ر.س</span>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeOption('side', i)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {sideOptions.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => removeOption('side', i)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 <Button

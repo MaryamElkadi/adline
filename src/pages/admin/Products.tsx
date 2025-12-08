@@ -4,7 +4,6 @@ import { Plus, Pencil, Trash2, Search, X, ChevronDown, ChevronUp, Settings } fro
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-
 import {
   Table,
   TableBody,
@@ -106,6 +105,21 @@ export default function Products() {
     }
   };
 
+  // Helper function to generate slug from Arabic text
+  const generateSlug = (text: string): string => {
+    // Use timestamp-based slug for Arabic text since Arabic characters can't be used in URLs
+    const timestamp = Date.now();
+    const randomNum = Math.floor(Math.random() * 1000);
+    return `product-${timestamp}-${randomNum}`;
+  };
+
+  const handleGenerateSlug = () => {
+    if (formData.name_ar) {
+      const slug = generateSlug(formData.name_ar);
+      setFormData({ ...formData, slug });
+    }
+  };
+
   const handleOpenDialog = async (product?: Product) => {
     if (product) {
       setEditingProduct(product);
@@ -150,22 +164,76 @@ export default function Products() {
   };
 
   const handleSave = async () => {
+    // Validation
+    if (!formData.name_ar.trim()) {
+      toast({
+        title: 'خطأ',
+        description: 'يرجى إدخال اسم المنتج',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!formData.slug.trim()) {
+      toast({
+        title: 'خطأ',
+        description: 'يرجى إدخال الرابط المختصر (Slug)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!formData.category_id) {
+      toast({
+        title: 'خطأ',
+        description: 'يرجى اختيار الفئة',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
       let productId: string;
       
+      // Prepare product data (exclude selected_option_ids which is not part of Product type)
+      const { selected_option_ids, ...productData } = formData;
+      
+      // Convert empty string category_id to null (but validation should prevent this)
+      if (productData.category_id === '') {
+        console.warn('category_id is empty string, converting to null');
+        productData.category_id = null;
+      }
+      
+      // Ensure images is an array (not undefined)
+      if (!productData.images) {
+        productData.images = [];
+      }
+      
+      // Ensure all required fields are present
+      if (!productData.name_ar || !productData.slug) {
+        throw new Error('اسم المنتج والرابط المختصر مطلوبان');
+      }
+      
+      // Ensure numeric fields are numbers
+      productData.base_price = Number(productData.base_price) || 0;
+      productData.min_quantity = Number(productData.min_quantity) || 1;
+      productData.production_time_days = Number(productData.production_time_days) || 3;
+      
+      console.log('Saving product with data:', JSON.stringify(productData, null, 2));
+      
       if (editingProduct) {
-        await api.updateProduct(editingProduct.id, formData);
+        await api.updateProduct(editingProduct.id, productData);
         productId = editingProduct.id;
         toast({
-          title: 'Success',
-          description: 'Product updated successfully',
+          title: 'نجح',
+          description: 'تم تحديث المنتج بنجاح',
         });
       } else {
-        const newProduct = await api.createProduct(formData);
+        const newProduct = await api.createProduct(productData);
         productId = newProduct.id;
         toast({
-          title: 'Success',
-          description: 'Product created successfully',
+          title: 'نجح',
+          description: 'تم إضافة المنتج بنجاح',
         });
       }
       
@@ -190,11 +258,33 @@ export default function Products() {
       
       setDialogOpen(false);
       loadData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving product:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        formData: formData
+      });
+      
+      let errorMessage = 'فشل حفظ المنتج';
+      
+      // Check for specific errors
+      if (error?.message?.includes('duplicate') || error?.message?.includes('unique') || error?.code === '23505') {
+        errorMessage = 'الرابط المختصر (Slug) مستخدم بالفعل. يرجى استخدام رابط مختلف';
+      } else if (error?.message?.includes('foreign key') || error?.message?.includes('category') || error?.code === '23503') {
+        errorMessage = 'الفئة المحددة غير صالحة';
+      } else if (error?.message?.includes('null value') || error?.code === '23502') {
+        errorMessage = 'يرجى ملء جميع الحقول المطلوبة';
+      } else if (error?.message) {
+        // Show the actual error message for debugging
+        errorMessage = `فشل حفظ المنتج: ${error.message}`;
+      }
+      
       toast({
-        title: 'Error',
-        description: 'Failed to save product',
+        title: 'خطأ',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -355,55 +445,70 @@ export default function Products() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingProduct ? 'Edit Product' : 'Add Product'}</DialogTitle>
+            <DialogTitle>{editingProduct ? 'تعديل المنتج' : 'إضافة منتج جديد'}</DialogTitle>
             <DialogDescription>
-              {editingProduct ? 'Update product information' : 'Create a new product'}
+              {editingProduct ? 'تحديث معلومات المنتج' : 'إنشاء منتج جديد'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name_ar">Product Name (Arabic) *</Label>
+                <Label htmlFor="name_ar">اسم المنتج (بالعربية) *</Label>
                 <Input
                   id="name_ar"
                   value={formData.name_ar}
                   onChange={(e) => setFormData({ ...formData, name_ar: e.target.value })}
-                  placeholder="Enter product name"
+                  placeholder="أدخل اسم المنتج"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug *</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="slug">الرابط المختصر (Slug) *</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateSlug}
+                    disabled={!formData.name_ar}
+                  >
+                    توليد تلقائي
+                  </Button>
+                </div>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                   placeholder="product-slug"
+                  dir="ltr"
                 />
+                <p className="text-xs text-muted-foreground">
+                  الرابط المختصر يجب أن يكون فريداً ويستخدم في عنوان URL
+                </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description_ar">Description (Arabic)</Label>
+              <Label htmlFor="description_ar">الوصف (بالعربية)</Label>
               <Textarea
                 id="description_ar"
                 value={formData.description_ar}
                 onChange={(e) => setFormData({ ...formData, description_ar: e.target.value })}
-                placeholder="Enter product description"
+                placeholder="أدخل وصف المنتج"
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="category_id">Category</Label>
+                <Label htmlFor="category_id">الفئة *</Label>
                 <Select
                   value={formData.category_id}
                   onValueChange={(value) => setFormData({ ...formData, category_id: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="اختر الفئة" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -416,7 +521,7 @@ export default function Products() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="base_price">Base Price (SAR) *</Label>
+                <Label htmlFor="base_price">السعر الأساسي (ريال) *</Label>
                 <Input
                   id="base_price"
                   type="number"
@@ -429,7 +534,7 @@ export default function Products() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="min_quantity">Minimum Quantity *</Label>
+                <Label htmlFor="min_quantity">الحد الأدنى للكمية *</Label>
                 <Input
                   id="min_quantity"
                   type="number"
@@ -439,7 +544,7 @@ export default function Products() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="production_time_days">Production Time (Days) *</Label>
+                <Label htmlFor="production_time_days">مدة الإنتاج (أيام) *</Label>
                 <Input
                   id="production_time_days"
                   type="number"
@@ -450,7 +555,7 @@ export default function Products() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">Product Image</Label>
+              <Label htmlFor="image_url">صورة المنتج</Label>
               <ImageUpload
                 value={formData.image_url}
                 onChange={(url) => setFormData({ ...formData, image_url: url })}
@@ -459,14 +564,14 @@ export default function Products() {
             </div>
 
             <div className="space-y-2">
-              <Label>Product Options</Label>
+              <Label>خيارات المنتج</Label>
               <p className="text-sm text-muted-foreground mb-2">
-                Select which options customers can choose for this product
+                اختر الخيارات التي يمكن للعملاء الاختيار منها لهذا المنتج
               </p>
               <div className="border rounded-lg p-4 space-y-2 max-h-96 overflow-y-auto">
                 {optionTemplates.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No options available. Create options in Product Options page first.
+                    لا توجد خيارات متاحة. قم بإنشاء الخيارات في صفحة خيارات المنتج أولاً.
                   </p>
                 ) : (
                   optionTemplates.map((template) => {
@@ -586,10 +691,10 @@ export default function Products() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
+              إلغاء
             </Button>
             <Button onClick={handleSave}>
-              {editingProduct ? 'Update' : 'Create'}
+              {editingProduct ? 'تحديث' : 'إضافة'}
             </Button>
           </DialogFooter>
         </DialogContent>
