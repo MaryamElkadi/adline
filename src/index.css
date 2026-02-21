@@ -6,7 +6,179 @@
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
+/* --- TRULY INFINITE SCROLL --- */
+.scroller-container {
+  overflow: hidden;
+  width: 100%;
+}
 
+.scroller-mask {
+  /* Creates the fade-in/out effect on the edges */
+  mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+  -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+}
+
+.scroller-inner {
+  display: flex;
+  width: max-content; /* Critical: allows content to push width */
+  flex-wrap: nowrap;
+  gap: 3rem; /* Same as gap-12 in Tailwind */
+  animation: infinite-scroll var(--animation-duration, 30s) linear infinite;
+}
+
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Moves exactly half of the total doubled width */
+    transform: translateX(calc(-50% - 1.5rem)); 
+  }
+}
+
+/* Optional: pause on hover */
+.scroller-inner:hover {
+  animation-play-state: paused;
+}
+/* Wokine-style Drawing Animations */
+.svg-drawing-container {
+  filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.3));
+}
+
+.H-left-stroke, .H-right-stroke, .E-left-stroke, .L-one-long-stroke, .L-two-long-stroke {
+  stroke-dasharray: 124px;
+  stroke-dashoffset: 124px;
+  animation: draw-long 2s ease forwards;
+}
+
+.H-mid-stroke, .E-top-stroke, .E-mid-stroke, .E-bottom-stroke, .L-one-short-stroke, .L-two-short-stroke {
+  stroke-dasharray: 50px;
+  stroke-dashoffset: 50px;
+  animation: draw-short 1.5s ease forwards 0.5s; /* slight delay */
+}
+
+.O-stroke {
+  stroke-dasharray: 302px;
+  stroke-dashoffset: 302px;
+  animation: draw-long 2.5s ease forwards;
+}
+
+.red-dot-wokine {
+  stroke-width: 0;
+  stroke-linecap: round;
+  animation: grow-dot 0.5s ease-out forwards 1.8s;
+}
+/* Arabic Text Drawing Animation */
+.animate-draw-text {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-arabic-text 4s ease-in-out forwards;
+  filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.3));
+}
+
+@keyframes draw-arabic-text {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Optional: Fill the text color after drawing finishes */
+.fill-after-draw {
+  animation: fill-text 1.5s ease-out forwards 3s;
+}
+/* ProductCard.css */
+.uiverse-card {
+  width: 100%;
+  height: 380px;
+  /* تغيير الخلفية من #1a1a1a إلى شفافة */
+  background: transparent; 
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+
+.uiverse-img {
+  /* جعل الصورة تملأ الكارت بالكامل بدلاً من 60% */
+  height: 100%; 
+  width: 100%;
+  /* التأكد من أن الصورة تغطي المساحة بشكل جميل */
+  object-fit: cover; 
+  position: absolute;
+  transition: 0.4s ease-in-out;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+.uiverse-card:hover .uiverse-img {
+  /* جعل التكبير أوضح بدلاً من البلور القوي إذا كنت تفضل رؤية المنتج */
+  transform: scale(1.1);
+  filter: blur(4px); 
+  animation: floating-anim 3s infinite;
+}
+
+.uiverse-textBox {
+  /* صندوق النصوص يظهر فوق الصورة عند الهوفر */
+  background: rgba(0, 0, 0, 0.5); 
+  backdrop-filter: blur(2px); /* تأثير زجاجي خفيف */
+}
+
+.uiverse-textBox {
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: 0.3s ease-in-out;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6); /* خلفية داكنة لتسهيل القراءة عند الهوفر */
+  height: 100%;
+}
+
+.uiverse-card:hover .uiverse-textBox {
+  opacity: 1;
+}
+
+.uiverse-card:hover .uiverse-img {
+  height: 70%;
+  filter: blur(12px); /* تغبيش الصورة عند الهوفر */
+  animation: floating-anim 3s infinite;
+}
+
+@keyframes floating-anim {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.uiverse-card:hover {
+  transform: scale(1.05) rotate(-1deg);
+  border-color: #fbbf24; /* تغيير لون الحدود عند الهوفر إلى الأصفر */
+}
+
+/* تحسينات للنصوص */
+.uiverse-head { font-weight: bold; font-size: 1.2rem; color: #fff; }
+.uiverse-price { font-size: 1.1rem; color: #fbbf24; font-weight: bold; }
+.uiverse-desc { font-size: 0.8rem; color: #ccc; }
+@keyframes fill-text {
+  to {
+    fill: url(#textGradient);
+    stroke-width: 0;
+  }
+}
+@keyframes draw-long { to { stroke-dashoffset: 0; } }
+@keyframes draw-short { to { stroke-dashoffset: 0; } }
+@keyframes grow-dot { to { stroke-width: 44px; } }
 @layer base {
   :root {
     --radius: 0.5rem;
@@ -196,4 +368,52 @@ All colors MUST be HSL.
       opacity: 0.9;
     }
   }
+}
+/* تأثير الأيقونة والحقيبة (Tooltip Effect) */
+.category-icon-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.category-tooltip {
+  position: absolute;
+  top: 0;
+  font-size: 12px;
+  background: #fbbf24; /* لون أصفر متناسق مع تصميمك */
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.category-tooltip::before {
+  position: absolute;
+  content: "";
+  height: 8px;
+  width: 8px;
+  background: #fbbf24;
+  bottom: -3px;
+  left: 50%;
+  transform: translate(-50%) rotate(45deg);
+}
+
+.group:hover .category-tooltip {
+  top: -45px;
+  opacity: 1;
+  visibility: visible;
+}
+
+.group:hover .category-icon-wrapper {
+  background: #fbbf24 !important; /* يتغير لون الدائرة عند الهوفر */
+  color: #000 !important;
+  transform: scale(1.1);
 }

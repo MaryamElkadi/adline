@@ -140,18 +140,18 @@ export const api = {
     return Array.isArray(data) ? data : [];
   },
 
-  async getFeaturedProducts(): Promise<Product[]> {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .eq('featured', true)
-      .order('created_at', { ascending: false })
-      .limit(8);
-    
-    if (error) throw error;
-    return Array.isArray(data) ? data : [];
-  },
+async getFeaturedProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .eq('featured', true) // تأكد أن اسم العمود في سوبابيز 'featured' وليس 'is_featured'
+    .order('created_at', { ascending: false })
+    .limit(6); // تم التعديل من 8 إلى 6 بناءً على طلبك
+  
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+},
 
   async getProductBySlug(slug: string): Promise<ProductWithOptions | null> {
     const { data: product, error: productError } = await supabase
