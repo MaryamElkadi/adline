@@ -41,22 +41,29 @@ export default function Header() {
   return (
     <header className="bg-card shadow-md sticky top-0 z-50 border-b border-border">
       <nav className="max-w-7xl mx-auto px-4 xl:px-6">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">خ</span>
+        <div className="flex justify-between items-center h-20"> {/* Increased height slightly for logo clarity */}
+          
+          {/* Logo Section */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative w-12 h-12 overflow-hidden rounded-lg">
+              <img 
+                src="./logo.png" 
+                alt="خط الاعلان" 
+                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              />
             </div>
-            <span className="text-xl xl:text-2xl font-bold text-foreground">
-              خط الاعلان
-            </span>
+           <span className="text-xl xl:text-2xl font-bold tracking-tight bg-gradient-to-l from-[#FFD700] to-[#1E40AF] bg-clip-text text-transparent">
+  خط الاعلان
+</span>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden xl:flex items-center gap-6">
             {navigation.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 text-base font-medium rounded-md transition-smooth ${
+                className={`px-3 py-2 text-base font-medium rounded-md transition-all duration-200 ${
                   location.pathname === item.path
                     ? 'text-primary bg-primary/10'
                     : 'text-foreground hover:text-primary hover:bg-muted'
@@ -67,6 +74,7 @@ export default function Header() {
             ))}
           </div>
 
+          {/* Actions Section */}
           <div className="flex items-center gap-3">
             <Link to="/cart" className="relative">
               <Button variant="ghost" size="icon" className="relative">
@@ -95,13 +103,13 @@ export default function Header() {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="cursor-pointer">
+                    <Link to="/profile" className="cursor-pointer flex items-center w-full">
                       <User className="ml-2 h-4 w-4" />
                       الملف الشخصي
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/orders" className="cursor-pointer">
+                    <Link to="/orders" className="cursor-pointer flex items-center w-full">
                       <ShoppingCart className="ml-2 h-4 w-4" />
                       طلباتي
                     </Link>
@@ -110,7 +118,7 @@ export default function Header() {
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/admin" className="cursor-pointer">
+                        <Link to="/admin" className="cursor-pointer flex items-center w-full">
                           <LayoutDashboard className="ml-2 h-4 w-4" />
                           لوحة التحكم
                         </Link>
@@ -118,7 +126,7 @@ export default function Header() {
                     </>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                     <LogOut className="ml-2 h-4 w-4" />
                     تسجيل الخروج
                   </DropdownMenuItem>
@@ -141,8 +149,9 @@ export default function Header() {
           </div>
         </div>
 
+        {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden py-4 border-t border-border">
+          <div className="xl:hidden py-4 border-t border-border animate-in slide-in-from-top duration-300">
             <div className="flex flex-col gap-2">
               {navigation.map((item) => (
                 <Link

@@ -106,15 +106,17 @@ const loadData = async () => {
   className="relative z-10 max-w-7xl mx-auto px-4 xl:px-6 text-center text-white"
 >
   {/* H1 with a Gradient Effect */}
-  <h1 className="text-4xl xl:text-7xl font-bold mb-6 drop-shadow-lg bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-white to-blue-400 leading-tight">
+ <div className="px-4 text-center">
+  {/* Main Heading: Scaled from text-3xl (mobile) up to 7xl (xl screens) */}
+  <h1 className="text-3xl  md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 drop-shadow-lg bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-white to-blue-400 leading-[1.2] md:leading-tight ">
     خدمات الطباعة الاحترافية واللوحات الإعلانية
   </h1>
 
-  {/* Headline/Paragraph with a soft Blue-White tint */}
-  <p className="text-xl xl:text-2xl mb-12 max-w-3xl mx-auto text-blue-50/90 leading-relaxed">
+  {/* Sub-headline: Adjusted padding and max-width for readability on all screens */}
+  <p className="text-lg md:text-xl lg:text-2xl mb-8 md:mb-12 max-w-[90%] sm:max-w-2xl lg:max-w-3xl mx-auto text-blue-50/90 leading-relaxed">
     نقدم لكم أفضل خدمات الطباعة بجودة عالية وأسعار تنافسية من بطاقات الأعمال إلى التغليف المخصص.
   </p>
-
+</div>
   {/* --- INFINITE SCROLLER (Alternating Yellow & Blue) --- */}
   <div className="scroller scroller-mask relative mb-12 overflow-hidden border-y border-white/20 py-6">
     <div 
